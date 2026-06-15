@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Learning Paths | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Interactive Learning Platform</p>
+        <h1>Learn step by step, then build for the real world.</h1>
+        <p>Explore programming, web development, mobile, databases, cloud, cybersecurity, and AI paths with lessons, exercises, quizzes, notes, and projects.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form class="filter-bar" method="get" role="search">
+            <label class="sr-only" for="path-search">Search learning paths</label>
+            <input id="path-search" type="search" name="q" value="{{ search_query }}" placeholder="Search Python, JavaScript, cloud, AI...">
+            <label class="sr-only" for="path-category">Learning category</label>
+            <select id="path-category" name="category">
+                <option value="">All categories</option>
+                {% for value, label in categories %}
+                    <option value="{{ value }}" {% if active_category == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+
+        <div class="path-grid">
+            {% for path in paths %}
+                <article class="path-card">
+                    <p class="tag">{{ path.get_category_display }}</p>
+                    <h2><a href="{{ path.get_absolute_url }}">{{ path.title }}</a></h2>
+                    <p>{{ path.summary }}</p>
+                    <div class="meta-row">
+                        <span>{{ path.get_level_display }}</span>
+                        <span>{{ path.duration }}</span>
+                        <span>{{ path.lesson_count }} lessons</span>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-state">Learning paths will appear after they are added in Django Admin.</p>
+            {% endfor %}
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</section>
+{% endblock %}

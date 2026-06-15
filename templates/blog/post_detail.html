@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} | CodeSavannah Academy{% endblock %}
+{% block meta_description %}{{ post.excerpt }}{% endblock %}
+
+{% block content %}
+<section class="page-hero detail-hero">
+    <div class="container">
+        <p class="eyebrow">{{ post.get_category_display }}</p>
+        <h1>{{ post.title }}</h1>
+        <p>{{ post.excerpt }}</p>
+        <p class="post-meta">Published {{ post.date_published|date:"M d, Y" }}</p>
+    </div>
+</section>
+
+<section class="section">
+    <article class="container article-body">
+        {{ post.content|linebreaks }}
+    </article>
+</section>
+{% endblock %}

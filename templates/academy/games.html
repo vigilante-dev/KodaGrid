@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Coding Games | CodeSavannah Academy{% endblock %}
+{% block meta_description %}Sharpen your programming skills through fun coding games — typing races, bug fixing, code fill-ins, and tech quizzes at CodeSavannah Academy.{% endblock %}
+
+{% block content %}
+
+<section class="page-hero" style="background-image:linear-gradient(135deg,rgba(6,16,30,.96),rgba(5,150,105,.72)),url('{% static 'img/programming-languages.jpg' %}');background-size:cover;background-position:center;">
+    <div class="container">
+        <p class="eyebrow">Play & Learn</p>
+        <h1>Coding Games</h1>
+        <p>Race the clock, squash bugs, fill in the blanks, and ace the quiz. Learning through play is the fastest way to lock in what you know.</p>
+        <div class="hero-actions">
+            <a class="btn btn-accent btn-icon" href="#game-arena">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Play Now
+            </a>
+            <a class="btn light-ghost" href="#leaderboard">Leaderboard</a>
+        </div>
+    </div>
+</section>
+
+{# ── GAME TYPES ── #}
+<section class="section section-soft">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow">Four Challenges</p>
+                <h2>Pick your game and sharpen your skills</h2>
+            </div>
+        </div>
+        <div class="feature-grid">
+            <article class="feature-tile reveal reveal-delay-1" style="cursor:pointer;" onclick="document.getElementById('game-arena').scrollIntoView({behavior:'smooth'})">
+                <div class="feature-icon" style="font-size:1.8rem;">⌨️</div>
+                <h3>Code Typer</h3>
+                <p>Race the clock typing real code snippets. Builds muscle memory for syntax and improves coding speed.</p>
+                <span class="tag">Speed Challenge</span>
+            </article>
+            <article class="feature-tile reveal reveal-delay-2" style="cursor:pointer;" onclick="document.getElementById('game-arena').scrollIntoView({behavior:'smooth'})">
+                <div class="feature-icon" style="font-size:1.8rem;">🐛</div>
+                <h3>Bug Fixer</h3>
+                <p>Spot the bug before time runs out. Trains your eye to catch syntax errors, logic flaws, and typos.</p>
+                <span class="tag">Debugging</span>
+            </article>
+            <article class="feature-tile reveal reveal-delay-3" style="cursor:pointer;" onclick="document.getElementById('game-arena').scrollIntoView({behavior:'smooth'})">
+                <div class="feature-icon" style="font-size:1.8rem;">📝</div>
+                <h3>Code Fill-In</h3>
+                <p>Complete the missing keyword in a code snippet. Reinforces language fundamentals and vocabulary.</p>
+                <span class="tag">Vocabulary</span>
+            </article>
+            <article class="feature-tile reveal reveal-delay-4" style="cursor:pointer;" onclick="document.getElementById('game-arena').scrollIntoView({behavior:'smooth'})">
+                <div class="feature-icon" style="font-size:1.8rem;">🧠</div>
+                <h3>Tech Quiz</h3>
+                <p>Rapid-fire programming trivia across Python, JavaScript, HTML, SQL, and computer science fundamentals.</p>
+                <span class="tag">Trivia</span>
+            </article>
+        </div>
+    </div>
+</section>
+
+{# ── GAME ARENA ── #}
+<section class="section" id="game-arena">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow">Game Arena</p>
+                <h2>Select a challenge to begin</h2>
+            </div>
+        </div>
+        <div id="games-container" class="games-container reveal"></div>
+    </div>
+</section>
+
+{# ── LEADERBOARD ── #}
+<section class="section section-soft" id="leaderboard">
+    <div class="container" style="max-width:680px;">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow">Top Players</p>
+                <h2>This Week's Leaderboard</h2>
+            </div>
+        </div>
+        <div class="leaderboard-list reveal">
+            {% for entry in leaderboard %}
+            <div class="leaderboard-row reveal reveal-delay-{{ forloop.counter }}">
+                <span class="lb-rank">{{ entry.badge }}</span>
+                <span class="lb-name">{{ entry.name }}</span>
+                <span class="lb-score">{{ entry.score }} pts</span>
+            </div>
+            {% endfor %}
+        </div>
+        <p style="color:var(--muted);margin-top:22px;text-align:center;">Play any game to add your score. Leaderboard resets weekly.</p>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container cta-layout">
+        <h2>Ready to learn the real thing?</h2>
+        <a class="btn btn-accent" href="{% url 'academy:learning_paths' %}">Start Learning Paths</a>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof initGames === "function") {
+        initGames("#games-container");
+    }
+});
+</script>
+{% endblock %}

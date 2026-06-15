@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Board | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Career Center</p>
+        <h1>Internships, attachments, remote jobs, and freelance opportunities.</h1>
+        <p>Find entry points into the technology industry and build the experience that turns training into income.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form class="filter-bar" method="get" role="search">
+            <label class="sr-only" for="job-search">Search jobs</label>
+            <input id="job-search" type="search" name="q" value="{{ search_query }}" placeholder="Search role, company, or skill">
+            <label class="sr-only" for="job-type">Opportunity type</label>
+            <select id="job-type" name="type">
+                <option value="">All opportunities</option>
+                {% for value, label in job_types %}
+                    <option value="{{ value }}" {% if active_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+
+        <div class="card-grid">
+            {% for job in jobs %}
+                <article class="card">
+                    <div class="card-body">
+                        <p class="tag">{{ job.get_job_type_display }}</p>
+                        <h2>{{ job.title }}</h2>
+                        <p>{{ job.company }} · {{ job.location }}</p>
+                        <p>{{ job.description|truncatewords:26 }}</p>
+                        {% if job.deadline %}<p><strong>Deadline:</strong> {{ job.deadline }}</p>{% endif %}
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-state">No active opportunities match your search.</p>
+            {% endfor %}
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</section>
+{% endblock %}

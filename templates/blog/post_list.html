@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog and Resources | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Resources</p>
+        <h1>Guides, tutorials, and technology insights.</h1>
+        <p>Read articles for learners, parents, schools, and partners interested in digital skills and future careers.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form class="filter-bar" method="get" role="search">
+            <label class="sr-only" for="blog-search">Search posts</label>
+            <input id="blog-search" type="search" name="q" value="{{ search_query }}" placeholder="Search articles">
+            <label class="sr-only" for="blog-category">Blog category</label>
+            <select id="blog-category" name="category">
+                <option value="">All categories</option>
+                {% for value, label in categories %}
+                    <option value="{{ value }}" {% if active_category == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+
+        {% if featured_posts %}
+            <div class="featured-strip">
+                {% for post in featured_posts %}
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="card-grid">
+            {% for post in posts %}
+                <article class="card blog-card">
+                    <div class="card-body">
+                        <p class="tag">{{ post.get_category_display }}</p>
+                        <h2><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+                        <p>{{ post.excerpt }}</p>
+                        <div class="meta-row">
+                            <span>{{ post.date_published|date:"M d, Y" }}</span>
+                            <span>{% if post.author %}{{ post.author.get_full_name|default:post.author.username }}{% else %}CodeSavannah Team{% endif %}</span>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-state">No articles match your search.</p>
+            {% endfor %}
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</section>
+{% endblock %}

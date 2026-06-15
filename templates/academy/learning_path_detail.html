@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ path.title }} | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero detail-hero">
+    <div class="container">
+        <p class="eyebrow">{{ path.get_category_display }}</p>
+        <h1>{{ path.title }}</h1>
+        <p>{{ path.summary }}</p>
+        <div class="hero-actions">
+            {% with first=path.lessons.first %}
+            {% if first %}
+            <a class="btn btn-accent btn-icon" href="{% url 'academy:lesson' path.slug first.order %}">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Start Lesson 1
+            </a>
+            {% endif %}
+            {% endwith %}
+            <a class="btn btn-secondary" href="{% url 'academy:classroom' %}">Open Classroom</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        <div>
+            <h2 style="margin-top:0;">Lessons in this path</h2>
+            <div class="lesson-track">
+                {% for lesson in path.lessons.all %}
+                <section class="lesson-block">
+                    <span>Lesson {{ lesson.order }}</span>
+                    <h3>
+                        <a href="{% url 'academy:lesson' path.slug lesson.order %}" style="color:var(--text);">
+                            {{ lesson.title }}
+                        </a>
+                    </h3>
+                    <p>{{ lesson.objective }}</p>
+                    <div class="meta-row">
+                        <span>⏱️ {{ lesson.estimated_minutes }} min</span>
+                        {% if lesson.exercise_prompt %}<span>✏️ Exercise</span>{% endif %}
+                        {% if lesson.quiz_question %}<span>🧠 Quiz</span>{% endif %}
+                        {% if lesson.project_prompt %}<span>🚀 Project</span>{% endif %}
+                    </div>
+                    <a class="btn btn-ghost btn-small" href="{% url 'academy:lesson' path.slug lesson.order %}"
+                       style="margin-top:12px;display:inline-flex;">
+                        Open Lesson →
+                    </a>
+                </section>
+                {% empty %}
+                <p class="empty-state">Lessons will appear after this learning path is populated.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <aside class="side-panel" style="position:sticky;top:88px;">
+            <h2>Path Details</h2>
+            <dl class="detail-list">
+                <dt>Level</dt><dd>{{ path.get_level_display }}</dd>
+                <dt>Duration</dt><dd>{{ path.duration }}</dd>
+                <dt>Lessons</dt><dd>{{ path.lessons.count }}</dd>
+                <dt>Skills</dt><dd>{{ path.skill_stack }}</dd>
+            </dl>
+            <div style="margin-top:18px;display:grid;gap:10px;">
+                {% with first=path.lessons.first %}
+                {% if first %}
+                <a class="btn btn-accent btn-full" href="{% url 'academy:lesson' path.slug first.order %}">
+                    Start Learning
+                </a>
+                {% endif %}
+                {% endwith %}
+                <a class="btn btn-ghost btn-full" href="{% url 'academy:ai_mentor' %}">Ask Mentor AI</a>
+                <a class="btn btn-ghost btn-full" href="{% url 'academy:assessment' %}">Skill Assessment</a>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

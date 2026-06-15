@@ -1,0 +1,209 @@
+/* ============================================================
+   CodeSavannah Academy — Try it Yourself Editor
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+    --bg:         #1e1e2e;
+    --bg2:        #181825;
+    --surface:    #24273a;
+    --border:     #313244;
+    --text:       #cdd6f4;
+    --muted:      #6c7086;
+    --accent:     #00d4f5;
+    --green:      #04aa6d;
+    --green-dark: #028a57;
+    --red:        #f38ba8;
+    --font-mono:  "Cascadia Code","Fira Code","Consolas",monospace;
+    --header-h:   48px;
+    --status-h:   26px;
+}
+
+html, body { height: 100%; margin: 0; overflow: hidden; }
+
+.tryit-page {
+    display: flex; flex-direction: column;
+    height: 100vh;
+    background: var(--bg2);
+    color: var(--text);
+    font-family: var(--font-mono);
+}
+
+/* ── Header ── */
+.tryit-header {
+    flex-shrink: 0;
+    height: var(--header-h);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    z-index: 10;
+}
+
+.tryit-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 900; font-size: .9rem; color: var(--text);
+    flex-shrink: 0;
+}
+.tryit-logo-mark {
+    background: linear-gradient(135deg, #1341a8, #00d4f5);
+    color: #fff; padding: 3px 7px; border-radius: 5px;
+    font-size: .82rem;
+}
+.tryit-divider { color: var(--muted); }
+
+.tryit-header-controls {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tryit-lang-select {
+    padding: 5px 10px; border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg); color: var(--text);
+    font-family: var(--font-mono); font-size: .82rem;
+    cursor: pointer;
+}
+
+.tryit-btn {
+    padding: 6px 14px; border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg); color: var(--text);
+    font-family: var(--font-mono); font-size: .82rem; font-weight: 800;
+    cursor: pointer; text-decoration: none;
+    transition: background 160ms, border-color 160ms;
+    white-space: nowrap;
+}
+.tryit-btn:hover { background: var(--border); }
+
+.tryit-run-btn {
+    background: var(--green); color: #fff; border-color: var(--green);
+}
+.tryit-run-btn:hover { background: var(--green-dark); border-color: var(--green-dark); }
+
+.tryit-close-btn { color: var(--red); border-color: rgba(243,139,168,.3); }
+.tryit-close-btn:hover { background: rgba(243,139,168,.12); }
+
+/* ── Panes ── */
+.tryit-panes {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 4px 1fr;
+    overflow: hidden;
+}
+
+/* ── Editor pane ── */
+.tryit-editor-pane {
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+}
+
+.tryit-pane-label {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    font-size: .75rem; font-weight: 900; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .08em;
+    flex-shrink: 0;
+}
+.tryit-pane-hint { color: var(--muted); font-weight: 400; margin-left: auto; font-size: .72rem; }
+
+#editor-lang-badge {
+    padding: 2px 8px; border-radius: 4px;
+    background: var(--accent); color: var(--bg2);
+    font-size: .72rem; font-weight: 900;
+}
+
+.tryit-editor-wrapper {
+    flex: 1; display: flex; overflow: hidden; position: relative;
+}
+
+/* Line numbers */
+.tryit-line-numbers {
+    flex-shrink: 0; width: 44px; overflow: hidden;
+    padding: 12px 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    text-align: right;
+    pointer-events: none;
+    position: absolute; left: 0; top: 32px; bottom: 0;
+}
+.tryit-line-numbers span {
+    display: block; padding: 0 8px;
+    font-size: .82rem; line-height: 1.6;
+    color: var(--muted);
+}
+
+.tryit-editor {
+    flex: 1; resize: none; width: 100%; height: 100%;
+    padding: 12px 12px 12px 52px;
+    background: var(--bg2); color: var(--text);
+    font-family: var(--font-mono); font-size: .88rem; line-height: 1.6;
+    border: none; outline: none;
+    caret-color: var(--accent);
+    tab-size: 4;
+    white-space: pre;
+    overflow-x: auto; overflow-y: auto;
+    position: absolute; inset: 0; top: 32px;
+}
+.tryit-editor::selection { background: rgba(0,212,245,.22); }
+
+/* ── Resizer ── */
+.tryit-resizer {
+    background: var(--border);
+    cursor: col-resize;
+    transition: background 160ms;
+}
+.tryit-resizer:hover { background: var(--accent); }
+
+/* ── Output pane ── */
+.tryit-output-pane {
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--bg2);
+}
+
+.tryit-clear-btn {
+    margin-left: auto; padding: 2px 9px; border-radius: 4px;
+    border: 1px solid var(--border);
+    background: none; color: var(--muted);
+    font-size: .72rem; font-weight: 800; cursor: pointer;
+    transition: color 160ms;
+}
+.tryit-clear-btn:hover { color: var(--text); }
+
+.tryit-frame {
+    flex: 1; border: none; background: #fff;
+    display: block;
+}
+
+.tryit-console {
+    flex: 1; overflow-y: auto; padding: 12px;
+    display: flex; flex-direction: column; gap: 1px;
+}
+.tryit-console::-webkit-scrollbar { width: 5px; }
+.tryit-console::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+
+.tryit-console-line {
+    font-family: var(--font-mono); font-size: .86rem; line-height: 1.55;
+    padding: 1px 4px; border-radius: 3px;
+    white-space: pre-wrap; word-break: break-word;
+}
+
+/* ── Status bar ── */
+.tryit-statusbar {
+    flex-shrink: 0;
+    height: var(--status-h);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px;
+    background: #1341a8;
+    font-size: .76rem; font-weight: 700; color: rgba(255,255,255,.8);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .tryit-panes { grid-template-columns: 1fr; grid-template-rows: 1fr 4px 1fr; }
+    .tryit-resizer { cursor: row-resize; }
+    .tryit-header-controls { flex-wrap: wrap; }
+}

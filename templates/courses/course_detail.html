@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} | CodeSavannah Academy{% endblock %}
+{% block meta_description %}{{ course.description|truncatewords:24 }}{% endblock %}
+
+{% block content %}
+<section class="page-hero detail-hero">
+    <div class="container">
+        <p class="eyebrow">{{ course.get_category_display }}</p>
+        <h1>{{ course.title }}</h1>
+        <p>{{ course.description }}</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="{% url 'accounts:register' %}">Enroll Now</a>
+            <a class="btn btn-secondary" href="{% url 'contact:contact' %}">Ask a Question</a>
+            {% if learning_path %}
+            <a class="btn btn-accent" href="{{ learning_path.get_absolute_url }}">
+                <i class="bi bi-play-circle-fill"></i> Start Learning
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        <article class="rich-text">
+            <h2>What you will learn</h2>
+            {% if course.outcome_list %}
+                <ul class="check-list">
+                    {% for outcome in course.outcome_list %}
+                        <li>{{ outcome }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {{ course.learning_outcomes|linebreaks }}
+            {% endif %}
+
+            <h2>Requirements</h2>
+            {{ course.requirements|default:"No previous experience is required. Curiosity and commitment are enough to begin."|linebreaks }}
+
+            <h2>Certification</h2>
+            {{ course.certification_details|default:"Students receive a certificate of completion and portfolio guidance after meeting project requirements."|linebreaks }}
+
+            {# ── LESSONS & NOTES ── #}
+            {% if learning_path %}
+            <section class="cd-lessons-section">
+                <h2 style="display:flex;align-items:center;gap:10px;margin-top:40px;">
+                    <i class="bi bi-journal-bookmark-fill" style="color:var(--accent);"></i>
+                    Course Lessons &amp; Notes
+                </h2>
+                <p style="color:var(--muted);margin-bottom:20px;">
+                    {{ learning_path.lessons.count }} lesson{{ learning_path.lessons.count|pluralize }} ·
+                    {{ learning_path.level|capfirst }} · {{ learning_path.duration }}
+                </p>
+                <div class="cd-lesson-list">
+                    {% for lesson in learning_path.lessons.all %}
+                    <a class="cd-lesson-row" href="{% url 'academy:lesson' learning_path.slug lesson.order %}">
+                        <span class="cd-lesson-num">{{ lesson.order }}</span>
+                        <div class="cd-lesson-info">
+                            <strong>{{ lesson.title }}</strong>
+                            <span class="cd-lesson-meta">
+                                <i class="bi bi-clock"></i> ~{{ lesson.estimated_minutes }} min
+                                {% if lesson.notes %} · <i class="bi bi-sticky-fill"></i> Notes{% endif %}
+                                {% if lesson.exercise_prompt %} · <i class="bi bi-terminal-fill"></i> Exercise{% endif %}
+                                {% if lesson.quiz_question %} · <i class="bi bi-patch-question-fill"></i> Quiz{% endif %}
+                            </span>
+                        </div>
+                        <i class="bi bi-chevron-right cd-lesson-arrow"></i>
+                    </a>
+                    {% endfor %}
+                </div>
+                <div style="margin-top:20px;">
+                    <a class="btn btn-primary" href="{{ learning_path.get_absolute_url }}">
+                        <i class="bi bi-play-fill"></i> Open Full Learning Path
+                    </a>
+                </div>
+            </section>
+            {% else %}
+            <section class="cd-lessons-section cd-lessons-empty">
+                <h2 style="display:flex;align-items:center;gap:10px;margin-top:40px;">
+                    <i class="bi bi-journal-bookmark-fill" style="color:var(--accent);"></i>
+                    Course Lessons &amp; Notes
+                </h2>
+                <div class="empty-state" style="margin-top:16px;">
+                    <i class="bi bi-hourglass-split" style="font-size:2rem;color:var(--muted);"></i>
+                    <p>Lessons for this course are being prepared. <a href="{% url 'accounts:register' %}">Enroll now</a> to be notified when they're ready.</p>
+                </div>
+            </section>
+            {% endif %}
+        </article>
+
+        <aside class="side-panel" aria-label="Course summary">
+            <h2>Course Details</h2>
+            <dl class="detail-list">
+                <dt>Duration</dt>
+                <dd>{{ course.duration }}</dd>
+                <dt>Skill Level</dt>
+                <dd>{{ course.get_level_display }}</dd>
+                <dt>Instructor</dt>
+                <dd>{{ course.instructor }}</dd>
+                <dt>Category</dt>
+                <dd>{{ course.get_category_display }}</dd>
+                {% if learning_path %}
+                <dt>Lessons</dt>
+                <dd>{{ learning_path.lessons.count }} lesson{{ learning_path.lessons.count|pluralize }}</dd>
+                {% endif %}
+            </dl>
+            {% if learning_path %}
+            <a class="btn btn-primary" style="width:100%;margin-top:18px;justify-content:center;" href="{{ learning_path.get_absolute_url }}">
+                <i class="bi bi-play-circle-fill"></i> Start Learning Now
+            </a>
+            {% endif %}
+            <a class="btn btn-ghost" style="width:100%;margin-top:10px;justify-content:center;" href="{% url 'accounts:register' %}">
+                <i class="bi bi-person-plus"></i> Enroll in Course
+            </a>
+        </aside>
+    </div>
+</section>
+
+<style>
+.cd-lessons-section { border-top: 1px solid var(--border); padding-top: 16px; }
+.cd-lesson-list { display: flex; flex-direction: column; gap: 4px; }
+.cd-lesson-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border-radius: var(--radius-lg);
+    border: 1px solid var(--border); background: var(--surface);
+    text-decoration: none; color: var(--text);
+    transition: background 150ms, border-color 150ms, transform 150ms;
+}
+.cd-lesson-row:hover {
+    background: var(--surface-soft); border-color: var(--accent);
+    transform: translateX(4px); color: var(--text);
+}
+.cd-lesson-num {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; font-weight: 900; font-size: .82rem;
+    display: grid; place-items: center;
+}
+.cd-lesson-info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.cd-lesson-info strong { font-size: .95rem; }
+.cd-lesson-meta { font-size: .78rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cd-lesson-meta i { font-size: .82rem; }
+.cd-lesson-arrow { color: var(--muted); font-size: .85rem; flex-shrink: 0; transition: color 150ms; }
+.cd-lesson-row:hover .cd-lesson-arrow { color: var(--accent); }
+</style>
+{% endblock %}

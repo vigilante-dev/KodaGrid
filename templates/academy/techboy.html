@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TechBoy — Code Warriors | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+{# ── HERO ── #}
+<section class="tb-hero">
+    <div class="tb-hero-bg" aria-hidden="true">
+        <img src="{% static 'img/developer-coding-web-tech.jpg' %}" alt="">
+        <img src="{% static 'img/a-btech-students_-computerscience-is-one-of-the-.jpg' %}" alt="">
+    </div>
+    <div class="container tb-hero-content">
+        <p class="eyebrow" style="color:#67e8f9;" data-i18n="tb_eyebrow">Tech&nbsp;Boy&nbsp;·&nbsp;CodeSavannah Academy</p>
+        <h1 class="tb-headline">
+            <span data-i18n="tb_title1">Code It.</span><br>
+            <span data-i18n="tb_title2">Build It.</span><br>
+            <span data-i18n="tb_title3">Ship It.</span>
+        </h1>
+        <p class="hero-lede" style="color:rgba(255,255,255,.85);" data-i18n="tb_sub">Every great product started with one developer who refused to stop. Python, robotics, cybersecurity, AI — pick your battlefield and dominate it.</p>
+        <div class="hero-actions">
+            <a class="btn tb-btn-primary" href="{% url 'accounts:register' %}" data-i18n="tb_btn_join">Join Code Warriors</a>
+            <a class="btn light-ghost" href="{% url 'academy:assessment' %}" data-i18n="tb_btn_assess">Test Your Level</a>
+        </div>
+        <div class="hero-code-strip">
+            <span>git commit -m "start here"</span>
+            <span>while True: keep_building()</span>
+            <span>chmod 777 your_future</span>
+        </div>
+    </div>
+</section>
+
+{# ── MARQUEE ── #}
+<div class="tb-marquee-wrap">
+    <div class="tb-marquee">
+        {% for rm in role_models %}<span class="tb-marquee-item">▶ {{ rm.name }}</span>{% endfor %}
+        {% for rm in role_models %}<span class="tb-marquee-item">▶ {{ rm.name }}</span>{% endfor %}
+    </div>
+</div>
+
+{# ── PROGRAMS ── #}
+<section class="section tb-programs-section">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow" style="color:var(--accent);" data-i18n="tb_programs_eyebrow">Warrior Programs</p>
+                <h2 data-i18n="tb_programs_title">Choose your mission. Execute with precision.</h2>
+            </div>
+            <a class="text-link" href="{% url 'courses:list' %}" data-i18n="btn_all_courses">All courses →</a>
+        </div>
+        <div class="feature-grid">
+            {% for p in programs %}
+            <article class="tb-program-tile cs-clickable-card reveal reveal-delay-{{ forloop.counter }}" data-href="{% url 'courses:detail' p.course_slug %}">
+                <div class="tb-prog-icon"><i class="bi bi-{{ p.icon }}"></i></div>
+                <h3>{{ p.title }}</h3>
+                <p>{{ p.desc }}</p>
+                <a class="btn tb-btn-ghost btn-small" href="{% url 'courses:detail' p.course_slug %}">
+                    <i class="bi bi-arrow-right-circle"></i> <span data-i18n="btn_start_course">Start Course</span>
+                </a>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── IMAGE MOSAIC ── #}
+<section class="section" style="padding-top:0;">
+    <div class="container">
+        <div class="photo-mosaic reveal">
+            {% for img in boy_images|slice:":5" %}
+                {% if forloop.counter == 1 %}<figure class="pm-wide">
+                {% elif forloop.counter == 2 %}<figure class="pm-tall">
+                {% elif forloop.counter == 3 %}<figure class="pm-short">
+                {% elif forloop.counter == 4 %}<figure class="pm-wide2">
+                {% else %}<figure class="pm-short2">{% endif %}
+                    <img src="{{ img.image.url }}" alt="{{ img.caption|default:'Coder' }}" loading="lazy">
+                </figure>
+            {% empty %}
+                <figure class="pm-wide"><img src="{% static 'img/developer-coding-web-tech.jpg' %}" alt="Developer coding" loading="lazy"></figure>
+                <figure class="pm-tall"><img src="{% static 'img/a-btech-students_-computerscience-is-one-of-the-.jpg' %}" alt="Computer science students" loading="lazy"></figure>
+                <figure class="pm-short"><img src="{% static 'img/every-programming-language-works-best-when-paired-.jpg' %}" alt="Programming languages" loading="lazy"></figure>
+                <figure class="pm-wide2"><img src="{% static 'img/1009791547717492270.jpg' %}" alt="Student life" loading="lazy"></figure>
+                <figure class="pm-short2"><img src="{% static 'img/985795805950795933.jpg' %}" alt="Coding club" loading="lazy"></figure>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── ROLE MODELS ── #}
+<section class="section" style="background:linear-gradient(135deg,#06101e,#0c1a2e,#0e2040);color:#fff;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:url('{% static 'img/every-programming-language-works-best-when-paired-.jpg' %}') center/cover;opacity:.06;" aria-hidden="true"></div>
+    <div class="container" style="position:relative;">
+        <div class="section-heading reveal" style="color:#fff;">
+            <div>
+                <p class="eyebrow" style="color:#67e8f9;" data-i18n="tb_rm_eyebrow">Legends of Code</p>
+                <h2 style="color:#fff;" data-i18n="tb_rm_title">They started where you are right now.</h2>
+            </div>
+        </div>
+        <div class="card-grid">
+            {% for rm in role_models %}
+            <article class="tb-rolemodel-card reveal reveal-delay-{{ forloop.counter }}">
+                <div class="tb-rm-initial">{{ rm.name|slice:":1" }}</div>
+                <h3>{{ rm.name }}</h3>
+                <p class="tb-rm-role">{{ rm.role }}</p>
+                <p style="color:rgba(255,255,255,.65);font-size:.9rem;">{{ rm.fact }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── CHALLENGES ── #}
+<section class="section tb-challenges-section">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow" style="color:var(--accent);" data-i18n="tb_challenges_eyebrow">Active Challenges</p>
+                <h2 data-i18n="tb_challenges_title">Compete. Win. Get recognised.</h2>
+            </div>
+            <a class="text-link" href="{% url 'academy:community' %}">All challenges →</a>
+        </div>
+        <div class="tb-challenge-list">
+            {% for ch in challenges %}
+            <div class="tb-challenge-row reveal reveal-delay-{{ forloop.counter }}">
+                <div class="tb-ch-icon">🏆</div>
+                <div class="tb-ch-info">
+                    <strong>{{ ch.title }}</strong>
+                    <span>Prize: {{ ch.prize }}</span>
+                </div>
+                <span class="tag" style="margin:0;">{{ ch.difficulty }}</span>
+                <a class="btn tb-btn-primary btn-small" href="{% url 'academy:community' %}">Enter</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── SCROLL IMAGE STRIP ── #}
+<section style="padding:40px 0;overflow:hidden;background:var(--surface-soft);">
+    <div class="tb-image-strip">
+        {% for img in boy_images|slice:":8" %}
+        <figure><img src="{{ img.image.url }}" alt="{{ img.caption|default:'Tech warrior' }}" loading="lazy"></figure>
+        {% empty %}
+        <figure><img src="{% static 'img/developer-coding-web-tech.jpg' %}" alt="Developer coding" loading="lazy"></figure>
+        <figure><img src="{% static 'img/a-btech-students_-computerscience-is-one-of-the-.jpg' %}" alt="Computer science" loading="lazy"></figure>
+        <figure><img src="{% static 'img/1009791547717492270.jpg' %}" alt="Student life" loading="lazy"></figure>
+        <figure><img src="{% static 'img/1108659633299476683.jpg' %}" alt="Tech students" loading="lazy"></figure>
+        <figure><img src="{% static 'img/1109363320798836086.jpg' %}" alt="Academy" loading="lazy"></figure>
+        <figure><img src="{% static 'img/12877548933121465.jpg' %}" alt="Student coding" loading="lazy"></figure>
+        <figure><img src="{% static 'img/985795805950795933.jpg' %}" alt="Coding club" loading="lazy"></figure>
+        <figure><img src="{% static 'img/985795805951891255.jpg' %}" alt="Tech program" loading="lazy"></figure>
+        {% endfor %}
+    </div>
+</section>
+
+{# ── CTA ── #}
+<section class="tb-cta">
+    <div class="container" style="text-align:center;">
+        <p class="eyebrow" style="justify-content:center;color:#67e8f9;" data-i18n="tb_cta_eyebrow">Your Mission Starts Now</p>
+        <h2 style="color:#fff;font-size:2.8rem;margin:0 0 14px;" data-i18n="tb_cta_title">Ready to become a Code Warrior?</h2>
+        <p style="color:rgba(255,255,255,.72);font-size:1.1rem;margin-bottom:28px;" data-i18n="tb_cta_body">Join thousands of boys across Africa building software, robots, games, and careers through CodeSavannah Academy.</p>
+        <a class="btn tb-btn-primary" href="{% url 'accounts:register' %}" data-i18n="tb_cta_btn">Enrol Now — Free Starter Track</a>
+    </div>
+</section>
+{% endblock %}

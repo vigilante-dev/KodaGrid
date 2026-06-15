@@ -1,0 +1,46 @@
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <section>
+            <a class="brand footer-brand" href="{% url 'core:home' %}">
+                <span class="brand-mark">CS</span>
+                <span>CodeSavannah Academy</span>
+            </a>
+            <p data-i18n="footer_tagline">Preparing African learners for software careers, digital entrepreneurship, and responsible innovation.</p>
+            <div class="social-links" aria-label="Social media">
+                <a href="#" aria-label="LinkedIn">in</a>
+                <a href="#" aria-label="X">x</a>
+                <a href="#" aria-label="Instagram">ig</a>
+                <a href="#" aria-label="YouTube">yt</a>
+            </div>
+        </section>
+        <section>
+            <h2 data-i18n="footer_programs_heading">Programs</h2>
+            <a href="{% url 'academy:learning_paths' %}" data-i18n="footer_learning_paths">Learning Paths</a>
+            <a href="{% url 'courses:list' %}?category=web-development" data-i18n="footer_web_dev">Web Development</a>
+            <a href="{% url 'courses:list' %}?category=ai-machine-learning" data-i18n="footer_ai">Artificial Intelligence</a>
+            <a href="{% url 'courses:list' %}?category=cybersecurity" data-i18n="footer_cybersec">Cybersecurity</a>
+        </section>
+        <section>
+            <h2 data-i18n="footer_academy_heading">Academy</h2>
+            <a href="{% url 'core:about' %}" data-i18n="footer_about">About Us</a>
+            <a href="{% url 'academy:techgirl' %}" data-i18n="footer_techgirl_prog">TechGirl Program</a>
+            <a href="{% url 'academy:techboy' %}" data-i18n="footer_techboy_prog">TechBoy Program</a>
+            <a href="{% url 'academy:robotics' %}" data-i18n="footer_robotics">Robotics</a>
+            <a href="{% url 'academy:assessment' %}" data-i18n="footer_assessment">Skill Assessment</a>
+            <a href="{% url 'academy:high_school' %}" data-i18n="footer_highschool_div">High School Division</a>
+            <a href="{% url 'academy:college' %}" data-i18n="footer_college_div">College Division</a>
+            <a href="{% url 'academy:fees' %}" data-i18n="footer_fees">Fees</a>
+            <a href="{% url 'academy:ai_mentor' %}" data-i18n="footer_ai_mentor">Mentor AI</a>
+            <a href="{% url 'contact:contact' %}" data-i18n="footer_contact_link">Contact</a>
+        </section>
+        <section>
+            <h2 data-i18n="footer_contact_heading">Contact</h2>
+            <p>Innovation Drive, Nairobi</p>
+            <p><a href="mailto:hello@codesavannah.local">hello@codesavannah.local</a></p>
+            <p><a href="tel:+254700000000">+254 700 000 000</a></p>
+        </section>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} CodeSavannah Academy. <span data-i18n="footer_built_for">Built for future-ready learners.</span></p>
+    </div>
+</footer>

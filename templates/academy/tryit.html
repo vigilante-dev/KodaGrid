@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Try it Yourself — CodeSavannah Academy</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/tryit.css' %}">
+</head>
+<body class="tryit-page">
+
+<header class="tryit-header">
+    <div class="tryit-logo">
+        <span class="tryit-logo-mark">CS</span>
+        <span>CodeSavannah</span>
+        <span class="tryit-divider">|</span>
+        <span id="tryit-lang-label">HTML Editor</span>
+    </div>
+    <div class="tryit-header-controls">
+        <select class="tryit-lang-select" id="tryit-lang-select">
+            <option value="html">HTML / CSS / JS</option>
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript Only</option>
+            <option value="css">CSS Preview</option>
+            <option value="sql">SQL</option>
+            <option value="scratch">Scratch Ideas</option>
+        </select>
+        <button class="tryit-btn tryit-run-btn" id="tryit-run">▶ Run</button>
+        <button class="tryit-btn tryit-reset-btn" id="tryit-reset">⟳ Reset</button>
+        <button class="tryit-btn tryit-copy-btn" id="tryit-copy">📋 Copy</button>
+        <a class="tryit-btn tryit-close-btn" href="javascript:history.back()">✕ Close</a>
+    </div>
+</header>
+
+<div class="tryit-panes">
+    {# ── CODE EDITOR ── #}
+    <div class="tryit-editor-pane">
+        <div class="tryit-pane-label">
+            <span id="editor-lang-badge">HTML</span>
+            EDITOR
+            <span class="tryit-pane-hint">Tab = 4 spaces</span>
+        </div>
+        <div class="tryit-line-numbers" id="line-numbers" aria-hidden="true"></div>
+        <textarea class="tryit-editor" id="tryit-editor"
+            spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+            placeholder="Write your code here…"></textarea>
+    </div>
+
+    <div class="tryit-resizer" id="tryit-resizer"></div>
+
+    {# ── OUTPUT PANEL ── #}
+    <div class="tryit-output-pane">
+        <div class="tryit-pane-label">
+            <span id="output-pane-label">RESULT</span>
+            <button class="tryit-clear-btn" id="tryit-clear">Clear</button>
+        </div>
+        <iframe class="tryit-frame" id="tryit-frame" sandbox="allow-scripts allow-same-origin" title="Output"></iframe>
+        <div class="tryit-console" id="tryit-console" style="display:none;"></div>
+    </div>
+</div>
+
+<div class="tryit-statusbar">
+    <span id="tryit-status">Ready</span>
+    <span id="tryit-cursor-pos">Ln 1, Col 1</span>
+</div>
+
+<script>
+(function () {
+    const DEFAULT_CODE = {
+        html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            padding: 32px;
+            color: #1e293b;
+        }
+        h1 { color: #1341a8; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.1);
+            max-width: 480px;
+        }
+        .btn {
+            background: #00d4f5;
+            color: #06101e;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .btn:hover { background: #059669; color: white; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Hello, CodeSavannah! 🚀</h1>
+        <p>Edit this code and click <strong>Run</strong> to see the result.</p>
+        <button class="btn" onclick="this.textContent='You clicked it!'">
+            Click Me
+        </button>
+    </div>
+</body>
+</html>`,
+
+        python: `# CodeSavannah Python Editor
+# Click Run to execute your Python code
+
+def greet(name):
+    return f"Hello, {name}! Welcome to CodeSavannah."
+
+students = ["Amara", "Brian", "Grace", "Kofi"]
+
+for student in students:
+    print(greet(student))
+
+# Calculate the sum of first 10 numbers
+total = sum(range(1, 11))
+print(f"\\nSum of 1 to 10 = {total}")
+
+# List comprehension
+squares = [x**2 for x in range(1, 6)]
+print(f"Squares: {squares}")`,
+
+        javascript: `// CodeSavannah JavaScript Editor
+// Click Run to execute
+
+const students = [
+    { name: "Amara", score: 92 },
+    { name: "Brian", score: 78 },
+    { name: "Grace", score: 95 },
+    { name: "Kofi",  score: 85 },
+];
+
+// Display each student
+students.forEach(s => {
+    console.log(\`\${s.name}: \${s.score}%\`);
+});
+
+// Find highest score
+const top = students.reduce((a, b) => a.score > b.score ? a : b);
+console.log(\`\\nTop student: \${top.name} (\${top.score}%)\`);
+
+// Filter students with A grade
+const aStudents = students.filter(s => s.score >= 90);
+console.log(\`A students: \${aStudents.map(s => s.name).join(", ")}\`);`,
+
+        css: `/* CodeSavannah CSS Editor */
+/* Edit the CSS and click Run to see the styled preview */
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #06101e, #0c2340);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.card h1 {
+    color: #1341a8;
+    font-size: 1.8rem;
+    margin: 0 0 12px;
+}
+
+.card p {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.badge {
+    display: inline-block;
+    background: #00d4f5;
+    color: #06101e;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-top: 16px;
+}`,
+
+        sql: `-- CodeSavannah SQL Editor
+-- This shows SQL syntax. Connect to a real DB to run it.
+
+-- Create a students table
+CREATE TABLE students (
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(150) NOT NULL,
+    email      VARCHAR(200) UNIQUE,
+    grade      VARCHAR(20),
+    gpa        DECIMAL(3,2),
+    enrolled   DATE DEFAULT CURRENT_DATE
+);
+
+-- Insert sample data
+INSERT INTO students (name, email, grade, gpa) VALUES
+    ('Amara Osei',  'amara@cs.ac',  'Form 3', 3.85),
+    ('Brian Mwangi','brian@cs.ac',  'Form 4', 3.62),
+    ('Grace Njeri', 'grace@cs.ac',  'Form 2', 3.91),
+    ('Kofi Asante', 'kofi@cs.ac',   'Form 1', 3.70);
+
+-- Query: students with GPA above average
+SELECT name, grade, gpa
+FROM students
+WHERE gpa > (SELECT AVG(gpa) FROM students)
+ORDER BY gpa DESC;`,
+
+        scratch: `# Scratch Block Program Ideas
+# This shows what your Scratch program will do
+
+== SPRITE: Cat ==
+
+WHEN green flag clicked:
+    SET x TO -200
+    SET y TO 0
+    REPEAT 10 TIMES:
+        MOVE 20 STEPS
+        NEXT COSTUME
+        WAIT 0.1 SECONDS
+    END REPEAT
+    SAY "I made it!" FOR 2 SECONDS
+
+WHEN space key pressed:
+    PLAY SOUND "Meow"
+    CHANGE SIZE BY 20
+    WAIT 0.5 SECONDS
+    CHANGE SIZE BY -20
+
+WHEN this sprite clicked:
+    CHANGE COLOR EFFECT BY 25`,
+    };
+
+    const editorEl   = document.getElementById('tryit-editor');
+    const frameEl    = document.getElementById('tryit-frame');
+    const consoleEl  = document.getElementById('tryit-console');
+    const runBtn     = document.getElementById('tryit-run');
+    const resetBtn   = document.getElementById('tryit-reset');
+    const copyBtn    = document.getElementById('tryit-copy');
+    const clearBtn   = document.getElementById('tryit-clear');
+    const langSel    = document.getElementById('tryit-lang-select');
+    const statusEl   = document.getElementById('tryit-status');
+    const cursorEl   = document.getElementById('tryit-cursor-pos');
+    const lineNums   = document.getElementById('line-numbers');
+    const editorBadge= document.getElementById('editor-lang-badge');
+    const outputLbl  = document.getElementById('output-pane-label');
+    const titleLbl   = document.getElementById('tryit-lang-label');
+
+    /* ── Determine initial language ── */
+    const urlLang    = new URLSearchParams(location.search).get('lang') || 'html';
+    langSel.value    = ['html','python','javascript','css','sql','scratch'].includes(urlLang) ? urlLang : 'html';
+
+    function setLang(lang) {
+        const isWeb = ['html','css','javascript'].includes(lang);
+        editorEl.value        = DEFAULT_CODE[lang] || DEFAULT_CODE.html;
+        editorBadge.textContent = lang.toUpperCase();
+        outputLbl.textContent   = isWeb ? 'RESULT' : 'OUTPUT';
+        titleLbl.textContent    = `${lang.toUpperCase()} Editor`;
+        frameEl.style.display   = isWeb ? 'block' : 'none';
+        consoleEl.style.display = isWeb ? 'none'  : 'flex';
+        updateLineNumbers();
+    }
+
+    setLang(langSel.value);
+
+    langSel.addEventListener('change', () => {
+        setLang(langSel.value);
+        runCode();
+    });
+
+    /* ── Run code ── */
+    function runCode() {
+        const lang = langSel.value;
+        const code = editorEl.value;
+        setStatus('Running…');
+
+        if (lang === 'html') {
+            frameEl.srcdoc = code;
+        } else if (lang === 'javascript') {
+            frameEl.srcdoc = `<!DOCTYPE html><html><head><style>
+body{font-family:monospace;padding:16px;background:#1e1e2e;color:#cdd6f4}
+.output-line{padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.err{color:#f38ba8}
+</style></head><body><div id="out"></div><script>
+const out=document.getElementById('out');
+const origLog=console.log,origErr=console.error;
+function addLine(t,cls=''){const d=document.createElement('div');d.className='output-line'+(cls?' '+cls:'');d.textContent=typeof t==='object'?JSON.stringify(t,null,2):String(t);out.appendChild(d);}
+console.log=(...a)=>a.forEach(x=>addLine(x));
+console.error=(...a)=>a.forEach(x=>addLine(x,'err'));
+window.onerror=(msg,src,l)=>{addLine('Error: '+msg,'err');return true};
+try{${code}}catch(e){addLine('Error: '+e,'err')}
+<\/script></body></html>`;
+            frameEl.style.display   = 'block';
+            consoleEl.style.display = 'none';
+        } else if (lang === 'css') {
+            frameEl.srcdoc = `<!DOCTYPE html><html><head><style>${code}</style></head><body>
+<h1>CSS Preview</h1><p class="intro">Edit the CSS on the left to style this page.</p>
+<div class="card"><p>I am a card element.</p></div>
+<button class="btn">A button</button>
+<span class="badge">Badge</span>
+</body></html>`;
+        } else if (lang === 'python') {
+            runPython(code);
+        } else if (lang === 'sql') {
+            showSqlPreview(code);
+        } else if (lang === 'scratch') {
+            showScratchPreview(code);
+        }
+
+        setStatus('Done');
+        setTimeout(() => setStatus('Ready'), 1200);
+    }
+
+    function showSqlPreview(code) {
+        consoleEl.innerHTML = '';
+        consoleEl.style.display = 'flex';
+        frameEl.style.display   = 'none';
+        const lines = code.split('\n');
+        addConsoleLine('-- SQL Editor (connect a DB to execute for real)', '#6366f1', true);
+        addConsoleLine('', '');
+        lines.forEach(l => {
+            const isComment = l.trim().startsWith('--');
+            addConsoleLine(l, isComment ? '#6b7280' : '#a5f3fc');
+        });
+        addConsoleLine('', '');
+        addConsoleLine('✅ Syntax looks valid. Use PostgreSQL / SQLite to run.', '#4ade80');
+    }
+
+    function showScratchPreview(code) {
+        consoleEl.innerHTML = '';
+        consoleEl.style.display = 'flex';
+        frameEl.style.display   = 'none';
+        addConsoleLine('🐱 Scratch Program Planner', '#f0abfc', true);
+        addConsoleLine('────────────────────────────', '#374151');
+        code.split('\n').forEach(l => {
+            const color = l.startsWith('==') ? '#fbbf24' : l.startsWith('WHEN') ? '#10b981' : l.startsWith('#') ? '#6b7280' : '#e2e8f0';
+            addConsoleLine(l, color);
+        });
+        addConsoleLine('', '');
+        addConsoleLine('▸ Open scratch.mit.edu to build this with blocks!', '#f0abfc');
+    }
+
+    /* ── Pyodide Python runner ── */
+    let pyodide = null;
+
+    async function runPython(code) {
+        consoleEl.innerHTML     = '';
+        consoleEl.style.display = 'flex';
+        frameEl.style.display   = 'none';
+
+        addConsoleLine('⏳ Loading Python… (first run ~5s)', '#6b7280');
+
+        if (!pyodide) {
+            try {
+                if (!window.loadPyodide) {
+                    await new Promise((res, rej) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js';
+                        s.onload = res; s.onerror = rej;
+                        document.head.appendChild(s);
+                    });
+                }
+                pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/' });
+            } catch {
+                consoleEl.innerHTML = '';
+                addConsoleLine('⚠️ Could not load Python runtime. Check your internet connection.', '#f87171');
+                return;
+            }
+        }
+
+        consoleEl.innerHTML = '';
+        try {
+            pyodide.setStdout({ batched: msg => addConsoleLine(msg, '#86efac') });
+            pyodide.setStderr({ batched: msg => addConsoleLine(msg, '#f87171') });
+            await pyodide.runPythonAsync(code);
+            if (!consoleEl.children.length) addConsoleLine('(Program finished with no output)', '#6b7280');
+        } catch (err) {
+            addConsoleLine('Error: ' + err.message, '#f38ba8');
+        }
+    }
+
+    function addConsoleLine(text, color, bold) {
+        const el = document.createElement('div');
+        el.className   = 'tryit-console-line';
+        el.textContent = text;
+        if (color) el.style.color = color;
+        if (bold)  el.style.fontWeight = '900';
+        consoleEl.appendChild(el);
+    }
+
+    /* ── Line numbers ── */
+    function updateLineNumbers() {
+        const count = editorEl.value.split('\n').length;
+        lineNums.innerHTML = Array.from({length: count}, (_, i) => `<span>${i + 1}</span>`).join('');
+    }
+
+    editorEl.addEventListener('input', updateLineNumbers);
+    editorEl.addEventListener('scroll', () => { lineNums.scrollTop = editorEl.scrollTop; });
+
+    /* ── Cursor position ── */
+    editorEl.addEventListener('keyup', updateCursor);
+    editorEl.addEventListener('click', updateCursor);
+    function updateCursor() {
+        const text = editorEl.value.substring(0, editorEl.selectionStart);
+        const lines = text.split('\n');
+        cursorEl.textContent = `Ln ${lines.length}, Col ${lines[lines.length - 1].length + 1}`;
+    }
+
+    /* ── Tab key ── */
+    editorEl.addEventListener('keydown', e => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const s = editorEl.selectionStart;
+            editorEl.value = editorEl.value.substring(0, s) + '    ' + editorEl.value.substring(s);
+            editorEl.selectionStart = editorEl.selectionEnd = s + 4;
+            updateLineNumbers();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runCode();
+    });
+
+    /* ── Buttons ── */
+    runBtn.addEventListener('click', runCode);
+    resetBtn.addEventListener('click', () => { setLang(langSel.value); runCode(); });
+    clearBtn.addEventListener('click', () => { consoleEl.innerHTML = ''; frameEl.srcdoc = ''; });
+    copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(editorEl.value).then(() => {
+            copyBtn.textContent = '✅ Copied!';
+            setTimeout(() => { copyBtn.textContent = '📋 Copy'; }, 1800);
+        });
+    });
+
+    /* ── Resizer ── */
+    const resizer = document.getElementById('tryit-resizer');
+    let dragging = false;
+    resizer.addEventListener('mousedown', e => { dragging = true; e.preventDefault(); });
+    document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        const panes = document.querySelector('.tryit-panes');
+        const rect  = panes.getBoundingClientRect();
+        const pct   = ((e.clientX - rect.left) / rect.width) * 100;
+        const clamped = Math.max(20, Math.min(80, pct));
+        panes.style.gridTemplateColumns = `${clamped}fr 4px ${100 - clamped}fr`;
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+
+    /* ── Status ── */
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    /* ── Auto run on load ── */
+    updateLineNumbers();
+    runCode();
+})();
+</script>
+</body>
+</html>

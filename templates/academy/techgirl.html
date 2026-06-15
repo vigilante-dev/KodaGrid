@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TechGirl — She Codes | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+{# ── HERO ── #}
+<section class="tg-hero">
+    <div class="tg-hero-bg" aria-hidden="true">
+        <img src="{% static 'img/she-believed-in-herself-so-she-learned-to-code-.jpg' %}" alt="">
+        <img src="{% static 'img/she-believed-in-herself-so-she-learned-to-code-1-.jpg' %}" alt="">
+    </div>
+    <div class="container tg-hero-content">
+        <p class="eyebrow" style="color:#f9a8d4;" data-i18n="tg_eyebrow">Tech&nbsp;Girl&nbsp;·&nbsp;CodeSavannah Academy</p>
+        <h1 class="tg-headline">
+            <span data-i18n="tg_title1">She Learns.</span><br>
+            <span data-i18n="tg_title2">She Builds.</span><br>
+            <span data-i18n="tg_title3">She Leads.</span>
+        </h1>
+        <p class="hero-lede" style="color:rgba(255,255,255,.85);" data-i18n="tg_sub">Technology is not just for boys. Girls who code change the world — from AI research to startup founding to cybersecurity. Your journey starts here.</p>
+        <div class="hero-actions">
+            <a class="btn tg-btn-primary" href="{% url 'accounts:register' %}" data-i18n="tg_btn_join">Join TechGirl Program</a>
+            <a class="btn light-ghost" href="{% url 'academy:assessment' %}" data-i18n="tg_btn_assess">Find Your Level</a>
+        </div>
+    </div>
+    <div class="tg-hero-quote" aria-hidden="true">
+        <span>"She believed she could, so she did."</span>
+    </div>
+</section>
+
+{# ── ROLE MODELS MARQUEE ── #}
+<div class="tg-marquee-wrap">
+    <div class="tg-marquee">
+        {% for rm in role_models %}<span class="tg-marquee-item">✦ {{ rm.name }}</span>{% endfor %}
+        {% for rm in role_models %}<span class="tg-marquee-item">✦ {{ rm.name }}</span>{% endfor %}
+    </div>
+</div>
+
+{# ── PROGRAMS ── #}
+<section class="section tg-programs-section">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow" style="color:#ec4899;" data-i18n="tg_programs_eyebrow">Programs for Girls</p>
+                <h2 data-i18n="tg_programs_title">Choose your path. Build your future.</h2>
+            </div>
+            <a class="text-link" href="{% url 'courses:list' %}" data-i18n="tg_explore_all">Explore all courses →</a>
+        </div>
+        <div class="feature-grid">
+            {% for p in programs %}
+            <article class="tg-program-tile cs-clickable-card reveal reveal-delay-{{ forloop.counter }}" data-href="{% url 'courses:detail' p.course_slug %}">
+                <div class="tg-prog-icon"><i class="bi bi-{{ p.icon }}"></i></div>
+                <h3>{{ p.title }}</h3>
+                <p>{{ p.desc }}</p>
+                <a class="btn tg-btn-ghost btn-small" href="{% url 'courses:detail' p.course_slug %}">
+                    <i class="bi bi-arrow-right-circle"></i> <span data-i18n="btn_explore_course">Explore Course</span>
+                </a>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── PHOTO GALLERY ── #}
+<section class="section tg-gallery-section">
+    <div class="container">
+        <p class="eyebrow" style="color:#ec4899;justify-content:center;display:flex;" data-i18n="tg_gallery_eyebrow">Gallery</p>
+        <h2 style="text-align:center;margin:0 0 32px;" data-i18n="tg_gallery_title">Girls coding, leading, and inspiring.</h2>
+        <div class="tg-photo-grid">
+            {% for img in girls_images %}
+            <figure class="tg-photo-item tg-photo-{{ forloop.counter }}">
+                <img src="{{ img.image.url }}" alt="{{ img.caption|default:img.title }}" loading="lazy">
+                <figcaption>{{ img.caption|default:img.title }}</figcaption>
+            </figure>
+            {% empty %}
+            <figure class="tg-photo-item tg-photo-1">
+                <img src="{% static 'img/she-believed-in-herself-so-she-learned-to-code-.jpg' %}" alt="She believed in herself" loading="lazy">
+                <figcaption>She believed — she coded</figcaption>
+            </figure>
+            <figure class="tg-photo-item tg-photo-2">
+                <img src="{% static 'img/she-believed-in-herself-so-she-learned-to-code-1-.jpg' %}" alt="She learned to code" loading="lazy">
+                <figcaption>From learner to builder</figcaption>
+            </figure>
+            <figure class="tg-photo-item tg-photo-3">
+                <img src="{% static 'img/for-anyone-who-has-ever-said-_oh-i-could-never-.jpg' %}" alt="Anyone can code" loading="lazy">
+                <figcaption>You can do this</figcaption>
+            </figure>
+            <figure class="tg-photo-item tg-photo-4">
+                <img src="{% static 'img/1056938606280062030.jpg' %}" alt="Student coding" loading="lazy">
+                <figcaption>In the zone</figcaption>
+            </figure>
+            <figure class="tg-photo-item tg-photo-5">
+                <img src="{% static 'img/1086774953853235185.jpg' %}" alt="Tech workshop" loading="lazy">
+                <figcaption>Tech workshop</figcaption>
+            </figure>
+            <figure class="tg-photo-item tg-photo-6">
+                <img src="{% static 'img/2251868556035681.jpg' %}" alt="Coding community" loading="lazy">
+                <figcaption>Community first</figcaption>
+            </figure>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── ROLE MODELS ── #}
+<section class="section" style="background:linear-gradient(135deg,#1e0a2e,#3b0764,#1e1b4b);color:#fff;">
+    <div class="container">
+        <div class="section-heading reveal" style="color:#fff;">
+            <div>
+                <p class="eyebrow" style="color:#f0abfc;" data-i18n="tg_rm_eyebrow">Women Who Changed Tech</p>
+                <h2 style="color:#fff;" data-i18n="tg_rm_title">They were told it wasn't for them. They did it anyway.</h2>
+            </div>
+        </div>
+        <div class="card-grid">
+            {% for rm in role_models %}
+            <article class="tg-rolemodel-card reveal reveal-delay-{{ forloop.counter }}">
+                <div class="tg-rm-initial">{{ rm.name|slice:":1" }}</div>
+                <h3>{{ rm.name }}</h3>
+                <p class="tg-rm-role">{{ rm.role }}</p>
+                <p style="color:rgba(255,255,255,.7);font-size:.9rem;">{{ rm.fact }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── SCHOLARSHIPS ── #}
+<section class="section tg-scholarships">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow" style="color:#ec4899;" data-i18n="tg_scholarship_eyebrow">Financial Support</p>
+                <h2 data-i18n="tg_scholarship_title">Scholarships open to you right now</h2>
+            </div>
+        </div>
+        <div class="tg-scholarship-list">
+            {% for s in scholarships %}
+            <div class="tg-scholarship-row reveal reveal-delay-{{ forloop.counter }}">
+                <div class="tg-s-icon">🎓</div>
+                <div>
+                    <strong>{{ s.org }}</strong>
+                    <span>{{ s.value }}</span>
+                </div>
+                <span class="tag" style="background:rgba(236,72,153,.12);color:#db2777;margin:0;">{{ s.region }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── INSPIRATION QUOTE ── #}
+<section class="tg-quote-section">
+    <div class="container">
+        <figure class="tg-big-quote reveal">
+            <blockquote>"The question isn't who's going to let me; it's who is going to stop me."</blockquote>
+            <figcaption>— Ayn Rand · Adopted by girls in tech everywhere</figcaption>
+        </figure>
+    </div>
+</section>
+
+{# ── FULL IMAGE WALL ── #}
+<section class="section" style="padding-top:0;overflow:hidden;">
+    <div class="tg-image-strip">
+        {% for img in girls_images|slice:":8" %}
+        <figure><img src="{{ img.image.url }}" alt="{{ img.caption|default:'Girl coder' }}" loading="lazy"></figure>
+        {% empty %}
+        <figure><img src="{% static 'img/she-believed-in-herself-so-she-learned-to-code-.jpg' %}" alt="She codes" loading="lazy"></figure>
+        <figure><img src="{% static 'img/she-believed-in-herself-so-she-learned-to-code-1-.jpg' %}" alt="She leads" loading="lazy"></figure>
+        <figure><img src="{% static 'img/for-anyone-who-has-ever-said-_oh-i-could-never-.jpg' %}" alt="You can code" loading="lazy"></figure>
+        <figure><img src="{% static 'img/1056938606280062030.jpg' %}" alt="Coding session" loading="lazy"></figure>
+        <figure><img src="{% static 'img/1086774953853235185.jpg' %}" alt="Tech students" loading="lazy"></figure>
+        <figure><img src="{% static 'img/442478732162453794.jpg' %}" alt="Academy life" loading="lazy"></figure>
+        <figure><img src="{% static 'img/519673244530066505.jpg' %}" alt="Tech class" loading="lazy"></figure>
+        <figure><img src="{% static 'img/625226360815216025.jpg' %}" alt="Hackathon" loading="lazy"></figure>
+        {% endfor %}
+    </div>
+</section>
+
+{# ── CTA ── #}
+<section class="tg-cta">
+    <div class="container" style="text-align:center;">
+        <p class="eyebrow" style="justify-content:center;color:#f0abfc;" data-i18n="tg_cta_eyebrow">Your Time Is Now</p>
+        <h2 style="color:#fff;font-size:2.8rem;margin:0 0 14px;" data-i18n="tg_cta_title">Ready to become a TechGirl?</h2>
+        <p style="color:rgba(255,255,255,.72);font-size:1.1rem;margin-bottom:28px;" data-i18n="tg_cta_body">Join thousands of girls in Africa building their future through code, robotics, AI, and creativity.</p>
+        <a class="btn tg-btn-primary" href="{% url 'accounts:register' %}" data-i18n="btn_start_free">Start Your Journey — It's Free</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}High School Division | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero" style="background-image:linear-gradient(135deg,rgba(6,16,30,.94),rgba(5,150,105,.72)),url('{% static 'img/students-coding.jpg' %}');background-size:cover;background-position:center top;">
+    <div class="container">
+        <p class="eyebrow" data-i18n="hs_eyebrow">High School Division</p>
+        <h1>Clubs, camps, competitions,<br>and confidence for future builders.</h1>
+        <p>CodeSavannah supports high school learners with age-appropriate coding, robotics, leadership, entrepreneurship, and mentorship programs.</p>
+    </div>
+</section>
+
+{# ── BOYS / GIRLS PROGRAM PANELS ── #}
+<section class="section">
+    <div class="container two-column" style="align-items:stretch;">
+        {# Boys Program #}
+        <div class="program-image-panel reveal reveal-left">
+            <img src="{% static 'img/programming-languages.jpg' %}" alt="Boys coding and STEM program" loading="lazy">
+            <div class="program-panel-overlay">
+                <p class="eyebrow" style="color:var(--accent);">Boys Program</p>
+                <h3>STEM confidence through building and leadership.</h3>
+                <ul class="check-list" style="margin-top:12px;">
+                    {% for item in boys_focus %}<li>{{ item }}</li>{% endfor %}
+                </ul>
+                <a class="btn btn-accent btn-small" href="{% url 'accounts:register' %}" style="margin-top:18px;">Join the Program</a>
+            </div>
+        </div>
+        {# Girls Program #}
+        <div class="program-image-panel reveal reveal-right">
+            <img src="{% static 'img/girls-program.jpg' %}" alt="Girls in technology program" loading="lazy">
+            <div class="program-panel-overlay">
+                <p class="eyebrow" style="color:#f9a8d4;">Girls Program</p>
+                <h3>Mentorship, scholarships, and pathways for women in tech.</h3>
+                <ul class="check-list" style="margin-top:12px;">
+                    {% for item in girls_focus %}<li>{{ item }}</li>{% endfor %}
+                </ul>
+                <a class="btn btn-small" style="background:#ec4899;color:#fff;margin-top:18px;display:inline-flex;padding:8px 16px;border-radius:8px;font-weight:800;" href="{% url 'accounts:register' %}">She Leads Tech</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ── INSPIRATION QUOTE ROW ── #}
+<section style="background:var(--secondary);color:#fff;padding:48px 0;">
+    <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;">
+        <div class="reveal reveal-left">
+            <figure style="margin:0;border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-lg);">
+                <img src="{% static 'img/girls-inspire.jpg' %}" alt="She believed in herself, so she learned to code" loading="lazy" style="width:100%;height:360px;object-fit:cover;">
+            </figure>
+        </div>
+        <div class="reveal reveal-right">
+            <p class="eyebrow">Girls in Tech</p>
+            <h2 style="color:#fff;font-size:2.2rem;line-height:1.2;">She believed in herself, so she learned to code.</h2>
+            <p style="color:rgba(255,255,255,.72);font-size:1.1rem;margin-top:14px;">Our Girls in Tech program creates a safe, encouraging space where young women discover programming, build confidence, access scholarships, and connect with mentors who look like them.</p>
+            <a class="btn btn-accent" href="{% url 'accounts:register' %}" style="margin-top:22px;display:inline-flex;">Apply for Girls Program</a>
+        </div>
+    </div>
+</section>
+
+{# ── FEATURE TILES ── #}
+<section class="section section-soft">
+    <div class="container feature-grid">
+        <article class="feature-tile cs-clickable-card reveal reveal-delay-1" data-href="{% url 'courses:list' %}">
+            <div class="feature-icon"><i class="bi bi-code-slash"></i></div>
+            <h3><a class="tile-link" href="{% url 'courses:list' %}" data-i18n="hs_coding_clubs">Coding Clubs</a></h3>
+            <p data-i18n="hs_coding_clubs_body">Weekly school clubs with guided lessons, peer demos, and practical challenges — designed to fit into any school timetable.</p>
+        </article>
+        <article class="feature-tile cs-clickable-card reveal reveal-delay-2" data-href="{% url 'academy:learning_paths' %}">
+            <div class="feature-icon"><i class="bi bi-sun-fill"></i></div>
+            <h3><a class="tile-link" href="{% url 'academy:learning_paths' %}" data-i18n="hs_holiday_camps">Holiday Camps</a></h3>
+            <p data-i18n="hs_holiday_camps_body">Immersive bootcamps for web, robotics, Python, AI, and digital creativity during school breaks.</p>
+        </article>
+        <article class="feature-tile cs-clickable-card reveal reveal-delay-3" data-href="{% url 'academy:community' %}">
+            <div class="feature-icon"><i class="bi bi-trophy-fill"></i></div>
+            <h3><a class="tile-link" href="{% url 'academy:community' %}" data-i18n="hs_competitions">Competitions</a></h3>
+            <p data-i18n="hs_competitions_body">Hackathons and robotics challenges that reward teamwork and problem solving. Win prizes and recognition.</p>
+        </article>
+        <article class="feature-tile cs-clickable-card reveal reveal-delay-4" data-href="{% url 'academy:trainers' %}">
+            <div class="feature-icon"><i class="bi bi-person-hearts"></i></div>
+            <h3><a class="tile-link" href="{% url 'academy:trainers' %}" data-i18n="hs_mentorship">Mentorship</a></h3>
+            <p data-i18n="hs_mentorship_body">Role models help learners see clear paths into technology careers. One-on-one and group mentorship available.</p>
+        </article>
+    </div>
+</section>
+
+{# ── DATA / INSPIRATION IMAGE ROW ── #}
+<section class="section" style="padding-top:0;">
+    <div class="container">
+        <div class="image-wall">
+            <figure>
+                <img src="{% static 'img/bg-data.jpg' %}" alt="Data and analytics learning" loading="lazy">
+            </figure>
+            <figure>
+                <img src="{% static 'img/hero-coding.jpg' %}" alt="Coding environment" loading="lazy">
+            </figure>
+            <figure>
+                <img src="{% static 'img/inspiration-coding.jpg' %}" alt="Coding inspiration" loading="lazy">
+            </figure>
+            <figure>
+                <img src="{% static 'img/community-coding.jpg' %}" alt="Community coding" loading="lazy">
+            </figure>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container cta-layout">
+        <h2>Build your future. Start coding today.</h2>
+        <a class="btn btn-accent" href="{% url 'accounts:register' %}">Join High School Program</a>
+    </div>
+</section>
+{% endblock %}

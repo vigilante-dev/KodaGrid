@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Skills Assessment | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero" style="background:linear-gradient(135deg,rgba(6,16,30,.97),rgba(5,150,105,.72)),url('{% static 'img/bg-data.jpg' %}') center/cover;">
+    <div class="container">
+        <p class="eyebrow">Personalised Learning</p>
+        <h1>Discover Your Level</h1>
+        <p>Answer 15 quick questions. We'll gauge your logical reasoning, tech knowledge, and learning style — then build a personalised study plan just for you.</p>
+        <div class="hero-actions">
+            <a class="btn btn-accent btn-icon" href="#assessment-form">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Start Assessment
+            </a>
+        </div>
+    </div>
+</section>
+
+{# ── WHAT YOU'LL GET ── #}
+<section class="section section-soft">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow">Personalised Roadmap</p>
+                <h2>After 15 questions you'll receive</h2>
+            </div>
+        </div>
+        <div class="feature-grid">
+            <article class="feature-tile reveal reveal-delay-1">
+                <div class="feature-icon">🧠</div>
+                <h3>Skill Level</h3>
+                <p>Explorer, Beginner, Intermediate, Advanced, or Expert — matched to your answers and reasoning ability.</p>
+            </article>
+            <article class="feature-tile reveal reveal-delay-2">
+                <div class="feature-icon">🗺️</div>
+                <h3>Learning Path</h3>
+                <p>Three recommended courses in the right order for your current level and stated interests.</p>
+            </article>
+            <article class="feature-tile reveal reveal-delay-3">
+                <div class="feature-icon">📚</div>
+                <h3>Book Picks</h3>
+                <p>Three curated books — with a note on exactly why each one is right for where you are right now.</p>
+            </article>
+            <article class="feature-tile reveal reveal-delay-4">
+                <div class="feature-icon">🎯</div>
+                <h3>Revision Tips</h3>
+                <p>Study strategies matched to your learning style — visual, kinesthetic, reading, or auditory.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+{# ── FORM ── #}
+<section class="section" id="assessment-form">
+    <div class="container" style="max-width:780px;">
+
+        {% if existing_assessment %}
+        <div class="assess-retake-banner reveal">
+            <p>You already completed an assessment — your level is <strong>{{ existing_assessment.get_skill_level_display }}</strong>.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+                <a class="btn btn-accent btn-small" href="{% url 'academy:assessment_result' %}">View My Results</a>
+                <span style="color:var(--muted);font-size:.9rem;align-self:center;">or retake below to update your profile</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="post" id="quiz-form" class="assessment-form reveal">
+            {% csrf_token %}
+
+            {# progress bar #}
+            <div class="assess-progress">
+                <div class="assess-progress-bar">
+                    <div class="assess-progress-fill" id="assess-fill" style="width:0%"></div>
+                </div>
+                <span class="assess-progress-label" id="assess-label">Question 1 of {{ total_questions }}</span>
+            </div>
+
+            {% for q_id, category, question, options, correct_idx, points in questions %}
+            <div class="assess-question {% if not forloop.first %}hidden{% endif %}" data-qnum="{{ forloop.counter }}" data-qid="{{ q_id }}">
+                <div class="assess-q-meta">
+                    <span class="assess-cat-badge assess-cat-{{ category }}">
+                        {% if category == 'logic' %}🧩 Logic
+                        {% elif category == 'math' %}📐 Math
+                        {% elif category == 'tech' %}💻 Tech
+                        {% elif category == 'problem' %}🔧 Problem Solving
+                        {% else %}🎭 About You{% endif %}
+                    </span>
+                    <span class="assess-pts">{% if points %}+{{ points }} pts{% else %}Personalises your plan{% endif %}</span>
+                </div>
+                <h3 class="assess-q-text">{{ question }}</h3>
+                <div class="assess-options">
+                    {% for option in options %}
+                    <label class="assess-option">
+                        <input type="radio" name="{{ q_id }}" value="{{ forloop.counter0 }}" required>
+                        <span class="assess-option-letter">{{ forloop.counter0|add:0 | stringformat:"s" | cut:"0"|default:"A" }}
+                            {# Simple A/B/C/D label #}
+                            {% if forloop.counter == 1 %}A{% elif forloop.counter == 2 %}B{% elif forloop.counter == 3 %}C{% else %}D{% endif %}
+                        </span>
+                        <span class="assess-option-text">{{ option }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="assess-nav">
+                    {% if not forloop.first %}
+                    <button type="button" class="btn btn-ghost btn-small assess-prev">← Back</button>
+                    {% else %}
+                    <span></span>
+                    {% endif %}
+                    {% if forloop.last %}
+                    <button type="submit" class="btn btn-accent assess-submit">See My Results 🚀</button>
+                    {% else %}
+                    <button type="button" class="btn btn-primary btn-small assess-next">Next →</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+</section>
+
+<script>
+(function () {
+    const form       = document.getElementById("quiz-form");
+    const fill       = document.getElementById("assess-fill");
+    const label      = document.getElementById("assess-label");
+    const questions  = Array.from(form.querySelectorAll(".assess-question"));
+    const total      = questions.length;
+    let current      = 0;
+
+    function showQ(idx) {
+        questions.forEach((q, i) => q.classList.toggle("hidden", i !== idx));
+        fill.style.width  = ((idx / total) * 100) + "%";
+        label.textContent = `Question ${idx + 1} of ${total}`;
+        questions[idx].scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    form.querySelectorAll(".assess-next").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const q = questions[current];
+            if (!q.querySelector('input[type="radio"]:checked')) {
+                q.querySelector(".assess-options").classList.add("shake");
+                setTimeout(() => q.querySelector(".assess-options").classList.remove("shake"), 500);
+                return;
+            }
+            current++;
+            showQ(current);
+        });
+    });
+
+    form.querySelectorAll(".assess-prev").forEach(btn => {
+        btn.addEventListener("click", () => { if (current > 0) { current--; showQ(current); } });
+    });
+
+    /* highlight selected option */
+    form.querySelectorAll(".assess-option input").forEach(input => {
+        input.addEventListener("change", () => {
+            const group = input.closest(".assess-options");
+            group.querySelectorAll(".assess-option").forEach(o => o.classList.remove("selected"));
+            input.closest(".assess-option").classList.add("selected");
+        });
+    });
+})();
+</script>
+{% endblock %}

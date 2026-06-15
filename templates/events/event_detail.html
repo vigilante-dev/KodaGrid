@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero detail-hero">
+    <div class="container">
+        <p class="eyebrow">{{ event.get_event_type_display }}</p>
+        <h1>{{ event.title }}</h1>
+        <p>{{ event.description }}</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        <article class="rich-text">
+            <h2>Event Details</h2>
+            <dl class="detail-list inline-list">
+                <dt>Date</dt>
+                <dd>{{ event.date|date:"M d, Y H:i" }}</dd>
+                <dt>Location</dt>
+                <dd>{{ event.location }}</dd>
+                <dt>Seats Available</dt>
+                <dd>{{ event.seats_available }}</dd>
+            </dl>
+            <p>Register your interest and our team will confirm the next steps by email.</p>
+        </article>
+
+        <aside class="side-panel">
+            <h2>Register for this event</h2>
+            <form method="post" class="stacked-form">
+                {% include 'includes/form_fields.html' %}
+                <button class="btn btn-primary btn-full" type="submit">Submit Registration</button>
+            </form>
+        </aside>
+    </div>
+</section>
+{% endblock %}

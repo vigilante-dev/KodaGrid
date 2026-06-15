@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}CodeSavannah Mentor AI | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">CodeSavannah Mentor AI</p>
+        <h1>Ask for coding help, project ideas, and learning direction.</h1>
+        <p>This built-in mentor gives structured guidance for beginners, students, and career switchers.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        <article class="side-panel">
+            <h2>Ask Mentor AI</h2>
+            <form method="post" class="stacked-form">
+                {% include 'includes/form_fields.html' %}
+                <button class="btn btn-primary btn-full" type="submit">Get Recommendation</button>
+            </form>
+        </article>
+        <aside class="mentor-answer">
+            {% if mentor_answer %}
+                <p class="eyebrow">Recommendation</p>
+                <h2>{{ mentor_question }}</h2>
+                <p>{{ mentor_answer }}</p>
+            {% else %}
+                <p class="eyebrow">Try asking</p>
+                <h2>What should I build after learning Python?</h2>
+                <p>Mentor AI responds with practical next steps, portfolio ideas, and learning paths.</p>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+{% endblock %}

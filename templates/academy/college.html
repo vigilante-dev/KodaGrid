@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}College Division | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">College Division</p>
+        <h1>Move from coursework to career-ready proof.</h1>
+        <p>Our college portal helps students turn academic knowledge into portfolios, internships, freelance readiness, and startup momentum.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container split-feature">
+        <div>
+            <p class="eyebrow">Career Preparation</p>
+            <h2>Build the story employers and clients can trust.</h2>
+            <p>College learners receive guided project reviews, interview preparation, mentor feedback, and practical paths into internships, attachments, remote work, and entrepreneurship.</p>
+            <a class="btn btn-primary" href="{% url 'academy:jobs' %}">Explore Opportunities</a>
+        </div>
+        <ul class="check-list">
+            {% for track in tracks %}<li>{{ track }}</li>{% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}

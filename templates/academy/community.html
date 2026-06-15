@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Hub | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Community Hub</p>
+        <h1>Forums, clubs, hackathons, challenges, and peer learning.</h1>
+        <p>CodeSavannah is designed to feel like a learning community, not a lonely tutorial site.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        <article>
+            <div class="section-heading">
+                <p class="eyebrow">Discussion Forums</p>
+                <h2>Ask, answer, and learn in public.</h2>
+            </div>
+            <div class="timeline-list">
+                {% for topic in topics %}
+                    <p><strong>{{ topic.title }}</strong><span>{{ topic.category }} · {{ topic.replies.count }} replies</span></p>
+                {% empty %}
+                    <p><strong>Forum topics</strong><span>Topics will appear after admin creates them.</span></p>
+                {% endfor %}
+            </div>
+        </article>
+        <aside class="side-panel">
+            <h2>Active Challenges</h2>
+            <div class="timeline-list">
+                {% for challenge in challenges %}
+                    <p><strong>{{ challenge.title }}</strong><span>{{ challenge.challenge_type }} · {{ challenge.deadline }}</span></p>
+                {% empty %}
+                    <p><strong>Challenges</strong><span>New competitions will appear soon.</span></p>
+                {% endfor %}
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

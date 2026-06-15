@@ -1,0 +1,1315 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Robotics Lab | CodeSavannah Academy{% endblock %}
+{% block meta_description %}Build, wire, and code real robots. Step-by-step visual assembly guides for LEGO Mindstorms, Arduino, Raspberry Pi and more — with an interactive terminal.{% endblock %}
+
+{% block content %}
+
+{# ══ HERO ══ #}
+<section class="rob-hero">
+    <div class="rob-circuit-bg" aria-hidden="true">
+        <svg viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <radialGradient id="cg" cx="50%" cy="50%"><stop offset="0%" stop-color="#00d4f5" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="#00d4f5" stop-opacity="0"/></radialGradient>
+            </defs>
+            <!-- circuit traces -->
+            <path d="M0 120 L200 120 L200 80 L400 80 L400 200 L600 200 L600 120 L1200 120" stroke="#00d4f5" stroke-opacity=".18" stroke-width="1.5" fill="none"/>
+            <path d="M0 300 L150 300 L150 250 L350 250 L350 380 L550 380 L550 300 L1200 300" stroke="#10b981" stroke-opacity=".14" stroke-width="1.5" fill="none"/>
+            <path d="M100 0 L100 500" stroke="#00d4f5" stroke-opacity=".1" stroke-width="1" fill="none"/>
+            <path d="M400 0 L400 500" stroke="#10b981" stroke-opacity=".1" stroke-width="1" fill="none"/>
+            <path d="M750 0 L750 500" stroke="#00d4f5" stroke-opacity=".1" stroke-width="1" fill="none"/>
+            <path d="M1050 0 L1050 500" stroke="#10b981" stroke-opacity=".1" stroke-width="1" fill="none"/>
+            <!-- dots at intersections -->
+            <circle cx="200" cy="120" r="4" fill="#00d4f5" opacity=".5"/>
+            <circle cx="400" cy="80" r="4" fill="#00d4f5" opacity=".5"/>
+            <circle cx="600" cy="200" r="4" fill="#10b981" opacity=".5"/>
+            <circle cx="350" cy="250" r="4" fill="#10b981" opacity=".5"/>
+            <circle cx="550" cy="380" r="4" fill="#00d4f5" opacity=".4"/>
+            <!-- MCU chip -->
+            <rect x="560" y="160" width="80" height="80" rx="6" fill="none" stroke="#00d4f5" stroke-opacity=".3" stroke-width="1.5"/>
+            <rect x="572" y="172" width="56" height="56" rx="3" fill="#00d4f5" fill-opacity=".06"/>
+            <text x="600" y="204" text-anchor="middle" fill="#00d4f5" fill-opacity=".4" font-size="9" font-family="monospace">MCU</text>
+            <!-- pulse animation circles -->
+            <circle cx="200" cy="120" r="12" fill="none" stroke="#00d4f5" stroke-opacity=".15" stroke-width="1"><animate attributeName="r" values="4;20;4" dur="3s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values=".5;0;.5" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="550" cy="380" r="8" fill="none" stroke="#10b981" stroke-opacity=".2" stroke-width="1"><animate attributeName="r" values="4;18;4" dur="4s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values=".4;0;.4" dur="4s" repeatCount="indefinite"/></circle>
+        </svg>
+    </div>
+    <div class="container rob-hero-content">
+        <p class="eyebrow" style="color:var(--accent);" data-i18n="rb_eyebrow">Hands-On Engineering</p>
+        <h1 class="rob-hero-title"><span data-i18n="rb_hero_title">Build. Wire. Code. Repeat.</span></h1>
+        <p style="color:rgba(255,255,255,.8);font-size:1.15rem;max-width:600px;margin:14px 0 28px;">From your first blinking LED to a face-tracking robot — our visual step-by-step manuals, live wiring diagrams, and integrated terminal take you from zero to maker.</p>
+        <div class="hero-actions">
+            <a class="btn btn-accent btn-icon" href="#kits">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Choose Your Kit
+            </a>
+            <a class="btn light-ghost btn-icon" href="{% url 'academy:tryit' %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                <span data-i18n="rb_btn_tryit">Open Terminal</span>
+            </a>
+        </div>
+        <div class="rob-hero-tags">
+            <span>🐱 Scratch</span><span>🧱 LEGO EV3</span><span>⚡ Arduino</span><span>🍓 Raspberry Pi</span><span>🤖 mBot</span><span>🔧 VEX IQ</span>
+        </div>
+    </div>
+</section>
+
+{# ══ LEVEL SELECTOR ══ #}
+<div class="rob-level-bar">
+    <button class="rob-level-tab active" data-level="all">All Kits</button>
+    <button class="rob-level-tab" data-level="kids">🐣 Ages 6–10</button>
+    <button class="rob-level-tab" data-level="beginner">🌱 Ages 11–14</button>
+    <button class="rob-level-tab" data-level="intermediate">⚡ Ages 14+</button>
+    <button class="rob-level-tab" data-level="advanced">🚀 Advanced</button>
+</div>
+
+<div class="container" id="kits" style="padding:0 20px;">
+
+<!-- ══════════════════════════════════════════════════════════════════
+     KIT 1: LEGO MINDSTORMS EV3  (Kids)
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="rob-kit" data-level="kids" id="kit-lego">
+    <div class="rob-kit-hero" style="background:linear-gradient(135deg,#3b1f7e,#7c3aed,#4f46e5);">
+        <div class="rob-kit-hero-text">
+            <span class="rob-kit-badge">Ages 6–10</span>
+            <h2>LEGO Mindstorms EV3</h2>
+            <p>Block-code your first robot with LEGO bricks, motors, and sensors — no soldering needed.</p>
+            <div class="rob-kit-languages"><span>Scratch Blocks</span><span>EV3-G</span><span>Python (advanced)</span></div>
+        </div>
+        {# SVG: LEGO EV3 Brick #}
+        <div class="rob-kit-diagram" aria-label="LEGO EV3 Brick diagram">
+            <svg viewBox="0 0 280 220" class="rob-svg">
+                <!-- Brick body -->
+                <rect x="20" y="10" width="240" height="200" rx="14" fill="#1a1a2e" stroke="#7c3aed" stroke-width="2"/>
+                <rect x="30" y="18" width="220" height="184" rx="10" fill="#16213e"/>
+                <!-- LCD Screen -->
+                <rect x="50" y="28" width="140" height="80" rx="6" fill="#0a0a1a" stroke="#7c3aed" stroke-width="1.5"/>
+                <rect x="56" y="34" width="128" height="68" rx="4" fill="#0d1b2a"/>
+                <text x="120" y="62" text-anchor="middle" fill="#00d4f5" font-size="9" font-family="monospace">CodeSavannah</text>
+                <text x="120" y="74" text-anchor="middle" fill="#7c3aed" font-size="8" font-family="monospace">EV3 BRICK v1.0</text>
+                <text x="120" y="86" text-anchor="middle" fill="#10b981" font-size="8" font-family="monospace">● Program Running</text>
+                <text x="120" y="96" text-anchor="middle" fill="#6b7280" font-size="7" font-family="monospace">Battery: 85%</text>
+                <!-- Buttons row -->
+                <circle cx="100" cy="128" r="12" fill="#7c3aed" opacity=".9"/><text x="100" y="132" text-anchor="middle" fill="#fff" font-size="10">◀</text>
+                <circle cx="130" cy="116" r="12" fill="#7c3aed" opacity=".9"/><text x="130" y="120" text-anchor="middle" fill="#fff" font-size="10">▲</text>
+                <circle cx="130" cy="140" r="12" fill="#7c3aed" opacity=".9"/><text x="130" y="144" text-anchor="middle" fill="#fff" font-size="10">▼</text>
+                <circle cx="160" cy="128" r="12" fill="#7c3aed" opacity=".9"/><text x="160" y="132" text-anchor="middle" fill="#fff" font-size="10">▶</text>
+                <circle cx="130" cy="128" r="10" fill="#059669"/><text x="130" y="132" text-anchor="middle" fill="#fff" font-size="8">OK</text>
+                <!-- Motor ports -->
+                <text x="48" y="172" fill="#f0abfc" font-size="7.5" font-family="monospace" font-weight="bold">MOTORS</text>
+                <rect x="45" y="175" width="24" height="16" rx="3" fill="#1e1e3f" stroke="#f0abfc" stroke-width="1"/><text x="57" y="186" text-anchor="middle" fill="#f0abfc" font-size="7">A</text>
+                <rect x="75" y="175" width="24" height="16" rx="3" fill="#1e1e3f" stroke="#f0abfc" stroke-width="1"/><text x="87" y="186" text-anchor="middle" fill="#f0abfc" font-size="7">B</text>
+                <rect x="105" y="175" width="24" height="16" rx="3" fill="#1e1e3f" stroke="#f0abfc" stroke-width="1"/><text x="117" y="186" text-anchor="middle" fill="#f0abfc" font-size="7">C</text>
+                <rect x="135" y="175" width="24" height="16" rx="3" fill="#1e1e3f" stroke="#f0abfc" stroke-width="1"/><text x="147" y="186" text-anchor="middle" fill="#f0abfc" font-size="7">D</text>
+                <!-- Sensor ports -->
+                <text x="172" y="172" fill="#67e8f9" font-size="7.5" font-family="monospace" font-weight="bold">SENSORS</text>
+                <rect x="170" y="175" width="18" height="16" rx="3" fill="#1e1e3f" stroke="#67e8f9" stroke-width="1"/><text x="179" y="186" text-anchor="middle" fill="#67e8f9" font-size="7">1</text>
+                <rect x="193" y="175" width="18" height="16" rx="3" fill="#1e1e3f" stroke="#67e8f9" stroke-width="1"/><text x="202" y="186" text-anchor="middle" fill="#67e8f9" font-size="7">2</text>
+                <rect x="216" y="175" width="18" height="16" rx="3" fill="#1e1e3f" stroke="#67e8f9" stroke-width="1"/><text x="225" y="186" text-anchor="middle" fill="#67e8f9" font-size="7">3</text>
+                <rect x="239" y="175" width="18" height="16" rx="3" fill="#1e1e3f" stroke="#67e8f9" stroke-width="1"/><text x="248" y="186" text-anchor="middle" fill="#67e8f9" font-size="7">4</text>
+            </svg>
+        </div>
+    </div>
+
+    <div class="rob-kit-body">
+        {# Components #}
+        <div class="rob-components-panel">
+            <h3 class="rob-panel-title">📦 What's in the box</h3>
+            <div class="rob-component-grid">
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#7c3aed22;border-color:#7c3aed;">🧠</div><span>EV3 Brick (x1)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#059669;border-color:#10b981;">⚙️</div><span>Large Motors (x2)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1341a8;border-color:#00d4f5;">⚙️</div><span>Medium Motor (x1)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#92400e;border-color:#f59e0b;">👆</div><span>Touch Sensor (x1)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0f766e;border-color:#2dd4bf;">🎨</div><span>Color Sensor (x1)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#3730a3;border-color:#818cf8;">📡</div><span>IR Sensor (x1)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1f2937;border-color:#6b7280;">🔌</div><span>USB + Cables</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#7f1d1d;border-color:#f87171;">🔋</div><span>Battery Pack (x1)</span></div>
+            </div>
+        </div>
+
+        {# Step-by-step manual #}
+        <div class="rob-manual">
+            <h3 class="rob-panel-title">🔧 Visual Assembly Guide</h3>
+            <div class="rob-steps">
+
+                <div class="rob-step" data-step="1">
+                    <div class="rob-step-num">1</div>
+                    <div class="rob-step-content">
+                        <h4>Sort and inventory your parts</h4>
+                        <p>Lay everything out. Match each part to the inventory list inside the box lid. Count all cables — you need exactly 6.</p>
+                        <div class="rob-wiring-diagram" style="background:#0f0f1a;">
+                            <svg viewBox="0 0 400 120" class="rob-svg-small">
+                                <text x="20" y="30" fill="#f0abfc" font-size="11" font-family="monospace" font-weight="bold">INVENTORY CHECK ✓</text>
+                                <rect x="20" y="40" width="100" height="20" rx="4" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5"/>
+                                <text x="70" y="54" text-anchor="middle" fill="#c4b5fd" font-size="9">EV3 Brick</text>
+                                <rect x="135" y="40" width="80" height="20" rx="4" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="175" y="54" text-anchor="middle" fill="#86efac" font-size="9">2× Motors</text>
+                                <rect x="230" y="40" width="80" height="20" rx="4" fill="#1c1917" stroke="#f59e0b" stroke-width="1.5"/>
+                                <text x="270" y="54" text-anchor="middle" fill="#fcd34d" font-size="9">Sensors</text>
+                                <rect x="325" y="40" width="60" height="20" rx="4" fill="#1c1917" stroke="#f87171" stroke-width="1.5"/>
+                                <text x="355" y="54" text-anchor="middle" fill="#fca5a5" font-size="9">Cables</text>
+                                <text x="20" y="90" fill="#6b7280" font-size="9" font-family="monospace">💡 Tip: Separate by port type — motor cables (thicker) vs sensor cables (thinner)</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="2">
+                    <div class="rob-step-num">2</div>
+                    <div class="rob-step-content">
+                        <h4>Connect the Large Motors to ports A and D</h4>
+                        <p>Each motor gets one cable. Port A = left motor, Port D = right motor. Push the connectors firmly until you hear a click.</p>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 420 160" class="rob-svg-small">
+                                <!-- EV3 Brick (simplified) -->
+                                <rect x="140" y="30" width="140" height="100" rx="8" fill="#16213e" stroke="#7c3aed" stroke-width="2"/>
+                                <text x="210" y="55" text-anchor="middle" fill="#7c3aed" font-size="10" font-weight="bold">EV3 BRICK</text>
+                                <!-- Port A -->
+                                <rect x="152" y="100" width="28" height="20" rx="3" fill="#1e1e3f" stroke="#f0abfc" stroke-width="1.5"/>
+                                <text x="166" y="114" text-anchor="middle" fill="#f0abfc" font-size="9" font-weight="bold">A</text>
+                                <!-- Port D -->
+                                <rect x="240" y="100" width="28" height="20" rx="3" fill="#1e1e3f" stroke="#f0abfc" stroke-width="1.5"/>
+                                <text x="254" y="114" text-anchor="middle" fill="#f0abfc" font-size="9" font-weight="bold">D</text>
+                                <!-- Left motor -->
+                                <rect x="20" y="70" width="70" height="50" rx="6" fill="#1e1e3f" stroke="#10b981" stroke-width="2"/>
+                                <text x="55" y="90" text-anchor="middle" fill="#10b981" font-size="9">MOTOR L</text>
+                                <circle cx="55" cy="108" r="8" fill="none" stroke="#10b981" stroke-width="1.5"/>
+                                <!-- Right motor -->
+                                <rect x="330" y="70" width="70" height="50" rx="6" fill="#1e1e3f" stroke="#10b981" stroke-width="2"/>
+                                <text x="365" y="90" text-anchor="middle" fill="#10b981" font-size="9">MOTOR R</text>
+                                <circle cx="365" cy="108" r="8" fill="none" stroke="#10b981" stroke-width="1.5"/>
+                                <!-- Wires -->
+                                <path d="M90 95 Q120 95 152 110" stroke="#f0abfc" stroke-width="2.5" fill="none" stroke-dasharray="6,3"><animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite"/></path>
+                                <path d="M330 95 Q300 95 268 110" stroke="#f0abfc" stroke-width="2.5" fill="none" stroke-dasharray="6,3"><animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite"/></path>
+                                <!-- Labels -->
+                                <text x="110" y="82" fill="#6b7280" font-size="8">cable A</text>
+                                <text x="285" y="82" fill="#6b7280" font-size="8">cable D</text>
+                            </svg>
+                        </div>
+                        <div class="rob-tip">💡 <strong>Tip:</strong> Motor cables are 25cm (short). Sensor cables are 35cm (long). Don't mix them up!</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="3">
+                    <div class="rob-step-num">3</div>
+                    <div class="rob-step-content">
+                        <h4>Connect the Color Sensor to port 3</h4>
+                        <p>The color sensor detects red, green, blue, yellow, white, and black. Connect it to port 3 on the right side of the brick.</p>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 400 130" class="rob-svg-small">
+                                <!-- EV3 right side sensor ports -->
+                                <rect x="150" y="20" width="130" height="90" rx="8" fill="#16213e" stroke="#7c3aed" stroke-width="2"/>
+                                <text x="215" y="45" text-anchor="middle" fill="#7c3aed" font-size="10" font-weight="bold">EV3 BRICK</text>
+                                <rect x="160" y="82" width="22" height="18" rx="3" fill="#1e1e3f" stroke="#67e8f9" stroke-width="1.5"/>
+                                <text x="171" y="94" text-anchor="middle" fill="#67e8f9" font-size="8">1</text>
+                                <rect x="188" y="82" width="22" height="18" rx="3" fill="#1e1e3f" stroke="#67e8f9" stroke-width="1.5"/>
+                                <text x="199" y="94" text-anchor="middle" fill="#67e8f9" font-size="8">2</text>
+                                <rect x="216" y="82" width="22" height="18" rx="3" fill="#67e8f9" fill-opacity=".2" stroke="#67e8f9" stroke-width="2"/>
+                                <text x="227" y="94" text-anchor="middle" fill="#67e8f9" font-size="8" font-weight="bold">3 ✓</text>
+                                <rect x="244" y="82" width="22" height="18" rx="3" fill="#1e1e3f" stroke="#67e8f9" stroke-width="1.5"/>
+                                <text x="255" y="94" text-anchor="middle" fill="#67e8f9" font-size="8">4</text>
+                                <!-- Color sensor -->
+                                <rect x="320" y="40" width="60" height="50" rx="6" fill="#0a1929" stroke="#2dd4bf" stroke-width="2"/>
+                                <text x="350" y="58" text-anchor="middle" fill="#2dd4bf" font-size="8">COLOR</text>
+                                <text x="350" y="70" text-anchor="middle" fill="#2dd4bf" font-size="8">SENSOR</text>
+                                <!-- Colored LED dots -->
+                                <circle cx="338" cy="80" r="4" fill="#ef4444"/>
+                                <circle cx="350" cy="80" r="4" fill="#22c55e"/>
+                                <circle cx="362" cy="80" r="4" fill="#3b82f6"/>
+                                <!-- Wire -->
+                                <path d="M320 65 L268 91" stroke="#2dd4bf" stroke-width="2.5" fill="none" stroke-dasharray="5,3"><animate attributeName="stroke-dashoffset" from="50" to="0" dur="1.5s" repeatCount="indefinite"/></path>
+                                <text x="285" y="78" fill="#6b7280" font-size="8">port 3</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="4">
+                    <div class="rob-step-num">4</div>
+                    <div class="rob-step-content">
+                        <h4>Insert batteries and power on</h4>
+                        <p>Insert 6 × AA batteries OR connect the rechargeable pack. Press the center button to power on. The screen should show the LEGO logo then the main menu.</p>
+                        <div class="rob-tip">🔋 <strong>Rechargeable tip:</strong> The official Li-ion pack lasts 3× longer than AA batteries and is better for the environment.</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="5">
+                    <div class="rob-step-num">5</div>
+                    <div class="rob-step-content">
+                        <h4>Download LEGO Mindstorms Education EV3 app</h4>
+                        <p>Free on Windows, Mac, iPad, and Chromebook. Connect your EV3 via USB (or Bluetooth: Settings → Bluetooth → Search for devices).</p>
+                        <div class="rob-code-block">
+                            <div class="rob-code-header">Your first EV3 Python program</div>
+<pre><code class="language-python">#!/usr/bin/env pybricks-micropython
+from pybricks.ev3devices import Motor, ColorSensor
+from pybricks.parameters import Port, Color
+from pybricks.tools import wait
+
+# Connect motors and sensor
+left_motor  = Motor(Port.A)
+right_motor = Motor(Port.D)
+color_sensor = ColorSensor(Port.S3)
+
+print("Robot ready. Starting drive sequence...")
+
+# Drive forward for 2 seconds
+left_motor.run(500)
+right_motor.run(500)
+wait(2000)
+
+# Stop and check colour
+left_motor.stop()
+right_motor.stop()
+
+detected = color_sensor.color()
+print(f"Color detected: {detected}")
+if detected == Color.RED:
+    print("🔴 STOP! Red detected.")
+else:
+    print("✅ Path clear.")</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="6">
+                    <div class="rob-step-num rob-step-final">6</div>
+                    <div class="rob-step-content">
+                        <h4>🎉 Build the Driving Base and run your first program</h4>
+                        <p>Follow the "Driving Base" build guide in the LEGO app (it's the strongest beginner chassis). Then upload and run the program above.</p>
+                        <div class="rob-project-ideas">
+                            <strong>🚀 Project ideas once you're rolling:</strong>
+                            <ul>
+                                <li>Line-following robot using color sensor</li>
+                                <li>Obstacle avoider using IR sensor</li>
+                                <li>Colour-sorting machine</li>
+                                <li>Maze solver with touch sensor bumpers</li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-accent btn-small" href="{% url 'academy:tryit' %}?kit=lego" target="_blank">Practice in Terminal →</a>
+                    </div>
+                </div>
+            </div>{# /rob-steps #}
+        </div>{# /rob-manual #}
+    </div>{# /rob-kit-body #}
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     KIT 2: ARDUINO UNO  (Beginner)
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="rob-kit" data-level="beginner" id="kit-arduino">
+    <div class="rob-kit-hero" style="background:linear-gradient(135deg,#0c2340,#1341a8,#0369a1);">
+        <div class="rob-kit-hero-text">
+            <span class="rob-kit-badge">Ages 11–14</span>
+            <h2>Arduino Uno</h2>
+            <p>Wire real circuits on a breadboard and program them in C++. The world's most popular hardware platform.</p>
+            <div class="rob-kit-languages"><span>C++</span><span>Arduino IDE</span><span>Python (via serial)</span></div>
+        </div>
+        {# SVG: Arduino Uno Board #}
+        <div class="rob-kit-diagram" aria-label="Arduino Uno board diagram">
+            <svg viewBox="0 0 320 220" class="rob-svg">
+                <!-- PCB base -->
+                <rect x="10" y="10" width="300" height="200" rx="8" fill="#1a5c1a" stroke="#22c55e" stroke-width="1.5"/>
+                <!-- USB connector -->
+                <rect x="0" y="40" width="18" height="28" rx="3" fill="#2d2d2d" stroke="#6b7280" stroke-width="1"/>
+                <rect x="3" y="44" width="12" height="20" rx="2" fill="#1a1a1a"/>
+                <text x="9" y="63" text-anchor="middle" fill="#6b7280" font-size="6">USB</text>
+                <!-- Power jack -->
+                <rect x="10" y="12" width="22" height="18" rx="3" fill="#1a1a1a" stroke="#6b7280" stroke-width="1"/>
+                <circle cx="21" cy="21" r="5" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+                <circle cx="21" cy="21" r="2" fill="#6b7280"/>
+                <!-- ATmega chip -->
+                <rect x="100" y="80" width="80" height="60" rx="4" fill="#0a0a0a" stroke="#4b5563" stroke-width="1.5"/>
+                <!-- Chip legs top -->
+                <line x1="115" y1="80" x2="115" y2="72" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="128" y1="80" x2="128" y2="72" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="141" y1="80" x2="141" y2="72" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="154" y1="80" x2="154" y2="72" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="167" y1="80" x2="167" y2="72" stroke="#9ca3af" stroke-width="1.5"/>
+                <!-- Chip legs bottom -->
+                <line x1="115" y1="140" x2="115" y2="148" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="128" y1="140" x2="128" y2="148" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="141" y1="140" x2="141" y2="148" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="154" y1="140" x2="154" y2="148" stroke="#9ca3af" stroke-width="1.5"/>
+                <line x1="167" y1="140" x2="167" y2="148" stroke="#9ca3af" stroke-width="1.5"/>
+                <text x="140" y="112" text-anchor="middle" fill="#22c55e" font-size="9" font-family="monospace">ATmega</text>
+                <text x="140" y="124" text-anchor="middle" fill="#22c55e" font-size="9" font-family="monospace">328P</text>
+                <!-- Digital pins header (top) -->
+                <rect x="35" y="15" width="250" height="14" rx="3" fill="#111" stroke="#374151" stroke-width="1"/>
+                <text x="160" y="25" text-anchor="middle" fill="#67e8f9" font-size="7" font-family="monospace">DIGITAL  0  1  2  3~ 4  5~ 6~ 7  8  9~ 10~11~12 13</text>
+                <!-- Analog pins header (bottom) -->
+                <rect x="35" y="191" width="160" height="14" rx="3" fill="#111" stroke="#374151" stroke-width="1"/>
+                <text x="115" y="201" text-anchor="middle" fill="#fbbf24" font-size="7" font-family="monospace">ANALOG  A0 A1 A2 A3 A4 A5</text>
+                <!-- PWR pins -->
+                <rect x="205" y="191" width="100" height="14" rx="3" fill="#111" stroke="#374151" stroke-width="1"/>
+                <text x="255" y="201" text-anchor="middle" fill="#f87171" font-size="7" font-family="monospace">PWR IOREF RST 3.3V 5V GND</text>
+                <!-- LED L -->
+                <circle cx="270" cy="60" r="5" fill="#22c55e"><animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/></circle>
+                <text x="270" y="75" text-anchor="middle" fill="#22c55e" font-size="7">L</text>
+                <!-- LED TX/RX -->
+                <circle cx="284" cy="60" r="4" fill="#f59e0b" opacity=".6"/>
+                <text x="284" y="75" text-anchor="middle" fill="#f59e0b" font-size="7">TX</text>
+                <circle cx="296" cy="60" r="4" fill="#3b82f6" opacity=".6"/>
+                <text x="296" y="75" text-anchor="middle" fill="#3b82f6" font-size="7">RX</text>
+                <!-- Reset button -->
+                <rect x="68" y="52" width="18" height="18" rx="3" fill="#dc2626" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="77" y="64" text-anchor="middle" fill="#fff" font-size="7">RST</text>
+                <!-- Crystal -->
+                <rect x="220" y="90" width="24" height="12" rx="2" fill="#d4a017" stroke="#b8860b" stroke-width="1"/>
+                <text x="232" y="99" text-anchor="middle" fill="#1a1a1a" font-size="6">16MHz</text>
+            </svg>
+        </div>
+    </div>
+
+    <div class="rob-kit-body">
+        <div class="rob-components-panel">
+            <h3 class="rob-panel-title">📦 What's in the kit</h3>
+            <div class="rob-component-grid">
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#052e16;border-color:#22c55e;">🟩</div><span>Arduino Uno (x1)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1c1917;border-color:#6b7280;">⬜</div><span>Breadboard 830pt (x1)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#7f1d1d;border-color:#f87171;">💡</div><span>LEDs mixed (x10)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1c1917;border-color:#9ca3af;">〰️</div><span>Resistors kit</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1e3a8a;border-color:#60a5fa;">🔘</div><span>Push buttons (x4)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0c4a6e;border-color:#38bdf8;">📡</div><span>HC-SR04 Ultrasonic</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0f2318;border-color:#10b981;">🌡️</div><span>DHT11 Sensor</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1e1b4b;border-color:#818cf8;">🔄</div><span>Servo SG90 (x1)</span></div>
+            </div>
+        </div>
+
+        <div class="rob-manual">
+            <h3 class="rob-panel-title">🔧 LED Blink — Your First Circuit</h3>
+            <div class="rob-steps">
+
+                <div class="rob-step" data-step="1">
+                    <div class="rob-step-num">1</div>
+                    <div class="rob-step-content">
+                        <h4>Install Arduino IDE and upload Blink example</h4>
+                        <p>Download Arduino IDE from arduino.cc/en/software (free). Connect the board with USB. Go to <em>File → Examples → 01.Basics → Blink</em> and click Upload ➜.</p>
+                        <div class="rob-tip">✅ The built-in LED on pin 13 will blink once a second. Congratulations — you just programmed hardware!</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="2">
+                    <div class="rob-step-num">2</div>
+                    <div class="rob-step-content">
+                        <h4>Wire an external LED on the breadboard</h4>
+                        <p>Follow this exact wiring. The 220Ω resistor protects the LED from burning out.</p>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 500 200" class="rob-svg-small">
+                                <!-- Breadboard -->
+                                <rect x="180" y="20" width="160" height="160" rx="4" fill="#f5f5dc" stroke="#8B7355" stroke-width="2"/>
+                                <text x="260" y="12" text-anchor="middle" fill="#6b7280" font-size="8">BREADBOARD</text>
+                                <!-- Power rails -->
+                                <line x1="190" y1="30" x2="190" y2="175" stroke="#ef4444" stroke-width="2"/>
+                                <line x1="200" y1="30" x2="200" y2="175" stroke="#1d4ed8" stroke-width="2"/>
+                                <line x1="330" y1="30" x2="330" y2="175" stroke="#ef4444" stroke-width="2"/>
+                                <line x1="320" y1="30" x2="320" y2="175" stroke="#1d4ed8" stroke-width="2"/>
+                                <!-- Holes row 10 -->
+                                <circle cx="225" cy="85" r="3" fill="#8B7355"/>
+                                <circle cx="240" cy="85" r="3" fill="#8B7355"/>
+                                <circle cx="255" cy="85" r="3" fill="#8B7355"/>
+                                <circle cx="270" cy="85" r="3" fill="#8B7355"/>
+                                <circle cx="285" cy="85" r="3" fill="#8B7355"/>
+                                <!-- LED -->
+                                <ellipse cx="265" cy="100" rx="7" ry="11" fill="#ff6666" stroke="#cc0000" stroke-width="1.5" opacity=".9"/>
+                                <line x1="259" y1="108" x2="259" y2="120" stroke="#d4d4d4" stroke-width="1.5"/>
+                                <line x1="271" y1="111" x2="271" y2="120" stroke="#d4d4d4" stroke-width="1.5"/>
+                                <text x="265" y="137" text-anchor="middle" fill="#ef4444" font-size="8">LED</text>
+                                <text x="265" y="147" text-anchor="middle" fill="#6b7280" font-size="7">(+) anode</text>
+                                <!-- Resistor -->
+                                <rect x="218" y="81" width="32" height="8" rx="3" fill="#c49a6c"/>
+                                <line x1="215" y1="85" x2="218" y2="85" stroke="#c49a6c" stroke-width="2"/>
+                                <line x1="250" y1="85" x2="265" y2="85" stroke="#c49a6c" stroke-width="2"/>
+                                <text x="234" y="78" text-anchor="middle" fill="#92400e" font-size="7">220Ω</text>
+                                <!-- Arduino on left -->
+                                <rect x="20" y="30" width="130" height="140" rx="6" fill="#1a5c1a" stroke="#22c55e" stroke-width="1.5"/>
+                                <text x="85" y="58" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="bold">ARDUINO UNO</text>
+                                <text x="85" y="72" text-anchor="middle" fill="#6b7280" font-size="8">Digital Pin 13 ──────────────────────→</text>
+                                <text x="85" y="86" text-anchor="middle" fill="#1d4ed8" font-size="8">GND ─────────────────────────────────→</text>
+                                <!-- Pin 13 wire (red) -->
+                                <path d="M150 82 L215 85" stroke="#ef4444" stroke-width="2.5"><animate attributeName="stroke" values="#ef4444;#fbbf24;#ef4444" dur="1s" repeatCount="indefinite"/></path>
+                                <!-- GND wire (black) -->
+                                <path d="M150 96 L190 120 L259 118 L259 115" stroke="#1d4ed8" stroke-width="2"/>
+                                <!-- Labels -->
+                                <text x="430" y="60" fill="#ef4444" font-size="9" font-family="monospace">Red = +5V / Signal</text>
+                                <text x="430" y="75" fill="#1d4ed8" font-size="9" font-family="monospace">Blue = GND (-)  </text>
+                                <text x="430" y="90" fill="#c49a6c" font-size="9" font-family="monospace">Brown = Resistor </text>
+                            </svg>
+                        </div>
+                        <div class="rob-tip">⚠️ <strong>Safety:</strong> NEVER connect an LED directly to 5V without a resistor — it will burn out instantly!</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="3">
+                    <div class="rob-step-num">3</div>
+                    <div class="rob-step-content">
+                        <h4>Upload the blink code for the external LED</h4>
+                        <div class="rob-code-block">
+                            <div class="rob-code-header">Arduino C++ — LED Blink (Pin 13)</div>
+<pre><code class="language-cpp">// Pin 13 has the built-in LED on most Arduino boards
+const int LED_PIN = 13;
+
+void setup() {
+    // Tell Arduino: pin 13 is an OUTPUT
+    pinMode(LED_PIN, OUTPUT);
+    Serial.begin(9600);
+    Serial.println("Arduino ready! LED will blink.");
+}
+
+void loop() {
+    // Turn LED ON
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("LED: ON  ●");
+    delay(500);  // wait 500 milliseconds
+
+    // Turn LED OFF
+    digitalWrite(LED_PIN, LOW);
+    Serial.println("LED: OFF ○");
+    delay(500);
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="4">
+                    <div class="rob-step-num">4</div>
+                    <div class="rob-step-content">
+                        <h4>Add a push button to control the LED</h4>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 480 180" class="rob-svg-small">
+                                <!-- Button symbol -->
+                                <rect x="240" y="60" width="30" height="30" rx="4" fill="#1e1e3f" stroke="#60a5fa" stroke-width="2"/>
+                                <rect x="248" y="70" width="14" height="10" rx="2" fill="#60a5fa" opacity=".7"/>
+                                <text x="255" y="104" text-anchor="middle" fill="#60a5fa" font-size="8">BUTTON</text>
+                                <!-- Pull-down resistor -->
+                                <rect x="238" y="115" width="34" height="10" rx="3" fill="#c49a6c"/>
+                                <text x="255" y="138" text-anchor="middle" fill="#92400e" font-size="7">10kΩ pull-down</text>
+                                <!-- Wires -->
+                                <line x1="255" y1="60" x2="255" y2="30" stroke="#ef4444" stroke-width="2"/><text x="255" y="22" text-anchor="middle" fill="#ef4444" font-size="8">5V</text>
+                                <line x1="255" y1="90" x2="255" y2="115" stroke="#fbbf24" stroke-width="2"/><text x="280" y="108" fill="#fbbf24" font-size="8">→ Pin 2</text>
+                                <line x1="255" y1="125" x2="255" y2="155" stroke="#1d4ed8" stroke-width="2"/><text x="255" y="168" text-anchor="middle" fill="#1d4ed8" font-size="8">GND</text>
+                                <!-- Explanation -->
+                                <text x="30" y="35" fill="#f0abfc" font-size="9" font-family="monospace" font-weight="bold">BUTTON WIRING</text>
+                                <text x="30" y="55" fill="#9ca3af" font-size="8">When button pressed → Pin 2 reads HIGH</text>
+                                <text x="30" y="68" fill="#9ca3af" font-size="8">When released → 10kΩ pulls to LOW</text>
+                                <text x="30" y="81" fill="#9ca3af" font-size="8">The pull-down resistor prevents floating</text>
+                            </svg>
+                        </div>
+                        <div class="rob-code-block">
+                            <div class="rob-code-header">Button controls LED</div>
+<pre><code class="language-cpp">const int LED_PIN    = 13;
+const int BUTTON_PIN = 2;
+
+void setup() {
+    pinMode(LED_PIN,    OUTPUT);
+    pinMode(BUTTON_PIN, INPUT);  // button on pin 2
+    Serial.begin(9600);
+}
+
+void loop() {
+    int btnState = digitalRead(BUTTON_PIN);
+    if (btnState == HIGH) {
+        digitalWrite(LED_PIN, HIGH);
+        Serial.println("Button pressed → LED ON");
+    } else {
+        digitalWrite(LED_PIN, LOW);
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="5">
+                    <div class="rob-step-num rob-step-final">5</div>
+                    <div class="rob-step-content">
+                        <h4>🎉 You built your first interactive circuit!</h4>
+                        <div class="rob-project-ideas">
+                            <strong>🚀 Now try these projects:</strong>
+                            <ul>
+                                <li>Traffic light: 3 LEDs cycling red → amber → green</li>
+                                <li>Ultrasonic alarm: buzzes when something comes within 20cm</li>
+                                <li>Temperature monitor: reads DHT11 and displays on Serial</li>
+                                <li>Servo sweep: servo arm moves 0° → 90° → 180° repeatedly</li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-accent btn-small" href="{% url 'academy:tryit' %}?kit=arduino">Practice in Terminal →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     KIT 3: RASPBERRY PI 4
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="rob-kit" data-level="intermediate" id="kit-rpi">
+    <div class="rob-kit-hero" style="background:linear-gradient(135deg,#0a2a12,#059669,#0f766e);">
+        <div class="rob-kit-hero-text">
+            <span class="rob-kit-badge">Ages 14+</span>
+            <h2>Raspberry Pi 4</h2>
+            <p>A full Linux computer on a credit card. Run Python, control GPIO pins, build vision systems and web servers.</p>
+            <div class="rob-kit-languages"><span>Python 3</span><span>Bash</span><span>Linux</span><span>OpenCV</span></div>
+        </div>
+        {# SVG: Raspberry Pi 4 Board #}
+        <div class="rob-kit-diagram" aria-label="Raspberry Pi 4 board diagram">
+            <svg viewBox="0 0 320 240" class="rob-svg">
+                <!-- PCB -->
+                <rect x="10" y="10" width="300" height="220" rx="8" fill="#1a5c1a" stroke="#22c55e" stroke-width="1.5"/>
+                <!-- GPIO header (40 pins) -->
+                <rect x="20" y="18" width="90" height="18" rx="2" fill="#111" stroke="#374151" stroke-width="1"/>
+                <text x="65" y="30" text-anchor="middle" fill="#fbbf24" font-size="7" font-family="monospace">GPIO 40-PIN HEADER</text>
+                <!-- Pin dots (2 rows of 20) -->
+                {% for i in "01234567890123456789" %}
+                <circle cx="{{ forloop.counter|add:19 }}" cy="24" r="2" fill="#fbbf24" opacity=".6"/>
+                {% endfor %}
+                <!-- BCM2711 SoC -->
+                <rect x="120" y="80" width="90" height="90" rx="6" fill="#0a0a0a" stroke="#4b5563" stroke-width="1.5"/>
+                <text x="165" y="118" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace" font-weight="bold">BCM2711</text>
+                <text x="165" y="130" text-anchor="middle" fill="#6b7280" font-size="7" font-family="monospace">Cortex-A72</text>
+                <text x="165" y="142" text-anchor="middle" fill="#6b7280" font-size="7" font-family="monospace">1.5 GHz</text>
+                <!-- USB-C power -->
+                <rect x="10" y="40" width="15" height="16" rx="3" fill="#2d2d2d" stroke="#6b7280" stroke-width="1"/>
+                <text x="17" y="50" text-anchor="middle" fill="#6b7280" font-size="5" text-anchor="middle">USB-C</text>
+                <!-- Micro HDMI x2 -->
+                <rect x="10" y="65" width="16" height="12" rx="2" fill="#2d2d2d" stroke="#818cf8" stroke-width="1"/>
+                <rect x="10" y="82" width="16" height="12" rx="2" fill="#2d2d2d" stroke="#818cf8" stroke-width="1"/>
+                <text x="17" y="74" text-anchor="middle" fill="#818cf8" font-size="5">HDMI</text>
+                <text x="17" y="91" text-anchor="middle" fill="#818cf8" font-size="5">HDMI</text>
+                <!-- USB3 + USB2 ports -->
+                <rect x="10" y="105" width="18" height="28" rx="2" fill="#1d4ed8" stroke="#60a5fa" stroke-width="1"/>
+                <rect x="10" y="108" width="16" height="10" rx="1" fill="#2d2d2d"/><text x="18" y="116" text-anchor="middle" fill="#60a5fa" font-size="5">USB3</text>
+                <rect x="10" y="120" width="16" height="10" rx="1" fill="#2d2d2d"/><text x="18" y="128" text-anchor="middle" fill="#60a5fa" font-size="5">USB3</text>
+                <rect x="10" y="140" width="18" height="28" rx="2" fill="#374151" stroke="#9ca3af" stroke-width="1"/>
+                <rect x="10" y="143" width="16" height="10" rx="1" fill="#2d2d2d"/><text x="18" y="151" text-anchor="middle" fill="#9ca3af" font-size="5">USB2</text>
+                <rect x="10" y="155" width="16" height="10" rx="1" fill="#2d2d2d"/><text x="18" y="163" text-anchor="middle" fill="#9ca3af" font-size="5">USB2</text>
+                <!-- Ethernet -->
+                <rect x="10" y="178" width="22" height="18" rx="2" fill="#059669" stroke="#10b981" stroke-width="1"/>
+                <text x="21" y="190" text-anchor="middle" fill="#10b981" font-size="5">ETH</text>
+                <!-- MicroSD slot -->
+                <rect x="105" y="218" width="48" height="10" rx="3" fill="#1a1a1a" stroke="#6b7280" stroke-width="1"/>
+                <text x="129" y="226" text-anchor="middle" fill="#6b7280" font-size="6">microSD</text>
+                <!-- Camera CSI -->
+                <rect x="260" y="18" width="40" height="12" rx="2" fill="#111" stroke="#f0abfc" stroke-width="1"/>
+                <text x="280" y="27" text-anchor="middle" fill="#f0abfc" font-size="6">CSI CAM</text>
+                <!-- LPDDR4 RAM chip -->
+                <rect x="220" y="90" width="70" height="40" rx="4" fill="#0a0a0a" stroke="#4b5563" stroke-width="1"/>
+                <text x="255" y="112" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="monospace">4 GB</text>
+                <text x="255" y="122" text-anchor="middle" fill="#6b7280" font-size="7" font-family="monospace">LPDDR4</text>
+                <!-- WiFi/BT chip -->
+                <rect x="230" y="145" width="55" height="30" rx="3" fill="#0a0a0a" stroke="#818cf8" stroke-width="1"/>
+                <text x="257" y="162" text-anchor="middle" fill="#818cf8" font-size="7">WiFi/BT</text>
+                <!-- LED ACT -->
+                <circle cx="285" cy="195" r="5" fill="#22c55e"><animate attributeName="opacity" values="1;0.2;1" dur="0.8s" repeatCount="indefinite"/></circle>
+                <text x="285" y="210" text-anchor="middle" fill="#22c55e" font-size="7">ACT</text>
+            </svg>
+        </div>
+    </div>
+
+    <div class="rob-kit-body">
+        <div class="rob-components-panel">
+            <h3 class="rob-panel-title">📦 What's in the kit</h3>
+            <div class="rob-component-grid">
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#052e16;border-color:#22c55e;">🍓</div><span>Raspberry Pi 4 (4GB)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1c1917;border-color:#f59e0b;">💾</div><span>32GB MicroSD</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#7f1d1d;border-color:#f87171;">🔌</div><span>USB-C Power Supply</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1e1b4b;border-color:#818cf8;">📷</div><span>Pi Camera Module V2</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0c4a6e;border-color:#38bdf8;">🔌</div><span>HDMI Adapter</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1a1a1a;border-color:#4b5563;">🧰</div><span>GPIO T-Cobbler + Cables</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1c1917;border-color:#d97706;">⬜</div><span>Breadboard</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0f2318;border-color:#10b981;">🌡️</div><span>Temperature/Humidity sensor</span></div>
+            </div>
+        </div>
+
+        <div class="rob-manual">
+            <h3 class="rob-panel-title">🔧 GPIO LED Project — Python Control</h3>
+            <div class="rob-steps">
+
+                <div class="rob-step" data-step="1">
+                    <div class="rob-step-num">1</div>
+                    <div class="rob-step-content">
+                        <h4>Flash Raspberry Pi OS to the MicroSD card</h4>
+                        <p>Download <strong>Raspberry Pi Imager</strong> (free). Select <em>Raspberry Pi OS Lite (64-bit)</em>. Before writing, click the ⚙️ gear to set: hostname, enable SSH, set WiFi credentials, set username/password.</p>
+                        <div class="rob-tip">🖥️ <strong>Headless setup:</strong> With SSH enabled, you never need a monitor. Connect from your laptop using: <code>ssh pi@raspberrypi.local</code></div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="2">
+                    <div class="rob-step-num">2</div>
+                    <div class="rob-step-content">
+                        <h4>Connect an LED to GPIO Pin 17</h4>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 480 180" class="rob-svg-small">
+                                <!-- Pi GPIO header -->
+                                <rect x="20" y="20" width="120" height="140" rx="6" fill="#0f2318" stroke="#22c55e" stroke-width="1.5"/>
+                                <text x="80" y="38" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="bold">RPi 4 GPIO</text>
+                                <!-- Pin grid (simplified) -->
+                                <text x="35" y="56" fill="#fbbf24" font-size="7">Pin 1:  3.3V</text>
+                                <text x="35" y="68" fill="#ef4444" font-size="7">Pin 2:  5V</text>
+                                <text x="35" y="80" fill="#6b7280" font-size="7">Pin 3:  SDA</text>
+                                <text x="35" y="92" fill="#ef4444" font-size="7">Pin 4:  5V</text>
+                                <text x="35" y="104" fill="#22c55e" font-size="7" font-weight="bold">Pin 11: GPIO17 ←</text>
+                                <text x="35" y="116" fill="#1d4ed8" font-size="7">Pin 14: GND</text>
+                                <text x="35" y="128" fill="#6b7280" font-size="7">...</text>
+                                <!-- Wire from GPIO17 (pin 11) to resistor -->
+                                <path d="M140 104 L240 100" stroke="#f59e0b" stroke-width="2.5"><animate attributeName="stroke" values="#f59e0b;#fbbf24;#f59e0b" dur="1.5s" repeatCount="indefinite"/></path>
+                                <!-- Resistor -->
+                                <rect x="240" y="96" width="30" height="8" rx="3" fill="#c49a6c"/>
+                                <text x="255" y="88" text-anchor="middle" fill="#92400e" font-size="7">220Ω</text>
+                                <!-- Wire to LED -->
+                                <path d="M270 100 L310 100" stroke="#f59e0b" stroke-width="2.5"/>
+                                <!-- LED -->
+                                <ellipse cx="318" cy="100" rx="8" ry="12" fill="#ff6666" stroke="#cc0000" stroke-width="1.5"><animate attributeName="opacity" values="1;0.4;1" dur="1s" repeatCount="indefinite"/></ellipse>
+                                <!-- GND wire -->
+                                <path d="M326 106 L360 106 L360 116 L140 116 L140 116" stroke="#1d4ed8" stroke-width="2"/>
+                                <!-- Labels -->
+                                <text x="340" y="96" fill="#f59e0b" font-size="8">GPIO17</text>
+                                <text x="340" y="122" fill="#1d4ed8" font-size="8">GND (Pin 14)</text>
+                                <text x="340" y="140" fill="#ef4444" font-size="8">LED anode (+) → resistor</text>
+                                <text x="340" y="152" fill="#1d4ed8" font-size="8">LED cathode (short leg) → GND</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="3">
+                    <div class="rob-step-num">3</div>
+                    <div class="rob-step-content">
+                        <h4>Write the Python blink program</h4>
+                        <div class="rob-code-block">
+                            <div class="rob-code-header">Python — GPIO LED Blink (save as blink.py)</div>
+<pre><code class="language-python">import RPi.GPIO as GPIO
+import time
+
+# Set BCM numbering (matches GPIO numbers on diagrams)
+GPIO.setmode(GPIO.BCM)
+
+LED_PIN = 17
+GPIO.setup(LED_PIN, GPIO.OUT)
+
+print("🔴 LED blink program started. Ctrl+C to stop.")
+
+try:
+    while True:
+        GPIO.output(LED_PIN, GPIO.HIGH)   # LED ON
+        print("● ON ")
+        time.sleep(0.5)
+
+        GPIO.output(LED_PIN, GPIO.LOW)    # LED OFF
+        print("○ OFF")
+        time.sleep(0.5)
+
+except KeyboardInterrupt:
+    print("\nStopped by user.")
+
+finally:
+    GPIO.cleanup()   # ALWAYS cleanup to reset pins
+    print("GPIO cleaned up. Safe to exit.")</code></pre>
+                        </div>
+                        <div class="rob-tip">💻 Run with: <code>python3 blink.py</code> in the terminal. SSH into the Pi first!</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="4">
+                    <div class="rob-step-num rob-step-final">4</div>
+                    <div class="rob-step-content">
+                        <h4>🎉 Next: Camera + Face Detection</h4>
+                        <div class="rob-code-block">
+                            <div class="rob-code-header">Python OpenCV — Detect faces with Pi Camera</div>
+<pre><code class="language-python">import cv2
+
+# Load pre-trained face detection model
+face_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+)
+
+# Open Pi Camera
+cap = cv2.VideoCapture(0)
+
+print("Starting face detection. Press 'q' to quit.")
+
+while True:
+    ret, frame = cap.read()
+    gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.1, 5)
+
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 2)
+        print(f"Face detected at ({x},{y}) size {w}×{h}")
+
+    cv2.imshow('Face Detection', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()</code></pre>
+                        </div>
+                        <a class="btn btn-accent btn-small" href="{% url 'academy:tryit' %}?kit=rpi">Practice in Terminal →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     KIT 4: mBot (Makeblock)  — Ages 8–12
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="rob-kit" data-level="kids" id="kit-mbot">
+    <div class="rob-kit-hero" style="background:linear-gradient(135deg,#1a0a3e,#6d28d9,#db2777);">
+        <div class="rob-kit-hero-text">
+            <span class="rob-kit-badge">Ages 8–12</span>
+            <h2>mBot (Makeblock)</h2>
+            <p>A beginner robot kit that snaps together in 10 minutes and is programmed with Scratch blocks or Arduino C. Perfect first robot.</p>
+            <div class="rob-kit-languages"><span>mBlock (Scratch)</span><span>Arduino C</span><span>Python</span></div>
+        </div>
+        {# SVG: mBot board diagram #}
+        <div class="rob-kit-diagram" aria-label="mBot board diagram">
+            <svg viewBox="0 0 300 230" class="rob-svg">
+                <!-- Chassis base -->
+                <rect x="15" y="60" width="270" height="150" rx="12" fill="#1e0a3e" stroke="#db2777" stroke-width="2"/>
+                <rect x="25" y="70" width="250" height="130" rx="8" fill="#16082e"/>
+                <!-- mCore board centre -->
+                <rect x="80" y="80" width="140" height="90" rx="6" fill="#12082e" stroke="#6d28d9" stroke-width="1.5"/>
+                <text x="150" y="104" text-anchor="middle" fill="#db2777" font-size="10" font-weight="bold" font-family="monospace">mCore</text>
+                <text x="150" y="118" text-anchor="middle" fill="#6d28d9" font-size="8" font-family="monospace">ATmega328P</text>
+                <!-- Blinking LED -->
+                <circle cx="198" cy="95" r="6" fill="#f0abfc"><animate attributeName="opacity" values="1;0.2;1" dur="0.9s" repeatCount="indefinite"/></circle>
+                <text x="198" y="110" text-anchor="middle" fill="#f0abfc" font-size="7">RGB</text>
+                <!-- IR sensors (front) -->
+                <rect x="30" y="90" width="34" height="20" rx="4" fill="#0a0a1a" stroke="#67e8f9" stroke-width="1.5"/>
+                <text x="47" y="103" text-anchor="middle" fill="#67e8f9" font-size="7">IR-L</text>
+                <rect x="30" y="115" width="34" height="20" rx="4" fill="#0a0a1a" stroke="#67e8f9" stroke-width="1.5"/>
+                <text x="47" y="128" text-anchor="middle" fill="#67e8f9" font-size="7">IR-R</text>
+                <!-- Ultrasonic (nose) -->
+                <rect x="16" y="100" width="12" height="30" rx="3" fill="#0c1a2e" stroke="#38bdf8" stroke-width="1.5"/>
+                <text x="22" y="118" text-anchor="middle" fill="#38bdf8" font-size="6" transform="rotate(-90 22 118)">US</text>
+                <!-- DC Motors -->
+                <rect x="26" y="165" width="40" height="18" rx="4" fill="#0a1929" stroke="#10b981" stroke-width="1.5"/>
+                <text x="46" y="177" text-anchor="middle" fill="#10b981" font-size="7">Motor L</text>
+                <rect x="234" y="165" width="40" height="18" rx="4" fill="#0a1929" stroke="#10b981" stroke-width="1.5"/>
+                <text x="254" y="177" text-anchor="middle" fill="#10b981" font-size="7">Motor R</text>
+                <!-- Wheels -->
+                <ellipse cx="35" cy="205" rx="18" ry="10" fill="none" stroke="#4b5563" stroke-width="3"/>
+                <ellipse cx="265" cy="205" rx="18" ry="10" fill="none" stroke="#4b5563" stroke-width="3"/>
+                <!-- Bluetooth -->
+                <rect x="220" y="82" width="40" height="20" rx="4" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5"/>
+                <text x="240" y="95" text-anchor="middle" fill="#818cf8" font-size="7">BT 4.0</text>
+                <!-- Battery slot -->
+                <rect x="100" y="155" width="100" height="22" rx="4" fill="#1a0a3e" stroke="#db2777" stroke-width="1.5"/>
+                <text x="150" y="170" text-anchor="middle" fill="#db2777" font-size="8">4× AA Battery</text>
+                <!-- Port labels -->
+                <text x="90" y="145" fill="#fbbf24" font-size="7" font-family="monospace">Port 1</text>
+                <text x="130" y="145" fill="#fbbf24" font-size="7" font-family="monospace">Port 2</text>
+                <text x="170" y="145" fill="#fbbf24" font-size="7" font-family="monospace">Port 3</text>
+                <!-- Pulse on IR -->
+                <circle cx="22" cy="115" r="8" fill="none" stroke="#38bdf8" stroke-opacity=".3"><animate attributeName="r" values="6;16;6" dur="2s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values=".4;0;.4" dur="2s" repeatCount="indefinite"/></circle>
+            </svg>
+        </div>
+    </div>
+
+    <div class="rob-kit-body">
+        <div class="rob-components-panel">
+            <h3 class="rob-panel-title">📦 What's in the mBot kit</h3>
+            <div class="rob-component-grid">
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#2e1065;border-color:#7c3aed;">🤖</div><span>mBot Chassis (pre-cut)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#12082e;border-color:#db2777;">🧠</div><span>mCore Controller Board</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#052e16;border-color:#10b981;">⚙️</div><span>DC Gear Motors (x2)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0c2340;border-color:#38bdf8;">📡</div><span>HC-SR04 Ultrasonic Sensor</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0a0a1a;border-color:#67e8f9;">➰</div><span>Line-Follow Sensors (x2)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1e1b4b;border-color:#818cf8;">📶</div><span>Bluetooth 4.0 Module</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1a0a3e;border-color:#f0abfc;">🌈</div><span>RGB LED (x2)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1c1917;border-color:#f59e0b;">🔩</div><span>Screws + Screwdriver</span></div>
+            </div>
+        </div>
+
+        <div class="rob-manual">
+            <h3 class="rob-panel-title">🔧 mBot Assembly Guide</h3>
+            <div class="rob-steps">
+
+                <div class="rob-step" data-step="1">
+                    <div class="rob-step-num">1</div>
+                    <div class="rob-step-content">
+                        <h4>Assemble the chassis frame</h4>
+                        <p>Lay the acrylic base plate flat. Attach the two motor brackets to the underside using M3 screws (4 per motor). The gear box faces outward. Don't overtighten — just snug.</p>
+                        <div class="rob-wiring-diagram" style="background:#0f0f1a;">
+                            <svg viewBox="0 0 420 110" class="rob-svg-small">
+                                <text x="20" y="25" fill="#db2777" font-size="11" font-family="monospace" font-weight="bold">CHASSIS ASSEMBLY</text>
+                                <!-- Base plate -->
+                                <rect x="100" y="35" width="220" height="60" rx="6" fill="#1e0a3e" stroke="#db2777" stroke-width="1.5"/>
+                                <text x="210" y="70" text-anchor="middle" fill="#db2777" font-size="9">Acrylic Base Plate</text>
+                                <!-- Left motor bracket -->
+                                <rect x="60" y="45" width="44" height="40" rx="4" fill="#0a1929" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="82" y="68" text-anchor="middle" fill="#10b981" font-size="7">Motor L</text>
+                                <!-- Right motor bracket -->
+                                <rect x="316" y="45" width="44" height="40" rx="4" fill="#0a1929" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="338" y="68" text-anchor="middle" fill="#10b981" font-size="7">Motor R</text>
+                                <!-- Screw indicators -->
+                                <circle cx="106" cy="42" r="4" fill="#f59e0b"/><text x="106" y="46" text-anchor="middle" fill="#1a1a1a" font-size="6">✕</text>
+                                <circle cx="314" cy="42" r="4" fill="#f59e0b"/><text x="314" y="46" text-anchor="middle" fill="#1a1a1a" font-size="6">✕</text>
+                                <circle cx="106" cy="88" r="4" fill="#f59e0b"/><text x="106" y="92" text-anchor="middle" fill="#1a1a1a" font-size="6">✕</text>
+                                <circle cx="314" cy="88" r="4" fill="#f59e0b"/><text x="314" y="92" text-anchor="middle" fill="#1a1a1a" font-size="6">✕</text>
+                                <text x="20" y="100" fill="#6b7280" font-size="8">💡 Use the smallest Phillips screwdriver in the kit</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="2">
+                    <div class="rob-step-num">2</div>
+                    <div class="rob-step-content">
+                        <h4>Mount the mCore board and connect motors</h4>
+                        <p>Screw the mCore onto the top of the chassis (4 standoff pillars). Connect the left motor to <strong>M1</strong> and the right motor to <strong>M2</strong> using the RJ25 cables (they only fit one way).</p>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 420 140" class="rob-svg-small">
+                                <!-- mCore board -->
+                                <rect x="120" y="20" width="180" height="100" rx="6" fill="#12082e" stroke="#6d28d9" stroke-width="2"/>
+                                <text x="210" y="45" text-anchor="middle" fill="#db2777" font-size="10" font-weight="bold">mCore Board</text>
+                                <!-- M1 port -->
+                                <rect x="130" y="90" width="36" height="20" rx="3" fill="#1e1e3f" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="148" y="103" text-anchor="middle" fill="#10b981" font-size="8" font-weight="bold">M1</text>
+                                <!-- M2 port -->
+                                <rect x="254" y="90" width="36" height="20" rx="3" fill="#1e1e3f" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="272" y="103" text-anchor="middle" fill="#10b981" font-size="8" font-weight="bold">M2</text>
+                                <!-- Left motor -->
+                                <rect x="20" y="75" width="70" height="40" rx="5" fill="#0a1929" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="55" y="99" text-anchor="middle" fill="#10b981" font-size="8">Motor L</text>
+                                <!-- Right motor -->
+                                <rect x="330" y="75" width="70" height="40" rx="5" fill="#0a1929" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="365" y="99" text-anchor="middle" fill="#10b981" font-size="8">Motor R</text>
+                                <!-- RJ25 cables (animated) -->
+                                <path d="M90 95 L130 100" stroke="#f0abfc" stroke-width="2.5" stroke-dasharray="5,3"><animate attributeName="stroke-dashoffset" from="80" to="0" dur="1.5s" repeatCount="indefinite"/></path>
+                                <path d="M330 95 L290 100" stroke="#f0abfc" stroke-width="2.5" stroke-dasharray="5,3"><animate attributeName="stroke-dashoffset" from="80" to="0" dur="1.5s" repeatCount="indefinite"/></path>
+                                <text x="100" y="88" fill="#f0abfc" font-size="7">RJ25</text>
+                                <text x="296" y="88" fill="#f0abfc" font-size="7">RJ25</text>
+                            </svg>
+                        </div>
+                        <div class="rob-tip">🔌 <strong>RJ25 cables</strong> look like phone cables. They click into the ports and can only be inserted one way — don't force them.</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="3">
+                    <div class="rob-step-num">3</div>
+                    <div class="rob-step-content">
+                        <h4>Attach the Ultrasonic Sensor to the front</h4>
+                        <p>Screw the ultrasonic sensor bracket to the front face of the chassis. Plug the RJ25 cable into <strong>Port 3</strong> on the mCore board. The two "eyes" (Trig/Echo) face forward.</p>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 400 120" class="rob-svg-small">
+                                <!-- Front plate -->
+                                <rect x="150" y="20" width="100" height="80" rx="6" fill="#1e0a3e" stroke="#db2777" stroke-width="1.5"/>
+                                <text x="200" y="40" text-anchor="middle" fill="#db2777" font-size="8">Front Plate</text>
+                                <!-- Ultrasonic eyes -->
+                                <circle cx="178" cy="65" r="14" fill="#0a0a1a" stroke="#38bdf8" stroke-width="2"/>
+                                <circle cx="178" cy="65" r="8" fill="#1e3a5f"/>
+                                <text x="178" y="90" text-anchor="middle" fill="#38bdf8" font-size="7">TRIG</text>
+                                <circle cx="222" cy="65" r="14" fill="#0a0a1a" stroke="#38bdf8" stroke-width="2"/>
+                                <circle cx="222" cy="65" r="8" fill="#1e3a5f"/>
+                                <text x="222" y="90" text-anchor="middle" fill="#38bdf8" font-size="7">ECHO</text>
+                                <!-- Cable to mCore -->
+                                <path d="M250 65 L310 65" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="5,3"><animate attributeName="stroke-dashoffset" from="50" to="0" dur="1.5s" repeatCount="indefinite"/></path>
+                                <rect x="310" y="55" width="50" height="20" rx="3" fill="#1e1e3f" stroke="#fbbf24" stroke-width="1.5"/>
+                                <text x="335" y="69" text-anchor="middle" fill="#fbbf24" font-size="8">Port 3</text>
+                                <!-- Distance wave animation -->
+                                <path d="M95 65 Q105 55 115 65 Q125 75 135 65" stroke="#38bdf8" stroke-width="1.5" fill="none" opacity=".7"><animate attributeName="opacity" values=".7;0;.7" dur="1.5s" repeatCount="indefinite"/></path>
+                                <text x="95" y="90" fill="#38bdf8" font-size="7">Ultrasound beam</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="4">
+                    <div class="rob-step-num">4</div>
+                    <div class="rob-step-content">
+                        <h4>Attach Line-Follow Sensors to the underside</h4>
+                        <p>Mount the line-follow sensor bracket on the underside front, about 3–5 mm above the ground. Connect to <strong>Port 2</strong>. The two IR eyes should point directly down at the floor.</p>
+                        <div class="rob-tip">📏 <strong>Height matters:</strong> Too high = misses the line. Too low = bumps the ground. Test with a piece of white paper and a black tape line.</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="5">
+                    <div class="rob-step-num">5</div>
+                    <div class="rob-step-content">
+                        <h4>Install 4 × AA batteries and power on</h4>
+                        <p>Slide the battery holder into the base plate. Switch the power toggle to ON. Both RGB LEDs should flash pink/purple for 2 seconds — that means the board is ready.</p>
+                        <div class="rob-tip">🔋 Use alkaline batteries (not rechargeable NiMH). The lower voltage of NiMH can cause motors to spin slowly or the board to reset mid-run.</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="6">
+                    <div class="rob-step-num">6</div>
+                    <div class="rob-step-content">
+                        <h4>Program with mBlock (Scratch-based IDE)</h4>
+                        <p>Download <strong>mBlock 5</strong> (free). Connect via USB or Bluetooth. Drag the Move Forward block and click Run — your robot drives!</p>
+                        <div class="rob-code-block">
+                            <div class="rob-code-header">mBot Obstacle Avoider — Arduino C</div>
+<pre><code class="language-cpp">#include &lt;MeMCore.h&gt;
+
+MeDCMotor motorL(M1);
+MeDCMotor motorR(M2);
+MeUltrasonicSensor us(PORT_3);
+
+void setup() {
+    Serial.begin(9600);
+}
+
+void loop() {
+    float dist = us.distanceCm();
+    Serial.print("Distance: "); Serial.print(dist); Serial.println(" cm");
+
+    if (dist > 20) {
+        // Clear path — drive forward
+        motorL.run(-200);
+        motorR.run( 200);
+    } else {
+        // Obstacle! — stop and turn right
+        motorL.stop();
+        motorR.stop();
+        delay(300);
+        motorL.run(-200);   // spin right
+        motorR.run(-200);
+        delay(500);
+    }
+    delay(50);
+}</code></pre>
+                        </div>
+                        <div class="rob-project-ideas">
+                            <strong>🚀 Project ideas:</strong>
+                            <ul>
+                                <li>Line follower: black tape track on white floor</li>
+                                <li>Bluetooth-controlled car using the mBlock app</li>
+                                <li>Light-chaser: drive towards the brightest light source</li>
+                                <li>Dance robot: choreograph moves to music timing</li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-accent btn-small" href="{% url 'academy:tryit' %}?kit=mbot">Practice in Terminal →</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     KIT 5: VEX IQ  — Advanced / Competition
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="rob-kit" data-level="advanced" id="kit-vex">
+    <div class="rob-kit-hero" style="background:linear-gradient(135deg,#0a0f1a,#0369a1,#0ea5e9);">
+        <div class="rob-kit-hero-text">
+            <span class="rob-kit-badge">Advanced · Competition</span>
+            <h2>VEX IQ</h2>
+            <p>Competition-grade snap-together robotics used in the VEX IQ Challenge — the world's largest robotics competition. Engineering at its finest.</p>
+            <div class="rob-kit-languages"><span>VEXcode IQ (Blocks)</span><span>VEXcode IQ (Python)</span><span>RobotC (advanced)</span></div>
+        </div>
+        {# SVG: VEX IQ Brain diagram #}
+        <div class="rob-kit-diagram" aria-label="VEX IQ Brain diagram">
+            <svg viewBox="0 0 320 230" class="rob-svg">
+                <!-- Brain body -->
+                <rect x="20" y="20" width="280" height="190" rx="10" fill="#061522" stroke="#0ea5e9" stroke-width="2"/>
+                <!-- Screen area -->
+                <rect x="35" y="35" width="180" height="90" rx="6" fill="#0a1929" stroke="#0369a1" stroke-width="1.5"/>
+                <rect x="42" y="42" width="166" height="76" rx="4" fill="#050e19"/>
+                <text x="125" y="74" text-anchor="middle" fill="#0ea5e9" font-size="10" font-family="monospace" font-weight="bold">VEX IQ Brain</text>
+                <text x="125" y="88" text-anchor="middle" fill="#0369a1" font-size="8" font-family="monospace">Program: AUTO_1</text>
+                <text x="125" y="102" text-anchor="middle" fill="#10b981" font-size="8" font-family="monospace">● READY</text>
+                <!-- Buttons -->
+                <rect x="228" y="45" width="32" height="18" rx="4" fill="#0369a1" stroke="#0ea5e9" stroke-width="1.5"/>
+                <text x="244" y="57" text-anchor="middle" fill="#fff" font-size="8">▶</text>
+                <rect x="228" y="68" width="32" height="18" rx="4" fill="#0a1929" stroke="#0369a1" stroke-width="1"/>
+                <text x="244" y="80" text-anchor="middle" fill="#0ea5e9" font-size="8">■</text>
+                <rect x="228" y="91" width="32" height="18" rx="4" fill="#0a1929" stroke="#0369a1" stroke-width="1"/>
+                <text x="244" y="103" text-anchor="middle" fill="#0369a1" font-size="8">⚙</text>
+                <!-- Smart Motor Ports (left side, 6 ports) -->
+                <text x="30" y="148" fill="#f59e0b" font-size="7.5" font-family="monospace" font-weight="bold">MOTORS</text>
+                {% for i in "123456" %}<rect x="{{ forloop.counter|add:24 }}" y="152" width="22" height="16" rx="3" fill="#0a1929" stroke="#f59e0b" stroke-width="1"/><text x="{{ forloop.counter|add:35 }}" y="163" text-anchor="middle" fill="#f59e0b" font-size="7">{{ forloop.counter }}</text>{% endfor %}
+                <!-- Sensor Ports (right side) -->
+                <text x="160" y="148" fill="#67e8f9" font-size="7.5" font-family="monospace" font-weight="bold">SENSORS</text>
+                <rect x="160" y="152" width="22" height="16" rx="3" fill="#0a1929" stroke="#67e8f9" stroke-width="1"/><text x="171" y="163" text-anchor="middle" fill="#67e8f9" font-size="7">A</text>
+                <rect x="186" y="152" width="22" height="16" rx="3" fill="#0a1929" stroke="#67e8f9" stroke-width="1"/><text x="197" y="163" text-anchor="middle" fill="#67e8f9" font-size="7">B</text>
+                <rect x="212" y="152" width="22" height="16" rx="3" fill="#0a1929" stroke="#67e8f9" stroke-width="1"/><text x="223" y="163" text-anchor="middle" fill="#67e8f9" font-size="7">C</text>
+                <rect x="238" y="152" width="22" height="16" rx="3" fill="#0a1929" stroke="#67e8f9" stroke-width="1"/><text x="249" y="163" text-anchor="middle" fill="#67e8f9" font-size="7">D</text>
+                <!-- Battery indicator -->
+                <rect x="30" y="183" width="80" height="14" rx="3" fill="#0a1929" stroke="#10b981" stroke-width="1"/>
+                <rect x="32" y="185" width="55" height="10" rx="2" fill="#10b981" opacity=".8"/>
+                <text x="125" y="194" fill="#10b981" font-size="7">Battery: 75%</text>
+                <!-- USB + WiFi -->
+                <rect x="260" y="183" width="25" height="14" rx="3" fill="#1e1b4b" stroke="#818cf8" stroke-width="1"/>
+                <text x="272" y="193" text-anchor="middle" fill="#818cf8" font-size="6">WiFi</text>
+                <!-- Pulse on motor port 1 -->
+                <circle cx="35" cy="160" r="12" fill="none" stroke="#f59e0b" stroke-opacity=".2"><animate attributeName="r" values="8;18;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values=".4;0;.4" dur="2.5s" repeatCount="indefinite"/></circle>
+            </svg>
+        </div>
+    </div>
+
+    <div class="rob-kit-body">
+        <div class="rob-components-panel">
+            <h3 class="rob-panel-title">📦 What's in the VEX IQ Starter Kit</h3>
+            <div class="rob-component-grid">
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0a1929;border-color:#0ea5e9;">🧠</div><span>IQ Brain (Controller)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#052e16;border-color:#10b981;">⚙️</div><span>Smart Motors (x4)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0c2340;border-color:#38bdf8;">📡</div><span>Distance Sensor</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1e1b4b;border-color:#818cf8;">🎨</div><span>Color/Light Sensor</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0a1929;border-color:#f59e0b;">📐</div><span>Bumper Sensors (x2)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1a0a3e;border-color:#f0abfc;">🕹️</div><span>Controller (gamepad)</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#0f2318;border-color:#22c55e;">🔩</div><span>350+ beam/pin pieces</span></div>
+                <div class="rob-component"><div class="rob-comp-icon" style="background:#1c1917;border-color:#f59e0b;">🔋</div><span>Rechargeable Battery</span></div>
+            </div>
+        </div>
+
+        <div class="rob-manual">
+            <h3 class="rob-panel-title">🔧 VEX IQ Clawbot Assembly Guide</h3>
+            <div class="rob-steps">
+
+                <div class="rob-step" data-step="1">
+                    <div class="rob-step-num">1</div>
+                    <div class="rob-step-content">
+                        <h4>Understand the VEX IQ snap-fit system</h4>
+                        <p>VEX IQ uses injection-moulded ABS plastic beams, pins, and connectors. No tools needed — everything snaps together. Red pins are structural (permanent), black pins are removable.</p>
+                        <div class="rob-wiring-diagram" style="background:#0a1020;">
+                            <svg viewBox="0 0 400 100" class="rob-svg-small">
+                                <text x="20" y="22" fill="#0ea5e9" font-size="11" font-family="monospace" font-weight="bold">PIN COLOUR CODE</text>
+                                <!-- Red pin -->
+                                <circle cx="50" cy="60" r="10" fill="#ef4444" stroke="#dc2626" stroke-width="1.5"/>
+                                <text x="70" y="55" fill="#f87171" font-size="9">Red pin</text>
+                                <text x="70" y="68" fill="#6b7280" font-size="8">Structural — snap once, stays</text>
+                                <!-- Black pin -->
+                                <circle cx="220" cy="60" r="10" fill="#374151" stroke="#6b7280" stroke-width="1.5"/>
+                                <text x="240" y="55" fill="#9ca3af" font-size="9">Black pin</text>
+                                <text x="240" y="68" fill="#6b7280" font-size="8">Removable — pull with pin tool</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="2">
+                    <div class="rob-step-num">2</div>
+                    <div class="rob-step-content">
+                        <h4>Build the drivetrain (4-wheel base)</h4>
+                        <p>Attach 2 double-beam rails as the left/right side chassis rails. Snap in 4 axle brackets. Mount a Smart Motor behind each rear wheel. Press the omnidirectional wheels onto the front axles.</p>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 460 160" class="rob-svg-small">
+                                <!-- Chassis rails -->
+                                <rect x="100" y="40" width="260" height="18" rx="4" fill="#0a1929" stroke="#0ea5e9" stroke-width="1.5"/>
+                                <rect x="100" y="102" width="260" height="18" rx="4" fill="#0a1929" stroke="#0ea5e9" stroke-width="1.5"/>
+                                <text x="230" y="32" text-anchor="middle" fill="#0ea5e9" font-size="8">Double-Beam Rails</text>
+                                <!-- Rear motors -->
+                                <rect x="50" y="35" width="54" height="30" rx="5" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="77" y="53" text-anchor="middle" fill="#10b981" font-size="8">Motor</text>
+                                <rect x="50" y="97" width="54" height="30" rx="5" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="77" y="115" text-anchor="middle" fill="#10b981" font-size="8">Motor</text>
+                                <!-- Wheels -->
+                                <ellipse cx="72" cy="50" rx="10" ry="16" fill="none" stroke="#4b5563" stroke-width="3"/>
+                                <ellipse cx="72" cy="112" rx="10" ry="16" fill="none" stroke="#4b5563" stroke-width="3"/>
+                                <ellipse cx="395" cy="50" rx="10" ry="16" fill="none" stroke="#4b5563" stroke-width="3"/>
+                                <ellipse cx="395" cy="112" rx="10" ry="16" fill="none" stroke="#4b5563" stroke-width="3"/>
+                                <!-- Omni labels -->
+                                <text x="395" y="38" text-anchor="middle" fill="#6b7280" font-size="7">Omni wheel</text>
+                                <!-- Smart port connectors -->
+                                <path d="M104 50 L76 50" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,2"/>
+                                <path d="M104 112 L76 112" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,2"/>
+                                <text x="108" y="65" fill="#f59e0b" font-size="7">Port 1</text>
+                                <text x="108" y="125" fill="#f59e0b" font-size="7">Port 2</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="3">
+                    <div class="rob-step-num">3</div>
+                    <div class="rob-step-content">
+                        <h4>Mount the IQ Brain and connect Smart Motors</h4>
+                        <p>Snap the IQ Brain onto the top-centre of the chassis using the beam holes. Connect the two drive motors to <strong>Ports 1 and 6</strong>. The VEX Smart cables click in firmly — you'll hear a snap.</p>
+                        <div class="rob-tip">⚡ <strong>Smart Ports auto-detect</strong> what's connected. No need to configure motor types in software — the Brain reads it automatically.</div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="4">
+                    <div class="rob-step-num">4</div>
+                    <div class="rob-step-content">
+                        <h4>Build and attach the Clawbot arm</h4>
+                        <p>Build the arm using 2× 10-hole beams as the lift arm, connected to a Smart Motor on Port 3 via a 60-tooth gear. Mount the claw assembly at the tip — it connects to a motor on Port 4.</p>
+                        <div class="rob-wiring-diagram">
+                            <svg viewBox="0 0 420 150" class="rob-svg-small">
+                                <!-- Arm beam -->
+                                <rect x="130" y="50" width="160" height="14" rx="3" fill="#0a1929" stroke="#0ea5e9" stroke-width="1.5"/>
+                                <text x="210" y="42" text-anchor="middle" fill="#0ea5e9" font-size="8">Lift Arm (10-hole beam)</text>
+                                <!-- Gear -->
+                                <circle cx="140" cy="57" r="18" fill="none" stroke="#f59e0b" stroke-width="2"/>
+                                <circle cx="140" cy="57" r="8" fill="#0a1929" stroke="#f59e0b" stroke-width="1.5"/>
+                                <text x="140" y="62" text-anchor="middle" fill="#f59e0b" font-size="7">60T</text>
+                                <!-- Arm motor -->
+                                <rect x="60" y="44" width="50" height="26" rx="4" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="85" y="60" text-anchor="middle" fill="#10b981" font-size="8">Motor P3</text>
+                                <!-- Claw -->
+                                <path d="M290 57 L330 40 L360 50 M290 57 L330 75 L360 65" stroke="#38bdf8" stroke-width="2.5" fill="none"/>
+                                <text x="355" y="60" fill="#38bdf8" font-size="8">Claw</text>
+                                <!-- Claw motor -->
+                                <rect x="270" y="48" width="20" height="18" rx="3" fill="#052e16" stroke="#10b981" stroke-width="1"/>
+                                <text x="280" y="60" text-anchor="middle" fill="#10b981" font-size="6">P4</text>
+                                <!-- Pivot pin -->
+                                <circle cx="130" cy="57" r="5" fill="#ef4444"/>
+                                <text x="130" y="80" text-anchor="middle" fill="#ef4444" font-size="7">Red pivot pin</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rob-step" data-step="5">
+                    <div class="rob-step-num">5</div>
+                    <div class="rob-step-content">
+                        <h4>Program with VEXcode IQ Python</h4>
+                        <div class="rob-code-block">
+                            <div class="rob-code-header">VEXcode IQ Python — Driver Control (Competition Ready)</div>
+<pre><code class="language-python">from vex import *
+
+brain  = Brain()
+left   = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
+right  = Motor(Ports.PORT6, GearSetting.RATIO_18_1, True)
+arm    = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
+claw   = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)
+ctrl   = Controller()
+
+brain.screen.print("VEX Clawbot Ready!")
+
+# Driver-control loop
+while True:
+    # Tank drive: left stick Y → left motor, right stick Y → right motor
+    left.spin(FORWARD,  ctrl.axisA.value(), PERCENT)
+    right.spin(FORWARD, ctrl.axisD.value(), PERCENT)
+
+    # ButtonL2 / ButtonR2 → raise/lower arm
+    if ctrl.buttonL2.pressing():
+        arm.spin(FORWARD, 80, PERCENT)
+    elif ctrl.buttonL1.pressing():
+        arm.spin(REVERSE, 80, PERCENT)
+    else:
+        arm.stop(HOLD)
+
+    # ButtonR1 / ButtonR2 → open/close claw
+    if ctrl.buttonR1.pressing():
+        claw.spin(FORWARD, 80, PERCENT)
+    elif ctrl.buttonR2.pressing():
+        claw.spin(REVERSE, 80, PERCENT)
+    else:
+        claw.stop(HOLD)
+
+    wait(20, MSEC)</code></pre>
+                        </div>
+                        <div class="rob-project-ideas">
+                            <strong>🏆 Competition skills to master:</strong>
+                            <ul>
+                                <li>Autonomous 15-second routine (pre-programmed path)</li>
+                                <li>Odometry: track X/Y position using motor encoders</li>
+                                <li>PID motor control for smooth, accurate movement</li>
+                                <li>Strategy planning: analyse the game manual and score optimally</li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-accent btn-small" href="{% url 'academy:tryit' %}?kit=vex">Practice in Terminal →</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>{# /container #}
+
+{# ══ TERMINAL CTA SECTION ══ #}
+<section class="rob-terminal-cta">
+    <div class="rob-terminal-preview" aria-hidden="true">
+        <div class="rob-term-bar"><span class="rob-dot rob-red"></span><span class="rob-dot rob-yellow"></span><span class="rob-dot rob-green"></span><span style="margin-left:8px;color:#6b7280;font-size:.78rem;">CodeSavannah Robotics Terminal</span></div>
+        <div class="rob-term-body">
+            <div><span class="rob-term-prompt">student@codesavannah:~$</span> <span class="rob-term-cmd">python3 blink.py</span></div>
+            <div class="rob-term-out">🔴 LED blink program started. Ctrl+C to stop.</div>
+            <div class="rob-term-out">● ON </div>
+            <div class="rob-term-out">○ OFF</div>
+            <div class="rob-term-out">● ON </div>
+            <div><span class="rob-term-prompt">student@codesavannah:~$</span> <span class="rob-term-cmd">gpio readall</span></div>
+            <div class="rob-term-out">+-----+-----+---------+------+---+---Pi 4B--+---+------+---------+-----+-----+</div>
+            <div class="rob-term-out"> | BCM | wPi |   Name  | Mode | V | Physical | V | Mode |  Name   | wPi | BCM |</div>
+            <div class="rob-term-out"> |     |     |    3.3v |      |   |  1 || 2  |   |      | 5v      |     |     |</div>
+            <div class="rob-term-out"> |  17 |   0 |   GPIO0 | OUT  | 1 | 11 || 12 | 0 | IN   | GPIO1   | 1   | 18  |</div>
+            <div><span class="rob-term-prompt">student@codesavannah:~$</span> <span class="rob-term-cursor">█</span></div>
+        </div>
+    </div>
+    <div class="rob-terminal-cta-text">
+        <p class="eyebrow" style="color:var(--accent);">Integrated Terminal</p>
+        <h2>Practice robotics code<br>right in your browser</h2>
+        <p style="color:rgba(255,255,255,.72);margin:14px 0 22px;">Run Python, simulate GPIO, practice Arduino C++, and execute Linux commands — no hardware needed to get started.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <a class="btn btn-accent btn-icon" href="{% url 'academy:tryit' %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                Open Robotics Terminal
+            </a>
+            <a class="btn light-ghost" href="{% url 'academy:assessment' %}">What level am I?</a>
+        </div>
+    </div>
+</section>
+
+{# ══ SCRATCH SECTION ══ #}
+<section class="section section-soft" id="scratch">
+    <div class="container">
+        <div class="two-column">
+            <div class="reveal reveal-left">
+                <p class="eyebrow" style="color:#a78bfa;">For Kids · Ages 6–12</p>
+                <h2>Start with Scratch — where coding meets play</h2>
+                <p style="color:var(--muted);margin-top:14px;">Scratch uses colourful snap-together blocks. No typing needed. Drag blocks to make sprites move, respond to sensors, and control virtual robots.</p>
+                <div class="check-list" style="margin-top:22px;">
+                    <li>Build your first robot controller in under 30 minutes</li>
+                    <li>Control LEGO robots using Scratch extension</li>
+                    <li>Bridge to real code: Python and JavaScript come next</li>
+                    <li>Used in 150+ countries by 100+ million students</li>
+                </div>
+                <a class="btn btn-emerald" href="{% url 'academy:lesson' 'scratch-for-kids' 1 %}" style="margin-top:22px;display:inline-flex;">Start Scratch Lessons</a>
+            </div>
+            <div class="scratch-blocks-preview reveal reveal-right">
+                <div class="scratch-block scratch-event">when 🚩 clicked</div>
+                <div class="scratch-block scratch-control">repeat <span>10</span> times</div>
+                <div class="scratch-block scratch-motion">&nbsp;&nbsp;move <span>20</span> steps</div>
+                <div class="scratch-block scratch-looks">&nbsp;&nbsp;next costume</div>
+                <div class="scratch-block scratch-sound">&nbsp;&nbsp;play sound <span>Motor</span></div>
+                <div class="scratch-block scratch-control">&nbsp;&nbsp;wait <span>0.1</span> seconds</div>
+                <div class="scratch-block scratch-control">end repeat</div>
+                <div class="scratch-block scratch-motion">if on edge, bounce</div>
+                <div class="scratch-block scratch-event">when <span>distance &lt; 10</span></div>
+                <div class="scratch-block scratch-looks">  say <span>Obstacle!</span> for <span>2</span> secs</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container cta-layout">
+        <h2>Ready to build your first robot?</h2>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <a class="btn btn-accent" href="{% url 'accounts:register' %}">Join Robotics Club</a>
+            <a class="btn light-ghost" href="{% url 'academy:tryit' %}">Open Terminal</a>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" crossorigin="anonymous"></script>
+<script>
+/* Level filter */
+document.querySelectorAll(".rob-level-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+        document.querySelectorAll(".rob-level-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const level = tab.dataset.level;
+        document.querySelectorAll(".rob-kit").forEach(kit => {
+            kit.style.display = (level === "all" || kit.dataset.level === level) ? "" : "none";
+        });
+    });
+});
+
+/* Highlight Prism blocks */
+if (window.Prism) Prism.highlightAll();
+</script>
+{% endblock %}

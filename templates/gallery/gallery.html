@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Gallery | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Gallery</p>
+        <h1>Moments from our learning community.</h1>
+        <p>Training sessions, workshops, graduation ceremonies, hackathons, student projects, and community outreach.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="category-pills" aria-label="Gallery categories">
+            <a class="{% if not active_category %}active{% endif %}" href="{% url 'gallery:list' %}">All</a>
+            {% for value, label in categories %}
+                <a class="{% if active_category == value %}active{% endif %}" href="?category={{ value }}">{{ label }}</a>
+            {% endfor %}
+        </div>
+
+        <div class="gallery-grid">
+            {% for image in images %}
+                <article class="gallery-item">
+                    {% if image.image %}
+                        <img src="{{ image.image.url }}" alt="{{ image.title }}">
+                    {% else %}
+                        <div class="gallery-placeholder">
+                            <span>{{ image.get_category_display }}</span>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h2>{{ image.title }}</h2>
+                        <p>{{ image.caption }}</p>
+                        {% if image.suggested_placement %}
+                            <p class="analysis-note"><strong>Suggested placement:</strong> {{ image.suggested_placement }}</p>
+                        {% endif %}
+                        {% if image.educational_relevance %}
+                            <p class="analysis-note"><strong>Educational relevance:</strong> {{ image.educational_relevance }}</p>
+                        {% endif %}
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-state">Gallery images will appear after they are uploaded in the admin dashboard.</p>
+            {% endfor %}
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</section>
+{% endblock %}

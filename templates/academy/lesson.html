@@ -1,0 +1,712 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ lesson.title }} | {{ path.title }} | CodeSavannah Academy{% endblock %}
+{% block meta_description %}{{ lesson.objective }}{% endblock %}
+
+{% block content %}
+{# Load Prism.js + Marked.js from CDN for syntax highlighting + markdown #}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+<div class="ws-layout">
+
+    {# ══════════════════════════════════════════
+       LEFT SIDEBAR — lesson navigator
+       ══════════════════════════════════════════ #}
+    <aside class="ws-sidebar" aria-label="Lesson navigation">
+        <div class="ws-sidebar-header">
+            <a class="ws-sidebar-back" href="{% url 'academy:learning_path_detail' path.slug %}">
+                ← {{ path.title }}
+            </a>
+            <div class="ws-sidebar-progress">
+                <div class="ws-sidebar-progress-bar">
+                    <div class="ws-sidebar-progress-fill" style="width:{{ completed_pct }}%"></div>
+                </div>
+                <span>{{ completed_pct }}% complete</span>
+            </div>
+        </div>
+
+        <nav class="ws-lesson-nav" aria-label="All lessons">
+            {% for l in lessons %}
+            <a class="ws-lesson-link {% if l.pk == lesson.pk %}active{% endif %}"
+               href="{% url 'academy:lesson' path.slug l.order %}"
+               title="{{ l.title }}">
+                <span class="ws-lesson-num">{{ l.order }}</span>
+                {{ l.title }}
+                {% if l.pk == lesson.pk %}<span class="ws-active-dot" aria-hidden="true"></span>{% endif %}
+            </a>
+            {% empty %}
+            <p style="padding:16px;color:rgba(255,255,255,.4);">No lessons yet.</p>
+            {% endfor %}
+        </nav>
+
+        <div class="ws-sidebar-footer">
+            <a class="btn btn-emerald btn-small btn-full" href="{% url 'academy:ai_mentor' %}">
+                Ask Mentor AI
+            </a>
+        </div>
+    </aside>
+
+    {# ══════════════════════════════════════════
+       MAIN LESSON CONTENT
+       ══════════════════════════════════════════ #}
+    <div class="ws-main">
+
+        {# Breadcrumb #}
+        <nav class="ws-breadcrumb" aria-label="Breadcrumb">
+            <a href="{% url 'academy:learning_paths' %}">Learn</a>
+            <span>›</span>
+            <a href="{% url 'academy:learning_path_detail' path.slug %}">{{ path.title }}</a>
+            <span>›</span>
+            <span>{{ lesson.title }}</span>
+        </nav>
+
+        {# Top prev/next #}
+        <div class="ws-nav-row ws-nav-top">
+            {% if prev_lesson %}
+            <a class="ws-nav-btn ws-prev" href="{% url 'academy:lesson' path.slug prev_lesson.order %}">
+                ❮ Previous
+            </a>
+            {% else %}<span></span>{% endif %}
+            <span class="ws-lesson-counter">Lesson {{ lesson_num }} / {{ total_lessons }}</span>
+            {% if next_lesson %}
+            <a class="ws-nav-btn ws-next" href="{% url 'academy:lesson' path.slug next_lesson.order %}">
+                Next ❯
+            </a>
+            {% else %}<span></span>{% endif %}
+        </div>
+
+        {# Lesson title + objective #}
+        <h1 class="ws-lesson-title">{{ lesson.title }}</h1>
+        <p class="ws-lesson-subtitle">{{ lesson.objective }}</p>
+        <hr class="ws-divider">
+
+        {# ── MAIN CONTENT rendered from markdown ── #}
+        <div id="lesson-content" class="ws-content"></div>
+        {# Raw markdown stored in a hidden <script> tag to avoid HTML escaping issues #}
+        <script id="lesson-raw" type="text/plain">{{ lesson.content }}</script>
+
+        <hr class="ws-divider">
+
+        {# ── EXERCISE ── #}
+        {% if lesson.exercise_prompt %}
+        <div class="ws-exercise-section">
+            <h2 class="ws-section-title">
+                <span class="ws-section-icon">✏️</span> Exercise
+            </h2>
+            <div class="ws-exercise-box">
+                <div id="exercise-content" class="ws-content"></div>
+                <script id="exercise-raw" type="text/plain">{{ lesson.exercise_prompt }}</script>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── QUIZ ── #}
+        {% if lesson.quiz_question %}
+        <div class="ws-quiz-section">
+            <h2 class="ws-section-title">
+                <span class="ws-section-icon">🧠</span> Quick Quiz
+            </h2>
+            <div class="ws-quiz-box">
+                <p class="ws-quiz-question">{{ lesson.quiz_question }}</p>
+                <div class="ws-quiz-input-row">
+                    <input type="text" id="quiz-answer" class="ws-quiz-input" placeholder="Type your answer…" autocomplete="off">
+                    <button class="ws-btn-check" id="quiz-check-btn">Check Answer</button>
+                </div>
+                <div class="ws-quiz-feedback" id="quiz-feedback"></div>
+                <button class="ws-btn-show-answer" id="quiz-show-btn">Show Answer</button>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── PROJECT ── #}
+        {% if lesson.project_prompt %}
+        <div class="ws-project-section">
+            <h2 class="ws-section-title">
+                <span class="ws-section-icon">🚀</span> Project Challenge
+            </h2>
+            <div class="ws-project-box">
+                <div id="project-content" class="ws-content"></div>
+                <script id="project-raw" type="text/plain">{{ lesson.project_prompt }}</script>
+                <div style="margin-top:18px;">
+                    <a class="ws-btn-tryit" href="{% url 'academy:tryit' %}?lang={{ editor_lang }}" target="_blank" rel="noopener">
+                        Open Code Editor »
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── INSTRUCTOR NOTES ── #}
+        {% if lesson.notes %}
+        <div class="ws-notes-section">
+            <h2 class="ws-section-title">
+                <span class="ws-section-icon">📌</span> Instructor Notes
+            </h2>
+            <div class="ws-notes-box">
+                <p>{{ lesson.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── PERSONAL NOTES + VOICE DICTATION ── #}
+        <div class="ws-mynotes-section">
+            <h2 class="ws-section-title">
+                <span class="ws-section-icon">✍️</span> My Notes
+            </h2>
+            <div class="ws-mynotes-box">
+                <div class="ws-mynotes-toolbar">
+                    <button class="ws-notes-btn ws-notes-mic" id="ws-mic-btn" title="Dictate notes with your voice" aria-label="Start voice dictation" aria-pressed="false">
+                        <i class="bi bi-mic-fill" id="ws-mic-icon"></i>
+                        <span id="ws-mic-label">Dictate</span>
+                    </button>
+                    <span class="ws-notes-status" id="ws-mic-status" hidden></span>
+                    <div style="flex:1;"></div>
+                    <span class="ws-notes-charcount" id="ws-notes-chars">0 chars</span>
+                    <button class="ws-notes-btn ws-notes-copy" id="ws-notes-copy-btn" title="Copy notes to clipboard">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                    <button class="ws-notes-btn ws-notes-clear" id="ws-notes-clear-btn" title="Clear all notes">
+                        <i class="bi bi-trash"></i> Clear
+                    </button>
+                </div>
+                <textarea
+                    class="ws-notes-textarea"
+                    id="ws-notes-area"
+                    placeholder="Write your own notes here — or click Dictate to speak them…"
+                    rows="7"
+                    spellcheck="true"
+                    aria-label="Personal lesson notes"
+                ></textarea>
+                <p class="ws-notes-hint"><i class="bi bi-check-circle-fill" style="color:var(--success);"></i> Notes auto-saved in your browser</p>
+            </div>
+        </div>
+
+        {# ── BOTTOM PREV / NEXT ── #}
+        <hr class="ws-divider">
+        <div class="ws-nav-row ws-nav-bottom">
+            {% if prev_lesson %}
+            <a class="ws-nav-btn ws-prev" href="{% url 'academy:lesson' path.slug prev_lesson.order %}">
+                ❮ {{ prev_lesson.title }}
+            </a>
+            {% else %}<span></span>{% endif %}
+            {% if next_lesson %}
+            <a class="ws-nav-btn ws-next" href="{% url 'academy:lesson' path.slug next_lesson.order %}">
+                {{ next_lesson.title }} ❯
+            </a>
+            {% endif %}
+        </div>
+
+        {# ── COURSE COMPLETE CTA ── #}
+        {% if not next_lesson %}
+        <div class="ws-complete-banner">
+            <span class="ws-complete-icon">🎉</span>
+            <div>
+                <h3>You've completed {{ path.title }}!</h3>
+                <p>Claim your certificate or explore the next learning path.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <a class="btn btn-emerald btn-small" href="{% url 'academy:certificate_verify' '00000000-0000-0000-0000-000000000000' %}">Get Certificate</a>
+                <a class="btn btn-ghost btn-small" href="{% url 'academy:learning_paths' %}">More Paths</a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>{# /ws-main #}
+</div>{# /ws-layout #}
+
+{# ══════════════════════════════════════════
+   TRY IT YOURSELF MODAL
+   ══════════════════════════════════════════ #}
+<div class="ws-tryit-overlay" id="ws-tryit-overlay" role="dialog" aria-modal="true" aria-label="Try it Yourself" style="display:none;">
+    <div class="ws-tryit-modal">
+        <div class="ws-tryit-toolbar">
+            <span class="ws-tryit-title" id="ws-tryit-title">Try it Yourself</span>
+            <div class="ws-tryit-actions">
+                <button class="ws-tryit-run" id="ws-tryit-run">▶ Run</button>
+                <button class="ws-tryit-reset" id="ws-tryit-reset">Reset</button>
+                <button class="ws-btn-copy-small" id="ws-tryit-copy">Copy</button>
+                <a class="ws-tryit-open" id="ws-tryit-fullopen" href="{% url 'academy:tryit' %}?lang={{ editor_lang }}" target="_blank" rel="noopener">⬜ Full Screen</a>
+                <button class="ws-tryit-close" id="ws-tryit-close" aria-label="Close editor">✕</button>
+            </div>
+        </div>
+        <div class="ws-tryit-panes">
+            <div class="ws-tryit-left">
+                <div class="ws-tryit-pane-label">CODE</div>
+                <textarea class="ws-tryit-editor" id="ws-tryit-code" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+            </div>
+            <div class="ws-tryit-divider"></div>
+            <div class="ws-tryit-right">
+                <div class="ws-tryit-pane-label" id="ws-tryit-output-label">RESULT</div>
+                <iframe class="ws-tryit-frame" id="ws-tryit-frame" sandbox="allow-scripts allow-same-origin" title="Code output"></iframe>
+                <div class="ws-tryit-console" id="ws-tryit-console" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" crossorigin="anonymous"></script>
+
+<script>
+(function () {
+    const EDITOR_LANG    = "{{ editor_lang }}";
+    const PATH_SLUG      = "{{ path.slug }}";
+    const TRYIT_BASE_URL = "{% url 'academy:tryit' %}";
+
+    /* ── Configure Marked.js ── */
+    marked.setOptions({
+        breaks:   true,
+        gfm:      true,
+    });
+
+    /* ── Render a markdown block into a target element ── */
+    function renderMarkdown(rawId, targetId) {
+        const raw    = document.getElementById(rawId);
+        const target = document.getElementById(targetId);
+        if (!raw || !target) return;
+
+        const html = marked.parse(raw.textContent.trim());
+        target.innerHTML = html;
+
+        /* Post-process: wrap <pre><code> blocks in .ws-example with header + footer */
+        target.querySelectorAll('pre').forEach(pre => {
+            const code = pre.querySelector('code');
+            if (!code) return;
+
+            const rawClass = code.className || '';
+            const lang = rawClass.replace('language-', '') || 'code';
+            const codeText = code.textContent;
+
+            /* Build wrapper */
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ws-example';
+
+            const header = document.createElement('div');
+            header.className = `ws-example-header ws-lang-${lang}`;
+            header.textContent = langLabel(lang);
+
+            const footer = document.createElement('div');
+            footer.className = 'ws-example-footer';
+            footer.innerHTML = buildFooter(lang, codeText);
+
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(header);
+            wrapper.appendChild(pre);
+            wrapper.appendChild(footer);
+
+            /* Prism highlight */
+            if (window.Prism) Prism.highlightElement(code);
+        });
+
+        /* Copy buttons */
+        target.querySelectorAll('.ws-copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = decodeURIComponent(btn.dataset.code || '');
+                copyText(code, btn);
+            });
+        });
+
+        /* Try it buttons — open modal */
+        target.querySelectorAll('.ws-tryit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = decodeURIComponent(btn.dataset.code || '');
+                const lang = btn.dataset.lang || EDITOR_LANG;
+                openModal(code, lang);
+            });
+        });
+    }
+
+    function langLabel(lang) {
+        const map = {
+            html: '🌐 HTML Example', css: '🎨 CSS Example',
+            javascript: '⚡ JavaScript Example', js: '⚡ JavaScript Example',
+            python: '🐍 Python Example', java: '☕ Java Example',
+            cpp: '⚙️ C++ Example', sql: '🗄️ SQL Example',
+            dart: '🎯 Dart Example', bash: '🖥️ Terminal',
+            scratch: '🐱 Scratch Example',
+        };
+        return map[lang] || `💻 ${lang.toUpperCase()} Example`;
+    }
+
+    function buildFooter(lang, codeText) {
+        const enc = encodeURIComponent(codeText);
+        const showTry = ['html','css','javascript','js','python','scratch'].includes(lang);
+        const tryBtn = showTry
+            ? `<button class="ws-tryit-btn" data-code="${enc}" data-lang="${lang}">Try it Yourself »</button>`
+            : `<a class="ws-tryit-btn" href="${TRYIT_BASE_URL}?lang=${lang}" target="_blank" rel="noopener">Open Editor »</a>`;
+        return `<button class="ws-copy-btn" data-code="${enc}">📋 Copy</button>${tryBtn}`;
+    }
+
+    /* ── Render all markdown sections ── */
+    renderMarkdown('lesson-raw',   'lesson-content');
+    renderMarkdown('exercise-raw', 'exercise-content');
+    renderMarkdown('project-raw',  'project-content');
+
+    /* ── Quiz logic ── */
+    const quizInput  = document.getElementById('quiz-answer');
+    const quizCheck  = document.getElementById('quiz-check-btn');
+    const quizFb     = document.getElementById('quiz-feedback');
+    const quizShow   = document.getElementById('quiz-show-btn');
+
+    if (quizCheck) {
+        quizCheck.addEventListener('click', () => {
+            const answer = (quizInput.value || '').trim().toLowerCase();
+            if (!answer) { quizFb.textContent = 'Type an answer first!'; quizFb.className = 'ws-quiz-feedback'; return; }
+            quizFb.className = 'ws-quiz-feedback ws-quiz-ok';
+            quizFb.textContent = '✅ Answer submitted! Discuss with your trainer for feedback.';
+        });
+        if (quizInput) quizInput.addEventListener('keydown', e => { if (e.key === 'Enter') quizCheck.click(); });
+    }
+
+    if (quizShow) {
+        quizShow.addEventListener('click', () => {
+            quizShow.textContent = quizShow.dataset.revealed === '1'
+                ? 'Show Answer'
+                : 'Hint: review the lesson content above and look at the code examples carefully.';
+            quizShow.dataset.revealed = quizShow.dataset.revealed === '1' ? '0' : '1';
+        });
+    }
+
+    /* ══════════════════════════════════
+       TRY IT MODAL
+       ══════════════════════════════════ */
+    const overlay    = document.getElementById('ws-tryit-overlay');
+    const codeArea   = document.getElementById('ws-tryit-code');
+    const frame      = document.getElementById('ws-tryit-frame');
+    const console_   = document.getElementById('ws-tryit-console');
+    const runBtn     = document.getElementById('ws-tryit-run');
+    const resetBtn   = document.getElementById('ws-tryit-reset');
+    const closeBtn   = document.getElementById('ws-tryit-close');
+    const copySmall  = document.getElementById('ws-tryit-copy');
+    const openFull   = document.getElementById('ws-tryit-fullopen');
+    const outputLbl  = document.getElementById('ws-tryit-output-label');
+    let   originalCode = '';
+    let   currentLang  = EDITOR_LANG;
+
+    function openModal(code, lang) {
+        originalCode  = code;
+        currentLang   = lang || EDITOR_LANG;
+        codeArea.value = code;
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        document.getElementById('ws-tryit-title').textContent = `Try it Yourself — ${langLabel(currentLang)}`;
+        openFull.href = `${TRYIT_BASE_URL}?lang=${currentLang}`;
+        setupOutputPanel(currentLang);
+        runCode();
+        codeArea.focus();
+    }
+
+    function closeModal() {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function setupOutputPanel(lang) {
+        const isWebLang = ['html','css','javascript','js'].includes(lang);
+        frame.style.display    = isWebLang ? 'block' : 'none';
+        console_.style.display = isWebLang ? 'none'  : 'flex';
+        outputLbl.textContent  = isWebLang ? 'RESULT' : 'OUTPUT';
+    }
+
+    function runCode() {
+        const code = codeArea.value;
+        const isWeb = ['html','css','javascript','js'].includes(currentLang);
+
+        if (isWeb) {
+            let doc = code;
+            if (currentLang === 'javascript' || currentLang === 'js') {
+                doc = `<!DOCTYPE html><html><head><style>body{font-family:sans-serif;padding:16px;background:#fff;color:#222}</style></head>
+<body><script>
+try { ${code} } catch(e) { document.body.innerHTML='<pre style="color:red;">'+e+'</pre>'; }
+<\/script></body></html>`;
+            } else if (currentLang === 'css') {
+                doc = `<!DOCTYPE html><html><head><style>${code}</style></head><body>
+<h1>CSS Preview</h1><p>Add HTML here to test your styles.</p><div class="box">Test box</div></body></html>`;
+            }
+            frame.srcdoc = doc;
+        } else {
+            simulateOutput(code, currentLang);
+        }
+    }
+
+    function simulateOutput(code, lang) {
+        console_.innerHTML = '';
+        console_.style.display = 'flex';
+        frame.style.display = 'none';
+
+        if (lang === 'python') {
+            runPython(code);
+        } else if (lang === 'sql') {
+            const lines = code.split('\n').filter(l => l.trim());
+            appendOutput('-- SQL simulation (connect to a real database to execute)', '#6366f1', true);
+            lines.forEach(l => appendOutput(l, '#a5f3fc'));
+            appendOutput('-- Query parsed successfully.', '#4ade80');
+        } else if (lang === 'scratch') {
+            appendOutput('🐱 Scratch programs run in the browser at scratch.mit.edu', '#f0abfc');
+            appendOutput('📋 Copy this code idea and paste it into your Scratch project!', '#a5f3fc');
+        } else {
+            appendOutput(`// ${lang.toUpperCase()} — use an online compiler to run this code`, '#6b7280', true);
+            const lines = code.split('\n');
+            lines.slice(0, 15).forEach(l => appendOutput(l, '#e2e8f0'));
+            if (lines.length > 15) appendOutput(`... (${lines.length - 15} more lines)`, '#6b7280');
+            appendOutput('', '');
+            appendOutput('▸ Open "Full Screen" to use our integrated compiler →', '#04aa6d');
+        }
+    }
+
+    function appendOutput(text, color, bold) {
+        const line = document.createElement('div');
+        line.className = 'ws-console-line';
+        line.textContent = text;
+        line.style.color = color || '#e2e8f0';
+        if (bold) line.style.fontWeight = '900';
+        console_.appendChild(line);
+    }
+
+    /* ── Python via Pyodide (lazy-loaded) ── */
+    let pyodide      = null;
+    let pyodideLoading = false;
+
+    async function runPython(code) {
+        console_.innerHTML = '';
+        appendOutput('⏳ Loading Python runtime (first time takes ~5s)…', '#6b7280');
+
+        if (!pyodideLoading && !pyodide) {
+            pyodideLoading = true;
+            try {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js';
+                document.head.appendChild(script);
+                await new Promise((resolve, reject) => {
+                    script.onload = resolve; script.onerror = reject;
+                });
+                pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/' });
+            } catch (e) {
+                console_.innerHTML = '';
+                appendOutput('⚠️ Could not load Python runtime (network/adblocker).', '#f87171');
+                appendOutput('▸ Use the Full Screen editor which has an integrated compiler.', '#04aa6d');
+                return;
+            }
+        }
+
+        if (!pyodide) {
+            setTimeout(() => runPython(code), 500);
+            return;
+        }
+
+        console_.innerHTML = '';
+
+        try {
+            pyodide.setStdout({ batched: (msg) => appendOutput(msg, '#86efac') });
+            pyodide.setStderr({ batched: (msg) => appendOutput(msg, '#f87171') });
+            await pyodide.runPythonAsync(code);
+            if (!console_.children.length) appendOutput('(No output)', '#6b7280', false);
+        } catch (err) {
+            appendOutput('Error: ' + err.message, '#f87171');
+        }
+    }
+
+    /* ── Event listeners ── */
+    if (runBtn)   runBtn.addEventListener('click', runCode);
+    if (resetBtn) resetBtn.addEventListener('click', () => { codeArea.value = originalCode; runCode(); });
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    if (copySmall) copySmall.addEventListener('click', () => copyText(codeArea.value, copySmall));
+
+    /* Tab key in editor inserts spaces */
+    if (codeArea) {
+        codeArea.addEventListener('keydown', e => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const s = codeArea.selectionStart;
+                codeArea.value = codeArea.value.substring(0, s) + '    ' + codeArea.value.substring(s);
+                codeArea.selectionStart = codeArea.selectionEnd = s + 4;
+            }
+        });
+    }
+
+    /* ── Utility: copy text ── */
+    function copyText(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = '✅ Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta);
+            ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        });
+    }
+
+    /* ══════════════════════════════════
+       PERSONAL NOTES + VOICE DICTATION
+       ══════════════════════════════════ */
+    (function () {
+        const NOTES_KEY  = `cs_mynotes_{{ path.slug }}_{{ lesson.order }}`;
+        const notesArea  = document.getElementById('ws-notes-area');
+        const micBtn     = document.getElementById('ws-mic-btn');
+        const micIcon    = document.getElementById('ws-mic-icon');
+        const micLabel   = document.getElementById('ws-mic-label');
+        const micStatus  = document.getElementById('ws-mic-status');
+        const copyBtn    = document.getElementById('ws-notes-copy-btn');
+        const clearBtn   = document.getElementById('ws-notes-clear-btn');
+        const charCount  = document.getElementById('ws-notes-chars');
+
+        if (!notesArea) return;
+
+        /* ── Load saved notes ── */
+        const saved = localStorage.getItem(NOTES_KEY);
+        if (saved) notesArea.value = saved;
+        updateCharCount();
+
+        /* ── Auto-save on input ── */
+        notesArea.addEventListener('input', () => {
+            localStorage.setItem(NOTES_KEY, notesArea.value);
+            updateCharCount();
+        });
+
+        function updateCharCount() {
+            const n = notesArea.value.length;
+            charCount.textContent = n === 0 ? '0 chars' : `${n.toLocaleString()} char${n === 1 ? '' : 's'}`;
+        }
+
+        /* ── Copy button ── */
+        copyBtn.addEventListener('click', () => {
+            if (!notesArea.value.trim()) return;
+            copyText(notesArea.value, copyBtn);
+        });
+
+        /* ── Clear button ── */
+        clearBtn.addEventListener('click', () => {
+            if (!notesArea.value.trim()) return;
+            if (!confirm('Clear all your notes for this lesson?')) return;
+            notesArea.value = '';
+            localStorage.removeItem(NOTES_KEY);
+            updateCharCount();
+        });
+
+        /* ── Voice Dictation (Web Speech API) ── */
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SR) {
+            micBtn.title = 'Voice dictation is not supported in this browser. Try Chrome or Edge.';
+            micBtn.style.opacity = '0.45';
+            micBtn.style.cursor = 'not-allowed';
+            micLabel.textContent = 'No mic support';
+            micBtn.addEventListener('click', () => {
+                showStatus('Voice dictation requires Chrome, Edge, or Safari. Try one of those.', 'warn');
+            });
+            return;
+        }
+
+        let recognition = null;
+        let isListening = false;
+        let interimText = '';
+
+        function buildRecognition() {
+            const r = new SR();
+            r.continuous    = true;
+            r.interimResults = true;
+            r.lang = document.documentElement.lang || 'en-US';
+            r.maxAlternatives = 1;
+
+            r.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('ws-mic-active');
+                micBtn.setAttribute('aria-pressed', 'true');
+                micIcon.className = 'bi bi-stop-circle-fill';
+                micLabel.textContent = 'Stop';
+                showStatus('Listening… speak now', 'active');
+            };
+
+            r.onresult = (e) => {
+                let interim = '';
+                let final   = '';
+                for (let i = e.resultIndex; i < e.results.length; i++) {
+                    const t = e.results[i][0].transcript;
+                    if (e.results[i].isFinal) {
+                        final += t + ' ';
+                    } else {
+                        interim += t;
+                    }
+                }
+                if (final) {
+                    /* Append finalised text to textarea */
+                    const cur = notesArea.value;
+                    const sep = cur.length && !cur.endsWith(' ') && !cur.endsWith('\n') ? ' ' : '';
+                    notesArea.value = cur + sep + final.trim();
+                    localStorage.setItem(NOTES_KEY, notesArea.value);
+                    updateCharCount();
+                }
+                interimText = interim;
+                if (interim) {
+                    showStatus('…' + interim, 'interim');
+                } else {
+                    showStatus('Listening… speak now', 'active');
+                }
+            };
+
+            r.onerror = (e) => {
+                const messages = {
+                    'not-allowed':      'Microphone access denied. Allow mic permission and try again.',
+                    'no-speech':        'No speech detected. Check your microphone and try again.',
+                    'network':          'Network error during speech recognition.',
+                    'audio-capture':    'No microphone found.',
+                    'service-not-allowed': 'Speech service blocked. Try a different browser.',
+                };
+                showStatus(messages[e.error] || `Error: ${e.error}`, 'warn');
+                stopListening();
+            };
+
+            r.onend = () => {
+                if (isListening) {
+                    /* Auto-restart if still supposed to be listening (browser stops after silence) */
+                    try { r.start(); } catch (_) { stopListening(); }
+                } else {
+                    stopListening();
+                }
+            };
+
+            return r;
+        }
+
+        function stopListening() {
+            isListening = false;
+            if (recognition) { try { recognition.stop(); } catch (_) {} }
+            micBtn.classList.remove('ws-mic-active');
+            micBtn.setAttribute('aria-pressed', 'false');
+            micIcon.className = 'bi bi-mic-fill';
+            micLabel.textContent = 'Dictate';
+            showStatus('', '');
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (isListening) {
+                stopListening();
+            } else {
+                recognition = buildRecognition();
+                try {
+                    recognition.start();
+                } catch (err) {
+                    showStatus('Could not start microphone: ' + err.message, 'warn');
+                }
+            }
+        });
+
+        function showStatus(text, type) {
+            if (!text) { micStatus.hidden = true; micStatus.textContent = ''; return; }
+            micStatus.hidden = false;
+            micStatus.textContent = text;
+            micStatus.className = `ws-notes-status ws-notes-status-${type}`;
+        }
+
+    }());
+
+})();
+</script>
+{% endblock %}

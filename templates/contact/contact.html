@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow" data-i18n="contact_eyebrow">Contact Us</p>
+        <h1 data-i18n="contact_hero_title">Let us help you choose the right path.</h1>
+        <p data-i18n="contact_hero_body">Talk to our admissions team about courses, school partnerships, events, sponsorships, or mentorship opportunities.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        <article class="contact-panel">
+            <h2 data-i18n="contact_reach_title">Reach CodeSavannah Academy</h2>
+            <div class="contact-list">
+                <p><strong data-i18n="contact_email_label">Email</strong><a href="mailto:hello@codesavannah.local">hello@codesavannah.local</a></p>
+                <p><strong data-i18n="contact_phone_label">Phone</strong><a href="tel:+254700000000">+254 700 000 000</a></p>
+                <p><strong data-i18n="contact_location_label">Location</strong>Innovation Drive, Nairobi, Kenya</p>
+                <p><strong data-i18n="contact_hours_label">Office Hours</strong>Monday to Friday, 8:30 AM - 5:30 PM</p>
+            </div>
+            <div class="map-placeholder" role="img" aria-label="Map placeholder showing CodeSavannah Academy office location">
+                <span>Innovation Drive, Nairobi</span>
+            </div>
+            <h2 data-i18n="contact_faq_title">Frequently Asked Questions</h2>
+            <details>
+                <summary data-i18n="contact_faq1_q">Do beginners need prior coding experience?</summary>
+                <p data-i18n="contact_faq1_a">No. Beginner courses start with fundamentals and progress through guided projects.</p>
+            </details>
+            <details>
+                <summary data-i18n="contact_faq2_q">Do students receive certificates?</summary>
+                <p data-i18n="contact_faq2_a">Yes. Students receive certificates after completing lessons, assignments, and portfolio projects.</p>
+            </details>
+            <details>
+                <summary data-i18n="contact_faq3_q">Can schools partner with CodeSavannah?</summary>
+                <p data-i18n="contact_faq3_a">Yes. We support school clubs, workshops, bootcamps, and teacher technology programs.</p>
+            </details>
+        </article>
+
+        <aside class="side-panel">
+            <h2 data-i18n="contact_send_title">Send a message</h2>
+            <form method="post" class="stacked-form">
+                {% include 'includes/form_fields.html' %}
+                <button class="btn btn-primary btn-full" type="submit" data-i18n="btn_send_message">Send Message</button>
+            </form>
+        </aside>
+    </div>
+</section>
+{% endblock %}

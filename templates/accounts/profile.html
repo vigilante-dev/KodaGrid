@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Portal | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="dashboard-hero">
+    <div class="container">
+        <p class="eyebrow">Student Portal</p>
+        <h1>Welcome back, {{ student.name }} <span aria-hidden="true">&#128075;</span></h1>
+        <p>Track learning progress, upcoming classes, assignments, certificates, recommended paths, and mentorship activity.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container dashboard-grid">
+        <div class="dashboard-main">
+            <div class="stats-grid portal-stats">
+                {% for stat in portal_stats %}
+                    <article class="stat-item">
+                        <strong>{{ stat.value }}</strong>
+                        <span>{{ stat.label }}</span>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <article class="portal-panel">
+                <h2>Learning Progress</h2>
+                <div class="timeline-list">
+                    {% for membership in memberships %}
+                        <div class="progress-row">
+                            <p><strong>{{ membership.classroom.name }}</strong><span>{{ membership.progress_percent }}% complete</span></p>
+                            <div class="progress-track" aria-hidden="true"><span style="width: {{ membership.progress_percent }}%;"></span></div>
+                        </div>
+                    {% empty %}
+                        <p><strong>No classes joined yet</strong><span>Use a class code in the classroom dashboard to begin.</span></p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="portal-panel">
+                <h2>Upcoming Classes and Assignments</h2>
+                <div class="timeline-list">
+                    {% for assignment in assignments_due %}
+                        <p><strong>{{ assignment.title }}</strong><span>{{ assignment.classroom.name }} &middot; due {{ assignment.due_date|date:"M d, Y" }}</span></p>
+                    {% empty %}
+                        <p><strong>No pending assignments</strong><span>Your next trainer tasks will appear here.</span></p>
+                    {% endfor %}
+                </div>
+                <p><a class="text-link" href="{% url 'academy:classroom' %}">Open classroom dashboard</a></p>
+            </article>
+
+            <article class="portal-panel">
+                <h2>Certificates and Feedback</h2>
+                <div class="timeline-list">
+                    {% for certificate in certificates %}
+                        <p><strong>{{ certificate.course_name }}</strong><span>Issued {{ certificate.completion_date|date:"M d, Y" }} &middot; <a class="text-link" href="{{ certificate.get_absolute_url }}">Verify</a></span></p>
+                    {% empty %}
+                        <p><strong>No certificates yet</strong><span>Complete projects and assessments to unlock verified certificates.</span></p>
+                    {% endfor %}
+                    {% for submission in submissions %}
+                        <p><strong>{{ submission.assignment.title }}</strong><span>{% if submission.grade != None %}{{ submission.grade }} pts{% else %}Awaiting grade{% endif %}</span></p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="portal-panel">
+                <h2>Recommended Courses</h2>
+                <div class="timeline-list">
+                    {% for path in recommended_paths %}
+                        <p><strong>{{ path.title }}</strong><span>{{ path.get_category_display }} &middot; <a class="text-link" href="{{ path.get_absolute_url }}">Start path</a></span></p>
+                    {% empty %}
+                        <p><strong>Recommendations pending</strong><span>Add a career interest in your profile to personalize this list.</span></p>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+
+        <aside class="side-panel">
+            <h2>Profile Details</h2>
+            <form method="post" enctype="multipart/form-data" class="stacked-form">
+                {% include 'includes/form_fields.html' %}
+                <button class="btn btn-primary btn-full" type="submit">Update Profile</button>
+            </form>
+        </aside>
+    </div>
+</section>
+{% endblock %}

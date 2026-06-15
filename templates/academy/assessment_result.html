@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Your Results | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+{% if not assessment %}
+<section class="page-hero">
+    <div class="container">
+        <h1>No results found</h1>
+        <p>Complete the assessment to get your personalised learning plan.</p>
+        <a class="btn btn-accent" href="{% url 'academy:assessment' %}">Take Assessment</a>
+    </div>
+</section>
+{% else %}
+
+{# ── RESULT HERO ── #}
+<section class="result-hero">
+    <div class="result-hero-bg" aria-hidden="true"></div>
+    <div class="container result-hero-inner">
+        <div class="result-badge">
+            {% if assessment.skill_level == 'explorer' %}🐣
+            {% elif assessment.skill_level == 'beginner' %}🌱
+            {% elif assessment.skill_level == 'intermediate' %}⚡
+            {% elif assessment.skill_level == 'advanced' %}🔥
+            {% else %}🚀{% endif %}
+        </div>
+        <p class="eyebrow" style="justify-content:center;">Your Assessment Result</p>
+        <h1 style="font-size:3.2rem;text-align:center;">
+            {{ assessment.get_skill_level_display }}
+        </h1>
+        <div class="result-score-row">
+            <div class="result-score-circle">
+                <svg viewBox="0 0 36 36" class="score-ring">
+                    <path class="score-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path class="score-ring-fill" stroke-dasharray="{{ assessment.iq_score }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <text x="18" y="20.35" class="score-text">{{ assessment.iq_score }}</text>
+                </svg>
+                <span>/ 60 pts</span>
+            </div>
+            <div class="result-meta-list">
+                <div><span>Age Group</span><strong>{{ assessment.age_group }}</strong></div>
+                <div><span>Learning Style</span><strong>{{ assessment.get_learning_style_display }}</strong></div>
+                <div><span>Interests</span><strong>{{ assessment.interests|join:", " }}</strong></div>
+                <div><span>Strengths</span><strong>{{ assessment.strengths|join:", "|default:"Problem Solving" }}</strong></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ── RECOMMENDED PATHS ── #}
+<section class="section section-soft">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow">Your Roadmap</p>
+                <h2>Start with these three learning paths</h2>
+            </div>
+        </div>
+        <div class="path-grid">
+            {% for path in assessment.recommended_paths %}
+            {% with detail=path_detail|default:{}|default:{} %}
+            <article class="path-card reveal reveal-delay-{{ forloop.counter }}">
+                <div style="font-size:2rem;margin-bottom:12px;">
+                    {% if path == 'Scratch for Kids' %}🐱
+                    {% elif path == 'Python Basics' or path == 'Machine Learning' %}🐍
+                    {% elif path == 'HTML & CSS' or path == 'HTML Basics' %}🌐
+                    {% elif path == 'JavaScript Intro' or path == 'JavaScript Frameworks' %}⚡
+                    {% elif path == 'Django Web Dev' %}🦄
+                    {% elif path == 'React' %}⚛️
+                    {% elif path == 'Cloud AWS' or path == 'Cloud Architecture' %}☁️
+                    {% elif path == 'Cybersecurity' %}🔐
+                    {% elif path == 'Generative AI' or path == 'Python Data Science' %}✨
+                    {% elif path == 'Robotics Intro' %}🤖
+                    {% elif path == 'System Design' %}🏗️
+                    {% else %}💻{% endif %}
+                </div>
+                <p class="tag">Recommended</p>
+                <h2>{{ path }}</h2>
+                <p class="meta-row">
+                    {% if forloop.counter == 1 %}Start here — foundational
+                    {% elif forloop.counter == 2 %}Level up after first path
+                    {% else %}Career-ready specialisation{% endif %}
+                </p>
+                <div class="meta-row" style="margin-top:auto;padding-top:14px;">
+                    <a class="btn btn-primary btn-small" href="{% url 'academy:learning_paths' %}">Start Learning</a>
+                </div>
+            </article>
+            {% endwith %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── BOOK RECOMMENDATIONS ── #}
+<section class="section">
+    <div class="container">
+        <div class="section-heading reveal">
+            <div>
+                <p class="eyebrow">Curated Reads</p>
+                <h2>Books picked for your exact level</h2>
+            </div>
+        </div>
+        <div class="card-grid">
+            {% for book in assessment.recommended_books %}
+            <article class="book-card reveal reveal-delay-{{ forloop.counter }}">
+                <div class="book-spine"></div>
+                <div class="book-card-body">
+                    <h3>{{ book.title }}</h3>
+                    <p class="book-author">by {{ book.author }}</p>
+                    <p class="book-why">{{ book.why }}</p>
+                    <span class="tag">📚 Recommended Read</span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── REVISION TIPS ── #}
+<section class="section section-soft">
+    <div class="container">
+        <div class="two-column">
+            <div class="reveal reveal-left">
+                <p class="eyebrow">Study Strategy</p>
+                <h2>How to study based on your learning style: <em>{{ assessment.get_learning_style_display }}</em></h2>
+                <p style="color:var(--muted);margin-top:14px;">Everyone absorbs knowledge differently. Here are three techniques that work best for your style.</p>
+            </div>
+            <ul class="check-list reveal reveal-right">
+                {% with style=assessment.learning_style %}
+                {% for tip in revision_tips|default:{}|default:{} %}
+                {% empty %}
+                <li>Build a mini project every week</li>
+                <li>Explain what you learn to someone else</li>
+                <li>Review your code 24 hours after writing it</li>
+                {% endfor %}
+                {# fallback per style #}
+                {% if assessment.learning_style == 'visual' %}
+                <li>Draw diagrams and flowcharts of every concept</li>
+                <li>Watch YouTube walkthroughs before reading docs</li>
+                <li>Use colour-coded notes and mind maps</li>
+                {% elif assessment.learning_style == 'kinesthetic' %}
+                <li>Build a project on day one — theory follows doing</li>
+                <li>Clone real apps and add your own features</li>
+                <li>Do coding challenges before reading explanations</li>
+                {% elif assessment.learning_style == 'reading' %}
+                <li>Read the official documentation first</li>
+                <li>Keep a typed code journal with your own examples</li>
+                <li>Write summaries of each lesson in your own words</li>
+                {% else %}
+                <li>Listen to the Syntax.fm or CodeNewbie podcast</li>
+                <li>Find a study partner to explain concepts to</li>
+                <li>Use voice notes to record your own explanations</li>
+                {% endif %}
+                {% endwith %}
+            </ul>
+        </div>
+    </div>
+</section>
+
+{# ── RETAKE / CONTINUE ── #}
+<section class="cta-band">
+    <div class="container cta-layout">
+        <h2>Ready to start your personalised journey?</h2>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <a class="btn btn-accent" href="{% url 'academy:learning_paths' %}">Begin Learning Paths</a>
+            <a class="btn btn-ghost" href="{% url 'academy:assessment' %}" style="border-color:rgba(255,255,255,.3);color:#fff;">Retake Assessment</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

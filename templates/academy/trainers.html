@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Trainers | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero" style="background-image:linear-gradient(135deg,rgba(6,16,30,.96),rgba(19,65,168,.82)),url('{% static 'img/students-coding.jpg' %}');background-size:cover;background-position:center;">
+    <div class="container">
+        <p class="eyebrow">Trainer Directory</p>
+        <h1>Learn from practitioners<br>who build and mentor.</h1>
+        <p>Meet instructors across software engineering, AI, cybersecurity, cloud, data, design, and career readiness.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="card-grid team-grid">
+            {% for trainer in trainers %}
+            <article class="trainer-card reveal reveal-delay-{{ forloop.counter }}">
+                <div class="trainer-card-photo">
+                    {% if trainer.photo %}
+                        <img src="{{ trainer.photo.url }}" alt="{{ trainer.name }}" loading="lazy">
+                    {% else %}
+                        <div class="trainer-photo-initials">{{ trainer.name|slice:":1" }}</div>
+                    {% endif %}
+                    <div style="position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(0deg,rgba(6,16,30,.9),transparent);">
+                        <p class="tag" style="margin:0;">{{ trainer.headline }}</p>
+                    </div>
+                </div>
+                <div class="trainer-card-body">
+                    <h2>{{ trainer.name }}</h2>
+                    <p>{{ trainer.bio|truncatewords:24 }}</p>
+                    {% if trainer.certifications %}<p><strong>Certified:</strong> {{ trainer.certifications|truncatewords:8 }}</p>{% endif %}
+                    <div class="trainer-skills">
+                        {% for skill in trainer.skills.split %}
+                        <span class="trainer-skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    {% if trainer.courses_taught %}
+                    <p style="margin-top:12px;font-size:.88rem;color:var(--muted);"><strong>Courses:</strong> {{ trainer.courses_taught }}</p>
+                    {% endif %}
+                    <a class="btn btn-ghost btn-small btn-full" href="{% url 'academy:trainers' %}?book={{ trainer.pk }}" style="margin-top:14px;">Book Mentorship</a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state" style="grid-column:1/-1;">Approved trainers will appear here after admin review. We are currently onboarding our expert instructor team.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ── APPLICATION + BOOKING ── #}
+<section class="section section-soft">
+    <div class="container detail-layout">
+        <article class="side-panel reveal reveal-left">
+            <p class="eyebrow">Join Our Team</p>
+            <h2>Apply to become a trainer</h2>
+            <p style="color:var(--muted);margin-bottom:20px;">Share your expertise with thousands of students. We welcome practitioners, engineers, designers, and mentors from all technology disciplines.</p>
+            <form method="post" enctype="multipart/form-data" class="stacked-form">
+                <input type="hidden" name="form_type" value="application">
+                {% include 'includes/form_fields.html' %}
+                <button class="btn btn-primary btn-full" type="submit">Submit Application</button>
+            </form>
+        </article>
+        <aside class="side-panel reveal reveal-right">
+            <p class="eyebrow">Need guidance?</p>
+            <h2>Book a mentorship session</h2>
+            <p style="color:var(--muted);margin-bottom:20px;">Get one-on-one time with an expert trainer. Review your code, plan your career path, or work through a challenging concept together.</p>
+            <form method="post" class="stacked-form">
+                <input type="hidden" name="form_type" value="booking">
+                {% csrf_token %}
+                {% for field in booking_form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<small class="form-error">{{ error }}</small>{% endfor %}
+                </div>
+                {% endfor %}
+                <button class="btn btn-accent btn-full" type="submit">Request Session</button>
+            </form>
+        </aside>
+    </div>
+</section>
+
+{# ── CTA ── #}
+<section class="cta-band">
+    <div class="container cta-layout">
+        <h2>Ready to start learning from the best?</h2>
+        <a class="btn btn-accent" href="{% url 'accounts:register' %}">Enroll Now</a>
+    </div>
+</section>
+{% endblock %}

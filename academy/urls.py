@@ -1,0 +1,53 @@
+from django.urls import path
+
+from .views import (
+    AssessmentResultView,
+    AssessmentView,
+    CertificateVerifyView,
+    ClassroomHubView,
+    CollegeDivisionView,
+    CommunityHubView,
+    FeePlanListView,
+    GamesView,
+    HighSchoolDivisionView,
+    JobBoardView,
+    LearningPathDetailView,
+    LearningPathListView,
+    LessonView,
+    LiveChatView,
+    MentorAIView,
+    ResourceCenterView,
+    RoboticsView,
+    TechBoyView,
+    TechGirlView,
+    TrainerDirectoryView,
+    TryItView,
+    VideoCallView,
+)
+
+app_name = 'academy'
+
+urlpatterns = [
+    path('learn/', LearningPathListView.as_view(), name='learning_paths'),
+    path('learn/tryit/', TryItView.as_view(), name='tryit'),
+    path('learn/<slug:slug>/', LearningPathDetailView.as_view(), name='learning_path_detail'),
+    path('learn/<slug:slug>/<int:order>/', LessonView.as_view(), name='lesson'),
+    path('high-school/', HighSchoolDivisionView.as_view(), name='high_school'),
+    path('college/', CollegeDivisionView.as_view(), name='college'),
+    path('trainers/', TrainerDirectoryView.as_view(), name='trainers'),
+    path('fees/', FeePlanListView.as_view(), name='fees'),
+    path('community/', CommunityHubView.as_view(), name='community'),
+    path('jobs/', JobBoardView.as_view(), name='jobs'),
+    path('resources/', ResourceCenterView.as_view(), name='resources'),
+    path('classroom/', ClassroomHubView.as_view(), name='classroom'),
+    path('mentor-ai/', MentorAIView.as_view(), name='ai_mentor'),
+    path('certificates/<uuid:code>/', CertificateVerifyView.as_view(), name='certificate_verify'),
+    path('games/',        GamesView.as_view(),            name='games'),
+    path('chat/',         LiveChatView.as_view(),         name='live_chat'),
+    path('call/<str:room_code>/', VideoCallView.as_view(), name='video_call'),
+    path('techgirl/',     TechGirlView.as_view(),         name='techgirl'),
+    path('techboy/',      TechBoyView.as_view(),          name='techboy'),
+    path('robotics/',     RoboticsView.as_view(),         name='robotics'),
+    path('assess/',       AssessmentView.as_view(),       name='assessment'),
+    path('assess/result/',AssessmentResultView.as_view(), name='assessment_result'),
+]

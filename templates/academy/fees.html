@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Fees | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Fee Structure</p>
+        <h1>Flexible plans for students, professionals, schools, and teams.</h1>
+        <p>Pricing is admin-managed so CodeSavannah can adjust beginner, intermediate, advanced, certification, and corporate programs as offerings grow.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container price-grid">
+        {% for plan in plans %}
+            <article class="price-card {% if plan.is_featured %}featured-price{% endif %}">
+                <p class="tag">{{ plan.get_level_display }}</p>
+                <h2>{{ plan.name }}</h2>
+                <div class="price-row"><strong>KSh {{ plan.monthly_price }}</strong><span>Monthly</span></div>
+                <div class="price-row"><strong>KSh {{ plan.term_price }}</strong><span>Term</span></div>
+                <div class="price-row"><strong>KSh {{ plan.annual_price }}</strong><span>Annual</span></div>
+                <ul class="check-list">
+                    {% for feature in plan.feature_list %}<li>{{ feature }}</li>{% endfor %}
+                </ul>
+            </article>
+        {% empty %}
+            <p class="empty-state">Fee plans will appear after they are added in Django Admin.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

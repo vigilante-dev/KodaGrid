@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Events and Workshops | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Events and Workshops</p>
+        <h1>Learn, compete, and build with peers.</h1>
+        <p>Join bootcamps, workshops, hackathons, coding competitions, and career sessions led by mentors and industry partners.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form class="filter-bar" method="get" role="search">
+            <label class="sr-only" for="event-search">Search events</label>
+            <input id="event-search" type="search" name="q" value="{{ search_query }}" placeholder="Search events">
+            <label class="sr-only" for="event-type">Event type</label>
+            <select id="event-type" name="type">
+                <option value="">All event types</option>
+                {% for value, label in event_types %}
+                    <option value="{{ value }}" {% if active_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+
+        <div class="card-grid">
+            {% for event in events %}
+                <article class="card event-card">
+                    <div class="card-body">
+                        <p class="tag">{{ event.get_event_type_display }}</p>
+                        <h2><a href="{{ event.get_absolute_url }}">{{ event.title }}</a></h2>
+                        <p>{{ event.description|truncatewords:28 }}</p>
+                        <div class="course-meta-grid">
+                            <span><strong>Date</strong>{{ event.date|date:"M d, Y H:i" }}</span>
+                            <span><strong>Location</strong>{{ event.location }}</span>
+                            <span><strong>Seats</strong>{{ event.seats_available }}</span>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-state">No upcoming events match your search.</p>
+            {% endfor %}
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</section>
+{% endblock %}

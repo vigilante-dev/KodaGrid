@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificate Verification | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container certificate-card">
+        <p class="eyebrow">Verified Certificate</p>
+        <h1>{{ certificate.student_name }}</h1>
+        <p>Successfully completed <strong>{{ certificate.course_name }}</strong> on {{ certificate.completion_date }}.</p>
+        <div class="qr-box">
+            <span>{{ certificate.verification_code }}</span>
+        </div>
+        <p class="form-note">Use this verification code as the QR payload for printed certificates.</p>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Classroom Dashboard | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="dashboard-hero">
+    <div class="container">
+        <p class="eyebrow">Live Classroom Workspace</p>
+        <h1>Welcome back, {{ user.first_name|default:user.username }}. 👋</h1>
+        <p>Track classes, assignments, materials, live video sessions, announcements, and grade progress — all in one place.</p>
+        <div class="hero-actions" style="margin-top:20px;">
+            {% if classrooms %}
+            <a class="btn btn-accent btn-icon" href="{% url 'academy:video_call' classrooms.0.class_code %}">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                Start Video Call
+            </a>
+            {% endif %}
+            <a class="btn light-ghost" href="{% url 'academy:live_chat' %}">Open Chat Room</a>
+        </div>
+    </div>
+</section>
+
+{# ── PORTAL STATS ── #}
+<div class="stats-band" style="padding:0;">
+    <div class="container stats-grid portal-stats" style="grid-template-columns:repeat(4,1fr);">
+        <article class="stat-item">
+            <strong><span class="counter" data-count="{{ classrooms|length }}">0</span></strong>
+            <span>Active Classes</span>
+        </article>
+        <article class="stat-item">
+            <strong><span class="counter" data-count="{{ assignments|length }}">0</span></strong>
+            <span>Assignments</span>
+        </article>
+        <article class="stat-item">
+            <strong><span class="counter" data-count="{{ attendance_count }}">0</span></strong>
+            <span>Sessions Attended</span>
+        </article>
+        <article class="stat-item">
+            <strong><span class="counter" data-count="{{ submissions|length }}">0</span></strong>
+            <span>Submissions</span>
+        </article>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+        <div class="classroom-layout">
+
+            {# ══════════════════════════════════
+               LEFT COLUMN — main panels
+               ══════════════════════════════════ #}
+            <div class="classroom-main">
+
+                {# ── JOIN A CLASS ── #}
+                <article class="portal-panel classroom-join-panel reveal">
+                    <div>
+                        <p class="eyebrow">Class Code</p>
+                        <h2>Join a classroom</h2>
+                        <p style="color:var(--muted);margin-top:4px;">Enter the code your trainer shared to unlock lessons, assignments, live sessions, and chat.</p>
+                    </div>
+                    <form method="post" class="inline-form" style="align-items:flex-start;margin-top:18px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_action" value="join_class">
+                        <label class="sr-only" for="{{ join_form.class_code.id_for_label }}">Class code</label>
+                        {{ join_form.class_code }}
+                        <button class="btn btn-primary" type="submit">Join</button>
+                        {% for error in join_form.class_code.errors %}<small class="form-error">{{ error }}</small>{% endfor %}
+                    </form>
+                </article>
+
+                {# ── ACTIVE CLASSES ── #}
+                <article class="portal-panel reveal">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <h2 style="margin:0;">Active Classes</h2>
+                        <span class="tag">{{ classrooms|length }} class{{ classrooms|length|pluralize:"es" }}</span>
+                    </div>
+                    <div class="classroom-cards">
+                        {% for classroom in classrooms %}
+                        <div class="classroom-card reveal reveal-delay-{{ forloop.counter }}">
+                            <div class="classroom-card-header">
+                                <div class="classroom-card-icon">{{ classroom.name|slice:":1"|upper }}</div>
+                                <div>
+                                    <h3>{{ classroom.name }}</h3>
+                                    <p>{{ classroom.trainer.name|default:"Trainer pending" }}</p>
+                                </div>
+                                <span class="classroom-code-badge">{{ classroom.class_code }}</span>
+                            </div>
+                            {% if classroom.learning_path %}
+                            <p style="color:var(--muted);font-size:.9rem;margin:10px 0 0;">{{ classroom.learning_path.title }}</p>
+                            {% endif %}
+                            <div class="classroom-card-actions">
+                                {# Always use internal video call — no more external links #}
+                                <a class="btn btn-accent btn-small btn-icon" href="{% url 'academy:video_call' classroom.class_code %}">
+                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                                    Video Call
+                                </a>
+                                <a class="btn btn-ghost btn-small" href="{% url 'academy:live_chat' %}">Chat</a>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="empty-state">Join a class above to see it here. Ask your trainer for the class code.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                {# ── LIVE SESSIONS ── #}
+                <article class="portal-panel reveal">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <h2 style="margin:0;">Live Sessions</h2>
+                        <span class="live-indicator" aria-label="Sessions available">
+                            <span class="live-dot"></span>Live
+                        </span>
+                    </div>
+                    <div class="timeline-list">
+                        {% for session in live_sessions %}
+                        <div class="session-row">
+                            <div class="session-row-info">
+                                <strong>{{ session.title }}</strong>
+                                <span>{{ session.get_session_type_display }} · {{ session.scheduled_for|date:"M d, H:i" }}</span>
+                            </div>
+                            {# Always route through our internal video call — fixes "opens another website" #}
+                            <a class="btn btn-accent btn-small btn-icon"
+                               href="{% url 'academy:video_call' session.classroom.class_code|default:'general' %}">
+                                <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                                Join
+                            </a>
+                        </div>
+                        {% empty %}
+                        <p class="empty-state">No live sessions scheduled. Your trainer will post one when a session is about to start.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                {# ── CLASS STREAM / ANNOUNCEMENTS ── #}
+                <article class="portal-panel reveal">
+                    <h2>Class Stream</h2>
+                    <div class="timeline-list">
+                        {% for announcement in announcements %}
+                        <div class="stream-item">
+                            <div class="stream-icon">📢</div>
+                            <div>
+                                <strong>{{ announcement.title }}</strong>
+                                <span>{{ announcement.classroom.name|default:"Academy-wide" }} · {{ announcement.created_at|date:"M d" }}</span>
+                                <p style="color:var(--muted);font-size:.9rem;margin-top:4px;">{{ announcement.message|truncatewords:20 }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="empty-state">Trainer posts and academy notices will appear here.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                {# ── ASSIGNMENTS ── #}
+                <article class="portal-panel reveal">
+                    <h2>Assignments</h2>
+                    <div class="timeline-list">
+                        {% for assignment in assignments %}
+                        <div class="assignment-row">
+                            <div class="assignment-info">
+                                <strong>{{ assignment.title }}</strong>
+                                <span>{{ assignment.classroom.name }} · Due {{ assignment.due_date|date:"M d, H:i" }} · {{ assignment.max_score }} pts</span>
+                            </div>
+                            <span class="assignment-due {% if assignment.due_date|date:'U' < 'now' %}overdue{% endif %}">
+                                {{ assignment.due_date|date:"M d" }}
+                            </span>
+                        </div>
+                        {% empty %}
+                        <p class="empty-state">No assignments yet. Trainers will publish tasks here.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                {# ── MATERIALS ── #}
+                <article class="portal-panel reveal">
+                    <h2>Class Materials</h2>
+                    <div class="materials-grid">
+                        {% for material in materials %}
+                        <div class="material-item">
+                            <span class="material-type-icon">
+                                {% if material.material_type == 'pdf' %}📄
+                                {% elif material.material_type == 'video' %}🎬
+                                {% elif material.material_type == 'notes' %}📖
+                                {% elif material.material_type == 'template' %}📋
+                                {% else %}💻{% endif %}
+                            </span>
+                            <div>
+                                <strong>{{ material.title }}</strong>
+                                <span>{{ material.get_material_type_display }}</span>
+                            </div>
+                            {% if material.file %}
+                            <a class="btn btn-ghost btn-small" href="{{ material.file.url }}" target="_blank" rel="noopener noreferrer">Download</a>
+                            {% elif material.external_url %}
+                            {# External resource links — open in new tab, not same tab #}
+                            <a class="btn btn-ghost btn-small" href="{{ material.external_url }}" target="_blank" rel="noopener noreferrer">Open</a>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <p class="empty-state">Notes, PDFs, videos, and resources will appear here.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+            </div>{# /classroom-main #}
+
+            {# ══════════════════════════════════
+               RIGHT COLUMN — sidebar panels
+               ══════════════════════════════════ #}
+            <aside class="classroom-sidebar">
+
+                {# ── EMBEDDED LIVE CHAT ── #}
+                <article class="portal-panel classroom-chat-panel reveal">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                        <h2 style="margin:0;">Class Chat</h2>
+                        <a class="text-link" href="{% url 'academy:live_chat' %}" style="font-size:.85rem;">Full view →</a>
+                    </div>
+                    <div id="classroom-chat" class="classroom-embedded-chat"></div>
+                </article>
+
+                {# ── SUBMIT ASSIGNMENT ── #}
+                <article class="side-panel reveal">
+                    <p class="eyebrow">Submit Work</p>
+                    <h2>Upload Assignment</h2>
+                    <form method="post" enctype="multipart/form-data" class="stacked-form" style="margin-top:14px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_action" value="submit_assignment">
+                        {{ submission_form.non_field_errors }}
+                        {% for field in submission_form %}
+                        <div class="form-field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<small class="form-error">{{ error }}</small>{% endfor %}
+                        </div>
+                        {% endfor %}
+                        <button class="btn btn-primary btn-full" type="submit">Upload Work</button>
+                    </form>
+                </article>
+
+                {# ── GRADEBOOK ── #}
+                <article class="side-panel reveal">
+                    <p class="eyebrow">Your Progress</p>
+                    <h2>Gradebook</h2>
+                    <div class="progress-row" style="margin-bottom:16px;">
+                        <span style="color:var(--muted);font-size:.9rem;">Attendance: {{ attendance_count }} session{{ attendance_count|pluralize }}</span>
+                        <div class="progress-track">
+                            <span data-width="{% if attendance_count %}{{ attendance_count|add:0 }}{% else %}0{% endif %}"></span>
+                        </div>
+                    </div>
+                    <div class="timeline-list">
+                        {% for submission in submissions %}
+                        <p>
+                            <strong>{{ submission.assignment.title }}</strong>
+                            <span>
+                                {% if submission.grade is not None %}
+                                    <span style="color:var(--success);font-weight:800;">{{ submission.grade }} pts</span>
+                                {% else %}
+                                    <span style="color:var(--muted);">Awaiting grade</span>
+                                {% endif %}
+                                {% if submission.feedback %} · {{ submission.feedback|truncatewords:8 }}{% endif %}
+                            </span>
+                        </p>
+                        {% empty %}
+                        <p class="empty-state">Submit work to track your grades here.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                {# ── CREATE CLASSROOM (trainers only) ── #}
+                {% if can_manage_classrooms %}
+                <article class="side-panel reveal">
+                    <p class="eyebrow">Trainer Tools</p>
+                    <h2>Create Classroom</h2>
+                    <form method="post" class="stacked-form" style="margin-top:14px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_action" value="create_classroom">
+                        {{ create_form.non_field_errors }}
+                        {% for field in create_form %}
+                        <div class="form-field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<small class="form-error">{{ error }}</small>{% endfor %}
+                        </div>
+                        {% endfor %}
+                        <button class="btn btn-emerald btn-full" type="submit">Create Class</button>
+                    </form>
+                </article>
+                {% endif %}
+
+            </aside>{# /classroom-sidebar #}
+
+        </div>{# /classroom-layout #}
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof initChat === "function") {
+        initChat("#classroom-chat", {
+            currentUser: "{{ request.user.get_full_name|default:request.user.username|default:'Student' }}",
+            userRole:    "{% if request.user.is_staff or request.user.is_superuser %}trainer{% else %}student{% endif %}",
+            roomId:      "classroom-{% if classrooms %}{{ classrooms.0.class_code }}{% else %}general{% endif %}",
+        });
+    }
+});
+</script>
+{% endblock %}

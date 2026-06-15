@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Programs and Courses | CodeSavannah Academy{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow" data-i18n="courses_eyebrow">Programs and Courses</p>
+        <h1 data-i18n="courses_hero_title">Career-ready technology pathways.</h1>
+        <p data-i18n="courses_hero_body">Explore practical courses in coding, AI, cybersecurity, robotics, design, data, cloud, and digital marketing.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form class="filter-bar" method="get" role="search">
+            <label class="sr-only" for="course-search">Search courses</label>
+            <input id="course-search" type="search" name="q" value="{{ search_query }}" placeholder="Search courses, skills, or instructors…" data-i18n-placeholder="courses_search_ph">
+            <label class="sr-only" for="course-category">Course category</label>
+            <select id="course-category" name="category">
+                <option value="" data-i18n="courses_all_categories">All categories</option>
+                {% for value, label in categories %}
+                    <option value="{{ value }}" {% if active_category == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">
+                <i class="bi bi-search"></i> <span data-i18n="btn_search">Search</span>
+            </button>
+        </form>
+
+        <div class="card-grid program-grid">
+            {% for course in courses %}
+            <article class="card program-card cs-clickable-card" data-href="{{ course.get_absolute_url }}">
+                {% if course.image %}
+                    <img class="card-image" src="{{ course.image.url }}" alt="{{ course.title }}">
+                {% else %}
+                    <div class="course-art course-art-{{ forloop.counter }}">
+                        <span>{{ course.get_category_display }}</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <p class="tag">{{ course.get_category_display }}</p>
+                    <h2>{{ course.title }}</h2>
+                    <p>{{ course.description|truncatewords:24 }}</p>
+                    <div class="course-meta-grid">
+                        <span><strong>Duration</strong> {{ course.duration }}</span>
+                        <span><strong>Level</strong> {{ course.get_level_display }}</span>
+                        <span><strong>Instructor</strong> {{ course.instructor }}</span>
+                    </div>
+                    <div class="card-cta-row">
+                        <a class="btn btn-primary btn-small" href="{{ course.get_absolute_url }}">
+                            <i class="bi bi-play-fill"></i> <span data-i18n="btn_view_course">View Course</span>
+                        </a>
+                        <a class="btn btn-ghost btn-small" href="{% url 'accounts:register' %}">
+                            <i class="bi bi-person-plus"></i> <span data-i18n="btn_enroll">Enroll</span>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+                <p class="empty-state" data-i18n="courses_empty">No courses match your search. Try another keyword or category.</p>
+            {% endfor %}
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</section>
+
+<section class="section section-alt" id="learning-paths">
+    <div class="container">
+        <div class="section-header">
+            <p class="eyebrow">Self-Paced Learning</p>
+            <h2>All Learning Paths</h2>
+            <p>{{ learning_paths|length }} structured paths across {{ path_categories|length }} technology areas. Pick a path and learn at your own pace.</p>
+        </div>
+
+        <div class="path-category-tabs" role="tablist">
+            <button class="tab-btn active" data-filter="all" role="tab">All</button>
+            {% for value, label in path_categories %}
+            <button class="tab-btn" data-filter="{{ value }}" role="tab">{{ label }}</button>
+            {% endfor %}
+        </div>
+
+        <div class="card-grid path-grid">
+            {% for path in learning_paths %}
+            <article class="card path-card cs-clickable-card reveal"
+                     data-href="{% url 'academy:learning_path_detail' path.slug %}"
+                     data-category="{{ path.category }}">
+                <div class="path-card-icon path-icon-{{ path.category }}">
+                    {% if path.category == 'programming' %}<i class="bi bi-code-slash"></i>
+                    {% elif path.category == 'web' %}<i class="bi bi-globe2"></i>
+                    {% elif path.category == 'mobile' %}<i class="bi bi-phone"></i>
+                    {% elif path.category == 'databases' %}<i class="bi bi-database"></i>
+                    {% elif path.category == 'cloud' %}<i class="bi bi-cloud"></i>
+                    {% elif path.category == 'cybersecurity' %}<i class="bi bi-shield-lock"></i>
+                    {% elif path.category == 'ai' %}<i class="bi bi-cpu"></i>
+                    {% else %}<i class="bi bi-book"></i>{% endif %}
+                </div>
+                <div class="card-body">
+                    <p class="tag">{{ path.get_category_display }}</p>
+                    <h3>{{ path.title }}</h3>
+                    {% if path.description %}
+                    <p>{{ path.description|truncatewords:18 }}</p>
+                    {% endif %}
+                    <div class="path-meta">
+                        <span><i class="bi bi-collection"></i> {{ path.lesson_count }} lesson{{ path.lesson_count|pluralize }}</span>
+                    </div>
+                    <a class="btn btn-ghost btn-small"
+                       href="{% url 'academy:learning_path_detail' path.slug %}">
+                        Start Path <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <p class="empty-state">No learning paths available yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+.path-category-tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2rem; }
+.tab-btn { padding: .4rem 1rem; border: 1.5px solid var(--clr-border,#e2e8f0); border-radius: 2rem;
+           background: transparent; cursor: pointer; font-size: .875rem; transition: all .2s; }
+.tab-btn.active,
+.tab-btn:hover { background: var(--clr-accent,#10b981); color: #fff; border-color: var(--clr-accent,#10b981); }
+.path-card { display: flex; flex-direction: column; }
+.path-card-icon { font-size: 2rem; padding: 1.25rem 1.5rem .5rem;
+                  line-height: 1; }
+.path-icon-programming { color: #f59e0b; }
+.path-icon-web         { color: #3b82f6; }
+.path-icon-mobile      { color: #8b5cf6; }
+.path-icon-databases   { color: #06b6d4; }
+.path-icon-cloud       { color: #0ea5e9; }
+.path-icon-cybersecurity{ color: #ef4444; }
+.path-icon-ai          { color: #10b981; }
+.path-meta { display: flex; gap: 1rem; font-size: .8rem; color: var(--clr-muted,#64748b);
+             margin: .5rem 0 1rem; }
+.path-meta span { display: flex; align-items: center; gap: .3rem; }
+.path-card[style*="display:none"],
+.path-card.hidden { display: none !important; }
+</style>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const cards = document.querySelectorAll('.path-card');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      cards.forEach(card => {
+        const show = filter === 'all' || card.dataset.category === filter;
+        card.style.display = show ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
+
+{% endblock %}

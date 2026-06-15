@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Technology classroom with students and code screens</title>
+  <desc id="desc">A modern illustrated technology learning space with code panels, desks, and network lines.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.45" stop-color="#1d4ed8"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" x2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <g opacity="0.2" fill="none" stroke="#ffffff" stroke-width="2">
+    <path d="M160 160h360v210H160zM1030 140h360v240h-360zM640 90h300v170H640z"/>
+    <path d="M520 265h120M940 200h90M1390 260h70M300 370v120M1210 380v130"/>
+    <circle cx="520" cy="265" r="8" fill="#ffffff"/>
+    <circle cx="940" cy="200" r="8" fill="#ffffff"/>
+    <circle cx="300" cy="490" r="8" fill="#ffffff"/>
+    <circle cx="1210" cy="510" r="8" fill="#ffffff"/>
+  </g>
+  <g transform="translate(760 260)">
+    <rect x="0" y="0" width="620" height="390" rx="24" fill="url(#screen)" stroke="#7dd3fc" stroke-width="4"/>
+    <rect x="34" y="42" width="180" height="18" rx="9" fill="#67e8f9"/>
+    <rect x="34" y="92" width="420" height="18" rx="9" fill="#bfdbfe"/>
+    <rect x="34" y="136" width="330" height="18" rx="9" fill="#38bdf8"/>
+    <rect x="34" y="180" width="500" height="18" rx="9" fill="#e0f2fe"/>
+    <rect x="34" y="244" width="240" height="82" rx="14" fill="#2563eb"/>
+    <rect x="304" y="244" width="240" height="82" rx="14" fill="#0891b2"/>
+    <circle cx="560" cy="52" r="18" fill="#22c55e"/>
+  </g>
+  <g transform="translate(210 500)">
+    <rect x="0" y="0" width="450" height="270" rx="24" fill="#f8fafc" opacity="0.94"/>
+    <rect x="36" y="38" width="160" height="18" rx="9" fill="#2563eb"/>
+    <rect x="36" y="82" width="330" height="18" rx="9" fill="#94a3b8"/>
+    <rect x="36" y="126" width="260" height="18" rx="9" fill="#06b6d4"/>
+    <rect x="36" y="180" width="120" height="54" rx="12" fill="#0f172a"/>
+    <rect x="180" y="180" width="120" height="54" rx="12" fill="#1d4ed8"/>
+  </g>
+  <g transform="translate(480 720)">
+    <ellipse cx="160" cy="130" rx="260" ry="50" fill="#0f172a" opacity="0.28"/>
+    <circle cx="80" cy="40" r="38" fill="#fbbf24"/>
+    <rect x="45" y="82" width="78" height="130" rx="32" fill="#2563eb"/>
+    <circle cx="230" cy="32" r="36" fill="#fda4af"/>
+    <rect x="194" y="75" width="82" height="136" rx="34" fill="#06b6d4"/>
+    <rect x="112" y="120" width="110" height="70" rx="12" fill="#f8fafc"/>
+  </g>
+  <path d="M0 825c260-90 470-70 700-35 310 46 565 6 900-120v330H0z" fill="#f8fafc" opacity="0.95"/>
+</svg>
