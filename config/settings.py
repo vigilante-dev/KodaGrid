@@ -13,8 +13,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get(
     'DJANGO_ALLOWED_HOSTS',
-    '127.0.0.1,localhost',
-    'codesavannah.onrender.com'
+    '127.0.0.1,localhost,codesavannah.onrender.com'
 ).split(',')
 
 
