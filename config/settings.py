@@ -154,8 +154,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 X_FRAME_OPTIONS = 'DENY'
 CSRF_TRUSTED_ORIGINS = [
-    "https://codesavannah.onrender.com/",
-    origin.strip()
+    "https://codesavannah.onrender.com",] + [    origin.strip()
     for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
     if origin.strip()
 ]
