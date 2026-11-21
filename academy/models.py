@@ -311,6 +311,7 @@ class ChatRoom(models.Model):
     name = models.CharField(max_length=160)
     room_type = models.CharField(max_length=30, choices=ROOM_TYPES, default='group')
     participants = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='academy_chat_rooms')
+    call_code = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -5,6 +6,13 @@ class Testimonial(models.Model):
     student_name = models.CharField(max_length=150)
     course_completed = models.CharField(max_length=160)
     feedback = models.TextField()
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='testimonials',
+        blank=True,
+        null=True,
+    )
     student_photo = models.ImageField(upload_to='testimonials/', blank=True, null=True)
     rating = models.PositiveSmallIntegerField(default=5)
     is_featured = models.BooleanField(default=True)

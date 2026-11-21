@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Login | CodeSavannah Academy{% endblock %}
+{% block title %}Login | KodaGrid{% endblock %}
 
 {% block content %}
 <section class="auth-section">
@@ -8,10 +9,18 @@
         <div class="auth-copy">
             <p class="eyebrow" data-i18n="auth_login_eyebrow">Welcome Back</p>
             <h1 data-i18n="auth_login_title">Access your student portal.</h1>
-            <p data-i18n="auth_login_body">Continue your courses, review assignments, track certificates, and stay connected with the CodeSavannah community.</p>
+            <p data-i18n="auth_login_body">Continue your courses, review assignments, track certificates, and stay connected with the KodaGrid community.</p>
         </div>
         <div class="auth-card">
             <h2 data-i18n="nav_login">Login</h2>
+            <div class="firebase-auth" data-mode="login" data-session-url="{% url 'accounts:firebase_session' %}" data-api-key="AIzaSyCn1fUdcnZhvLqoS6PDkiK2nCZv2JiYTos" data-auth-domain="codesavannah-94f36.firebaseapp.com" data-project-id="codesavannah-94f36" data-app-id="1:166052078134:web:8c1c1d6c33268594b0ae97">
+                <label>Email <input type="email" autocomplete="email" required></label>
+                <label>Password <input type="password" autocomplete="current-password" required></label>
+                <button class="btn btn-accent btn-full" type="button" data-firebase-submit>Continue with Firebase</button>
+                <p class="form-note" data-firebase-status role="status" aria-live="polite"></p>
+            </div>
+            <script type="module" src="{% static 'js/firebase-auth.js' %}"></script>
+            <hr>
             <form method="post" class="stacked-form">
                 {% include 'includes/form_fields.html' %}
                 <button class="btn btn-primary btn-full" type="submit" data-i18n="btn_login">Login</button>

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Create Student Account | CodeSavannah Academy{% endblock %}
+{% block title %}Create Student Account | KodaGrid{% endblock %}
 
 {% block content %}
 <section class="auth-section">
@@ -8,10 +9,18 @@
         <div class="auth-copy">
             <p class="eyebrow" data-i18n="auth_register_eyebrow">Student Portal</p>
             <h1 data-i18n="auth_register_title">Create your learner account.</h1>
-            <p data-i18n="auth_register_body">Join CodeSavannah Academy to track learning progress, submit projects, access certificates, and stay connected with mentors.</p>
+            <p data-i18n="auth_register_body">Join KodaGrid to track learning progress, submit projects, access certificates, and stay connected with mentors.</p>
         </div>
         <div class="auth-card">
             <h2 data-i18n="nav_register">Register</h2>
+            <div class="firebase-auth" data-mode="register" data-session-url="{% url 'accounts:firebase_session' %}" data-api-key="AIzaSyCn1fUdcnZhvLqoS6PDkiK2nCZv2JiYTos" data-auth-domain="codesavannah-94f36.firebaseapp.com" data-project-id="codesavannah-94f36" data-app-id="1:166052078134:web:8c1c1d6c33268594b0ae97">
+                <label>Email <input type="email" autocomplete="email" required></label>
+                <label>Password <input type="password" autocomplete="new-password" minlength="8" required></label>
+                <button class="btn btn-accent btn-full" type="button" data-firebase-submit>Create account with Firebase</button>
+                <p class="form-note" data-firebase-status role="status" aria-live="polite"></p>
+            </div>
+            <script type="module" src="{% static 'js/firebase-auth.js' %}"></script>
+            <hr>
             <form method="post" class="stacked-form">
                 {% include 'includes/form_fields.html' %}
                 <button class="btn btn-primary btn-full" type="submit" data-i18n="btn_create_account">Create Account</button>

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Blog and Resources | CodeSavannah Academy{% endblock %}
+{% block title %}Blog and Resources | KodaGrid{% endblock %}
 
 {% block content %}
 <section class="page-hero">
@@ -43,7 +43,7 @@
                         <p>{{ post.excerpt }}</p>
                         <div class="meta-row">
                             <span>{{ post.date_published|date:"M d, Y" }}</span>
-                            <span>{% if post.author %}{{ post.author.get_full_name|default:post.author.username }}{% else %}CodeSavannah Team{% endif %}</span>
+                            <span>{% if post.author %}{{ post.author.get_full_name|default:post.author.username }}{% else %}KodaGrid Team{% endif %}</span>
                         </div>
                     </div>
                 </article>

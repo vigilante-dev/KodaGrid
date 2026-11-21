@@ -1,20 +1,33 @@
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
+
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-codesavannah-academy-development-key-change-in-production',
-)
+debug_default = 'False' if os.environ.get('RENDER_EXTERNAL_HOSTNAME') else 'True'
+DEBUG = os.environ.get('DJANGO_DEBUG', debug_default).strip().lower() in {'true', '1', 'yes'}
 
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY before running with DEBUG disabled.')
+    SECRET_KEY = 'django-insecure-local-development-key'
 
-ALLOWED_HOSTS = os.environ.get(
-    'DJANGO_ALLOWED_HOSTS',
-    '127.0.0.1,localhost,codesavannah.onrender.com'
-).split(',')
+render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '').strip()
+default_allowed_hosts = ['127.0.0.1', 'localhost']
+if render_hostname:
+    default_allowed_hosts.append(render_hostname)
+configured_allowed_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '').strip()
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in configured_allowed_hosts.split(',')
+    if host.strip()
+] or default_allowed_hosts
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
 
 
 INSTALLED_APPS = [
@@ -68,7 +81,31 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-if os.environ.get('DJANGO_DB_ENGINE') == 'postgresql':
+database_url = os.environ.get('DATABASE_URL', '').strip()
+if database_url:
+    parsed_database_url = urlparse(database_url)
+    if parsed_database_url.scheme not in {'postgres', 'postgresql'}:
+        raise ImproperlyConfigured('DATABASE_URL must be a PostgreSQL connection URL.')
+    database_name = unquote(parsed_database_url.path.lstrip('/'))
+    if not parsed_database_url.hostname or not database_name:
+        raise ImproperlyConfigured('DATABASE_URL must include a database name and host.')
+    query = parse_qs(parsed_database_url.query)
+    database_options = {}
+    if 'sslmode' in query:
+        database_options['sslmode'] = query['sslmode'][0]
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': database_name,
+            'USER': unquote(parsed_database_url.username or ''),
+            'PASSWORD': unquote(parsed_database_url.password or ''),
+            'HOST': parsed_database_url.hostname,
+            'PORT': parsed_database_url.port or '5432',
+            'CONN_MAX_AGE': int(os.environ.get('POSTGRES_CONN_MAX_AGE', '60')),
+            'OPTIONS': database_options,
+        }
+    }
+elif os.environ.get('DJANGO_DB_ENGINE') == 'postgresql':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -119,6 +156,8 @@ USE_TZ = True
 LANGUAGES = [
     ('en', 'English'),
     ('sw', 'Swahili'),
+    ('fr', 'French'),
+    ('pt', 'Portuguese'),
 ]
 
 LOCALE_PATHS = [BASE_DIR / 'locale']
@@ -143,22 +182,29 @@ EMAIL_BACKEND = os.environ.get(
 )
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL',
-    'CodeSavannah Academy <hello@codesavannah.local>',
+    'KodaGrid <webmaster@localhost>',
 )
+CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', '').strip()
 
 ANALYTICS_ID = os.environ.get('DJANGO_ANALYTICS_ID', '')
 
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+if render_hostname:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 X_FRAME_OPTIONS = 'DENY'
-CSRF_TRUSTED_ORIGINS = [
-    "https://codesavannah.onrender.com",] + [    origin.strip()
+csrf_origins = [
+    origin.strip().rstrip('/')
     for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
     if origin.strip()
 ]
+if render_hostname:
+    csrf_origins.append(f'https://{render_hostname}')
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(csrf_origins))
 SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0' if DEBUG else '31536000'))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG

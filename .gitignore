@@ -5,6 +5,8 @@ db.sqlite3
 media/
 staticfiles/
 .env
+*-firebase-adminsdk-*.json
+firebase-service-account*.json
 .venv/
 venv/
 env/
