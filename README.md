@@ -103,9 +103,11 @@ DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 DEFAULT_FROM_EMAIL=CoderGrid <webmaster@example.com>
 CONTACT_EMAIL=your-inbox@example.com
 DJANGO_ANALYTICS_ID=G-XXXXXXXXXX
+FIREBASE_PROJECT_ID=codesavannah-94f36
+FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
 ```
 
-CoderGrid uses Django's built-in authentication for account registration, login, sessions, and logout. Registration creates a Django user and student profile in one database transaction. Apply migrations after deployment so private chat call codes and published-content branding are up to date.
+Firebase email/password authentication is enabled on the login and registration pages. Enable the Email/Password provider in Firebase Authentication and set `FIREBASE_SERVICE_ACCOUNT_JSON` to a service-account JSON secret in the deployment environment (never commit it). The Firebase browser API key is public configuration; it does not authorize server access. Django verifies Firebase ID tokens and creates its normal session. Apply migrations after deployment so private chat call codes exist.
 
 ## Notes
 
