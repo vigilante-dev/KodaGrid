@@ -1,16 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Classroom Chat | CodeSavannah Academy{% endblock %}
-{% block meta_description %}Chat live with students and teachers, search users, send direct messages, and start in-app video or audio calls — all inside CodeSavannah Academy.{% endblock %}
+{% block title %}Classroom Chat | CoderGrid{% endblock %}
+{% block meta_description %}Chat live with students and teachers, search users, send direct messages, and start in-app video or audio calls — all inside CoderGrid.{% endblock %}
 
 {% block footer %}{% endblock %}
 
 {% block content %}
-<style>
-html, body { overflow: hidden; height: 100%; }
-</style>
-
 {# ══ CHAT APP SHELL ══ #}
 <div class="cs-chat-app">
 
@@ -34,49 +30,12 @@ html, body { overflow: hidden; height: 100%; }
         {# Channel rooms #}
         <nav class="cs-nav-section">
             <p class="cs-nav-label"><i class="bi bi-hash"></i> Rooms</p>
-            <button class="cs-room-btn active" data-room="general" data-name="General Chat">
-                <i class="bi bi-people-fill"></i> general
-            </button>
-            <button class="cs-room-btn" data-room="python" data-name="Python Help">
-                <i class="bi bi-code-slash"></i> python-help
-            </button>
-            <button class="cs-room-btn" data-room="robotics" data-name="Robotics Lab">
-                <i class="bi bi-cpu-fill"></i> robotics-lab
-            </button>
-            <button class="cs-room-btn" data-room="projects" data-name="Show Your Projects">
-                <i class="bi bi-folder2-open"></i> projects
-            </button>
-            <button class="cs-room-btn" data-room="announcements" data-name="Announcements">
-                <i class="bi bi-megaphone-fill"></i> announcements
-            </button>
-            {% for room in rooms %}
-            <button class="cs-room-btn" data-room="{{ room.id }}" data-name="{{ room.name }}">
-                <i class="bi bi-hash"></i> {{ room.name|lower|cut:" " }}
-            </button>
-            {% endfor %}
         </nav>
 
         {# Trainers online #}
         <nav class="cs-nav-section">
             <p class="cs-nav-label"><i class="bi bi-mortarboard-fill"></i> Trainers</p>
-            {% for t in trainers_online %}
-            <button class="cs-dm-btn" data-user-id="{{ t.id|default:forloop.counter }}" data-name="{{ t.name }}" data-role="trainer">
-                <span class="cs-avatar cs-avatar-trainer">{{ t.name|slice:":1" }}</span>
-                <span class="cs-dm-name">{{ t.name }}</span>
-                <span class="cs-online-dot"></span>
-            </button>
-            {% empty %}
-            <button class="cs-dm-btn" data-user-id="demo-trainer" data-name="Mr. Kamau" data-role="trainer">
-                <span class="cs-avatar cs-avatar-trainer">K</span>
-                <span class="cs-dm-name">Mr. Kamau</span>
-                <span class="cs-online-dot"></span>
-            </button>
-            <button class="cs-dm-btn" data-user-id="demo-trainer2" data-name="Ms. Achieng" data-role="trainer">
-                <span class="cs-avatar cs-avatar-trainer">A</span>
-                <span class="cs-dm-name">Ms. Achieng</span>
-                <span class="cs-online-dot"></span>
-            </button>
-            {% endfor %}
+            <p class="cs-empty-hint">Search for an account to start a private conversation.</p>
         </nav>
 
         {# Direct messages #}
@@ -107,9 +66,6 @@ html, body { overflow: hidden; height: 100%; }
                 <button class="cs-call-btn cs-call-video" id="cs-btn-video" title="Start video call" aria-label="Video call">
                     <i class="bi bi-camera-video-fill"></i>
                 </button>
-                <button class="cs-call-btn" id="cs-btn-screen" title="Share screen" aria-label="Share screen">
-                    <i class="bi bi-display"></i>
-                </button>
             </div>
         </div>
 
@@ -136,14 +92,6 @@ html, body { overflow: hidden; height: 100%; }
     <aside class="cs-right-panel" id="cs-right-panel">
         <p class="cs-nav-label"><i class="bi bi-people-fill"></i> Members</p>
         <div id="cs-members-list">
-            <div class="cs-member-row">
-                <span class="cs-avatar cs-avatar-trainer">K</span>
-                <span>Mr. Kamau <span class="cs-role-tag trainer">Trainer</span></span>
-            </div>
-            <div class="cs-member-row">
-                <span class="cs-avatar cs-avatar-trainer">A</span>
-                <span>Ms. Achieng <span class="cs-role-tag trainer">Trainer</span></span>
-            </div>
             <div class="cs-member-row">
                 <span class="cs-avatar">{{ request.user.get_full_name|default:request.user.username|default:"You" |slice:":1" }}</span>
                 <span>{{ request.user.get_full_name|default:request.user.username|default:"You" }} <span class="cs-role-tag">You</span></span>
@@ -222,25 +170,27 @@ html, body { overflow: hidden; height: 100%; }
 <script>
 (function() {
     /* ─── state ──────────────────────────────────────────────────── */
-    const CURRENT_USER  = "{{ request.user.get_full_name|default:request.user.username|default:'Student' }}";
-    const CURRENT_ROLE  = "{% if request.user.is_staff or request.user.is_superuser %}trainer{% else %}student{% endif %}";
-    const STORAGE_PFX   = "cs_chat2_";
+    const CURRENT_USER  = "{{ request.user.get_full_name|default:request.user.username|default:'Student'|escapejs }}";
+    const CURRENT_ROLE  = "{{ chat_user_role }}";
+    const CHAT_API = "{% url 'academy:chat_api' %}";
+    const csrfToken = () => document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+    const api = async (url, options = {}) => {
+        const response = await fetch(url, { credentials: 'same-origin', ...options,
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': decodeURIComponent(csrfToken()), ...(options.headers || {}) } });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Chat request failed.');
+        return result;
+    };
 
     let activeRoom  = "general";
     let activeName  = "General Chat";
     let isDM        = false;
 
     /* ─── sample users (replace with API call in production) ─────── */
-    const DEMO_USERS = [
-        { id:"u1",  name:"Mr. Kamau",       role:"trainer",  avatar:"K" },
-        { id:"u2",  name:"Ms. Achieng",     role:"trainer",  avatar:"A" },
-        { id:"u3",  name:"Brian Otieno",    role:"student",  avatar:"B" },
-        { id:"u4",  name:"Cynthia Wanjiku", role:"student",  avatar:"C" },
-        { id:"u5",  name:"David Mwangi",    role:"student",  avatar:"D" },
-        { id:"u6",  name:"Esther Auma",     role:"student",  avatar:"E" },
-        { id:"u7",  name:"Felix Njoroge",   role:"student",  avatar:"F" },
-        { id:"u8",  name:"Grace Adhiambo",  role:"student",  avatar:"G" },
-    ];
+    let announcementsRoom = null;
+    let canAnnounce = false;
+    let pollTimer = null;
+    let lastMessageId = 0;
 
     /* ─── helpers ────────────────────────────────────────────────── */
     const qs  = s => document.querySelector(s);
@@ -261,11 +211,21 @@ html, body { overflow: hidden; height: 100%; }
         const div = document.createElement("div");
         div.className = `cs-msg ${isSelf ? "cs-msg-self" : "cs-msg-other"}`;
         const init = (user || "?").charAt(0).toUpperCase();
+        let messageHtml = escapeHTML(text);
+        const callUrl = text.match(/https?:\/\/[^\s]+/)?.[0];
+        if (callUrl) {
+            try {
+                const parsed = new URL(callUrl, window.location.origin);
+                if (parsed.origin === window.location.origin && /^\/call\/[\da-f-]+\/$/i.test(parsed.pathname)) {
+                    messageHtml = `${escapeHTML(text.split(callUrl)[0])}<a href="${escapeHTML(parsed.href)}">Join private call</a>`;
+                }
+            } catch (_) { /* render untrusted text literally */ }
+        }
         div.innerHTML = `
             ${!isSelf ? avatarHTML(init, role) : ""}
             <div class="cs-msg-body">
-                ${!isSelf ? `<span class="cs-msg-name" style="color:${colorFor(role)};">${user}${role === "trainer" ? ' <i class="bi bi-mortarboard-fill"></i>' : ""}</span>` : ""}
-                <p>${escapeHTML(text)}</p>
+                ${!isSelf ? `<span class="cs-msg-name" style="color:${colorFor(role)};">${escapeHTML(user)}${role === "trainer" ? ' <i class="bi bi-mortarboard-fill"></i>' : ""}</span>` : ""}
+                <p>${messageHtml}</p>
                 <span class="cs-msg-time">${time || fmt()}</span>
             </div>
             ${isSelf ? avatarHTML(init, role) : ""}
@@ -275,44 +235,20 @@ html, body { overflow: hidden; height: 100%; }
     }
 
     function escapeHTML(s) {
-        return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
     }
 
-    function seedMessages(room) {
-        msgBox.innerHTML = "";
-        const key = STORAGE_PFX + room;
-        const saved = JSON.parse(localStorage.getItem(key) || "[]");
-        if (saved.length) {
-            saved.forEach(m => appendMessage(m));
-        } else {
-            const seeds = {
-                general: [
-                    { user:"Mr. Kamau",    role:"trainer", text:"Good morning, warriors! Today's challenge: build a Python function that reverses a string without using slicing. Drop your solution here 💪", isSelf:false },
-                    { user:"Brian Otieno", role:"student", text:"Does using reversed() count as slicing? 😅", isSelf:false },
-                    { user:"Ms. Achieng",  role:"trainer", text:"Great question Brian — reversed() is fine, but explain your approach when you post it!", isSelf:false },
-                ],
-                python: [
-                    { user:"Ms. Achieng", role:"trainer", text:"Python tip of the day: use enumerate() instead of range(len(list)) for cleaner loops.", isSelf:false },
-                    { user:"Cynthia Wanjiku", role:"student", text:"I always forget about that! Thanks 🙏", isSelf:false },
-                ],
-                robotics: [
-                    { user:"Mr. Kamau", role:"trainer", text:"Arduino kits are ready for pickup. Bring your laptops to Lab 2 at 3pm for wiring session.", isSelf:false },
-                ],
-                announcements: [
-                    { user:"Mr. Kamau", role:"trainer", text:"📢 Term 2 hackathon registration opens next Monday. Theme: Smart Agriculture. Teams of 2–4.", isSelf:false },
-                    { user:"Ms. Achieng", role:"trainer", text:"📚 Python Level 2 cohort starts 10th. Register before Sunday to secure your slot.", isSelf:false },
-                ],
-            };
-            (seeds[room] || []).forEach(m => appendMessage({ ...m, time: "earlier" }));
-        }
-    }
-
-    function saveMessage(room, msg) {
-        const key = STORAGE_PFX + room;
-        const msgs = JSON.parse(localStorage.getItem(key) || "[]");
-        msgs.push(msg);
-        if (msgs.length > 100) msgs.splice(0, msgs.length - 100);
-        localStorage.setItem(key, JSON.stringify(msgs));
+    async function loadMessages(reset = false) {
+        if (!activeRoom || activeRoom === 'general') return;
+        if (reset) { msgBox.innerHTML = ''; lastMessageId = 0; }
+        try {
+            const data = await api(`${CHAT_API}?room=${encodeURIComponent(activeRoom)}&after=${lastMessageId}`, { headers: {} });
+            data.messages.forEach(m => {
+                appendMessage({ user: m.user, role: m.role, text: m.text,
+                    time: new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), isSelf: m.mine });
+                lastMessageId = Math.max(lastMessageId, m.id);
+            });
+        } catch (error) { qs('#cs-current-room').title = error.message; }
     }
 
     /* ─── room switching ─────────────────────────────────────────── */
@@ -324,7 +260,10 @@ html, body { overflow: hidden; height: 100%; }
         qs("#cs-room-icon").innerHTML = isDM ? '<i class="bi bi-person-fill"></i>' : '<i class="bi bi-hash"></i>';
         qs("#cs-input").placeholder = `Message ${isDM ? roomName : "#" + roomName.toLowerCase().replace(/\s+/g,"-")}…`;
         qs("#cs-call-btns").style.display = isDM ? "flex" : "none";
-        seedMessages(roomId);
+        qs('#cs-input').disabled = !isDM && !canAnnounce;
+        if (pollTimer) clearInterval(pollTimer);
+        loadMessages(true);
+        pollTimer = setInterval(loadMessages, 2500);
     }
 
     document.querySelectorAll(".cs-room-btn").forEach(btn => {
@@ -339,7 +278,7 @@ html, body { overflow: hidden; height: 100%; }
         btn.addEventListener("click", () => {
             document.querySelectorAll(".cs-room-btn,.cs-dm-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            switchRoom("dm_" + btn.dataset.userId, btn.dataset.name, true);
+            switchRoom(btn.dataset.roomId, btn.dataset.name, true);
         });
     });
 
@@ -348,11 +287,10 @@ html, body { overflow: hidden; height: 100%; }
         e.preventDefault();
         const input = qs("#cs-input");
         const text = input.value.trim();
-        if (!text) return;
-        const msg = { user: CURRENT_USER, role: CURRENT_ROLE, text, time: fmt(), isSelf: true };
-        appendMessage(msg);
-        saveMessage(activeRoom, { ...msg, isSelf: false });
-        input.value = "";
+        if (!text || !activeRoom || activeRoom === 'general') return;
+        api(CHAT_API, { method: 'POST', body: JSON.stringify({ room: activeRoom, text }) })
+            .then(() => { input.value = ''; loadMessages(); })
+            .catch(error => { qs('#cs-current-room').title = error.message; });
     });
 
     /* ─── user search ────────────────────────────────────────────── */
@@ -364,26 +302,35 @@ html, body { overflow: hidden; height: 100%; }
     searchInput.addEventListener("input", () => {
         const q = searchInput.value.trim().toLowerCase();
         if (!q) { searchResults.hidden = true; return; }
-        const matches = DEMO_USERS.filter(u => u.name.toLowerCase().includes(q));
-        if (!matches.length) {
-            searchResults.innerHTML = `<p class="cs-no-result">No users found</p>`;
-        } else {
-            searchResults.innerHTML = matches.map(u => `
-                <button class="cs-search-result-item" data-id="${u.id}" data-name="${u.name}" data-role="${u.role}">
-                    <span class="cs-avatar cs-avatar-sm ${u.role === "trainer" ? "cs-avatar-trainer" : ""}">${u.avatar}</span>
-                    <span>${u.name}</span>
-                    <span class="cs-role-tag ${u.role}">${u.role}</span>
-                </button>
-            `).join("");
-        }
-        searchResults.hidden = false;
+        api(`${CHAT_API}?q=${encodeURIComponent(q)}`, { headers: {} }).then(data => {
+            searchResults.replaceChildren();
+            const matches = data.users || [];
+            if (!matches.length) {
+                const empty = document.createElement('p');
+                empty.className = 'cs-no-result'; empty.textContent = 'No users found';
+                searchResults.appendChild(empty);
+            } else matches.forEach(u => {
+                const item = document.createElement('button');
+                item.className = 'cs-search-result-item';
+                item.dataset.id = u.id; item.dataset.name = u.name; item.dataset.role = u.role;
+                const avatar = document.createElement('span');
+                avatar.className = `cs-avatar cs-avatar-sm ${u.role === 'trainer' ? 'cs-avatar-trainer' : ''}`;
+                avatar.textContent = u.name.charAt(0);
+                const label = document.createElement('span'); label.textContent = u.name;
+                const tag = document.createElement('span'); tag.className = `cs-role-tag ${u.role}`; tag.textContent = u.role;
+                item.append(avatar, label, tag); searchResults.appendChild(item);
+            });
+            searchResults.hidden = false;
+        }).catch(() => { searchResults.hidden = true; });
     });
 
     searchResults.addEventListener("click", e => {
         const item = e.target.closest(".cs-search-result-item");
         if (!item) return;
         const { id, name, role } = item.dataset;
-        openDM(id, name, role);
+        api(CHAT_API, { method: 'POST', body: JSON.stringify({ action: 'start', user_id: id }) })
+            .then(room => openDM(room.id, room.name, role))
+            .catch(error => { qs('#cs-current-room').title = error.message; });
         searchResults.hidden = true;
         searchInput.value = "";
     });
@@ -402,23 +349,26 @@ html, body { overflow: hidden; height: 100%; }
         btn.className = "cs-dm-btn";
         btn.dataset.dmId = id;
         btn.dataset.userId = id;
+        btn.dataset.roomId = id;
         btn.dataset.name = name;
         btn.dataset.role = role;
         btn.innerHTML = `
-            <span class="cs-avatar cs-avatar-sm ${role === "trainer" ? "cs-avatar-trainer" : ""}">${name.charAt(0)}</span>
-            <span class="cs-dm-name">${name}</span>
+            <span class="cs-avatar cs-avatar-sm ${role === "trainer" ? "cs-avatar-trainer" : ""}">${escapeHTML(name.charAt(0))}</span>
+            <span class="cs-dm-name">${escapeHTML(name)}</span>
             <button class="cs-dm-close" data-id="${id}" aria-label="Close DM">×</button>
         `;
-        btn.addEventListener("click", ev => {
-            if (ev.target.closest(".cs-dm-close")) {
-                btn.remove();
-                if (!dmList.querySelector(".cs-dm-btn")) { if(dmEmpty) dmEmpty.hidden = false; }
-                return;
-            }
+        btn.addEventListener("click", () => {
             document.querySelectorAll(".cs-room-btn,.cs-dm-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            switchRoom("dm_" + id, name, true);
+            switchRoom(String(id), name, true);
         });
+        btn.replaceChildren();
+        const avatar = document.createElement('span');
+        avatar.className = `cs-avatar cs-avatar-sm ${role === 'trainer' ? 'cs-avatar-trainer' : ''}`;
+        avatar.textContent = name.charAt(0);
+        const label = document.createElement('span');
+        label.className = 'cs-dm-name'; label.textContent = name;
+        btn.append(avatar, label);
         dmList.appendChild(btn);
         btn.click();
     }
@@ -436,38 +386,13 @@ html, body { overflow: hidden; height: 100%; }
 
     async function startCall(video) {
         if (!isDM) return;
-        callIsVideo = video;
-        const label = video ? "Video Call" : "Voice Call";
-        qs("#cs-call-label").textContent = label + " — " + activeName;
-        qs("#cs-calling-name").textContent = "Calling " + activeName + "…";
-        qs("#cs-call-status").textContent  = "Calling…";
-        qs("#cs-call-videos").style.display = video ? "grid" : "none";
-        callOverlay.classList.add("cs-call-active");
-        document.body.style.overflow = "hidden";
-
+        const callTab = window.open('about:blank', '_blank');
+        if (callTab) callTab.opener = null;
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video, audio: true });
-            qs("#cs-local-video").srcObject = localStream;
-
-            peerConn = new RTCPeerConnection(ICE_SERVERS);
-            localStream.getTracks().forEach(t => peerConn.addTrack(t, localStream));
-
-            peerConn.ontrack = ev => {
-                qs("#cs-remote-video").srcObject = ev.streams[0];
-                qs("#cs-remote-placeholder").hidden = true;
-                qs("#cs-call-status").textContent = "Connected";
-            };
-
-            peerConn.oniceconnectionstatechange = () => {
-                const st = peerConn.iceConnectionState;
-                if (st === "disconnected" || st === "failed") endCall();
-            };
-
-            qs("#cs-call-status").textContent = "Ready (share the room code to connect peer)";
-        } catch (err) {
-            qs("#cs-call-status").textContent = "Could not access camera/mic. Check browser permissions.";
-            console.warn("getUserMedia error:", err);
-        }
+            const invite = await api(CHAT_API, { method: 'POST', body: JSON.stringify({ action: 'invite', room: activeRoom }) });
+            if (callTab) callTab.location = invite.url;
+            else window.location.assign(invite.url);
+        } catch (error) { if (callTab) callTab.close(); qs('#cs-current-room').title = error.message; }
     }
 
     function endCall() {
@@ -487,20 +412,6 @@ html, body { overflow: hidden; height: 100%; }
     qs("#cs-btn-video").addEventListener("click", () => startCall(true));
     qs("#cs-btn-end").addEventListener("click",   endCall);
     qs("#cs-call-close").addEventListener("click", endCall);
-
-    qs("#cs-btn-screen").addEventListener("click", async () => {
-        if (!localStream || !peerConn) return;
-        try {
-            const screen = await navigator.mediaDevices.getDisplayMedia({ video: true });
-            const videoTrack = screen.getVideoTracks()[0];
-            const sender = peerConn.getSenders().find(s => s.track && s.track.kind === "video");
-            if (sender) sender.replaceTrack(videoTrack);
-            videoTrack.onended = () => {
-                const cam = localStream.getVideoTracks()[0];
-                if (sender && cam) sender.replaceTrack(cam);
-            };
-        } catch (err) { console.warn("Screen share error:", err); }
-    });
 
     qs("#cs-btn-mute").addEventListener("click", () => {
         if (!localStream) return;
@@ -538,7 +449,32 @@ html, body { overflow: hidden; height: 100%; }
     setMemberCount(Math.floor(Math.random() * 18) + 3);
 
     /* ─── initial load ───────────────────────────────────────────── */
-    switchRoom("general", "General Chat", false);
+    api(CHAT_API, { headers: {} }).then(data => {
+        announcementsRoom = data.announcements;
+        canAnnounce = data.can_announce;
+        const roomNav = document.querySelector('.cs-nav-section');
+        if (announcementsRoom) {
+            const button = document.createElement('button');
+            button.className = 'cs-room-btn';
+            button.dataset.room = announcementsRoom;
+            button.dataset.name = 'Tutor Announcements';
+            button.innerHTML = '<i class="bi bi-megaphone-fill"></i> tutor-announcements';
+            roomNav.appendChild(button);
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.cs-room-btn,.cs-dm-btn').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                switchRoom(String(announcementsRoom), 'Tutor Announcements', false);
+            });
+        }
+        data.conversations.forEach(c => openDM(c.id, c.name, 'student'));
+        if (announcementsRoom) {
+            switchRoom(String(announcementsRoom), 'Tutor Announcements', false);
+            qs('#cs-input').disabled = !data.can_announce;
+        } else {
+            qs('#cs-current-room').textContent = 'Your private messages';
+            qs('#cs-input').disabled = true;
+        }
+    }).catch(error => { qs('#cs-current-room').textContent = error.message; });
     qs("#cs-call-btns").style.display = "none";
 
 })();

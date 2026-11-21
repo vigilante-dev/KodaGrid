@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Student Portal | CodeSavannah Academy{% endblock %}
+{% block title %}Student Portal | CoderGrid{% endblock %}
 
 {% block content %}
 <section class="dashboard-hero">
@@ -22,6 +22,12 @@
                     </article>
                 {% endfor %}
             </div>
+
+            <article class="portal-panel">
+                <h2>Messages and Announcements</h2>
+                <p>Private conversations appear only to you and the person you message. Tutors and mentors use the announcements room for shared updates.</p>
+                <p><a class="btn btn-primary" href="{% url 'academy:live_chat' %}">Open your messages</a></p>
+            </article>
 
             <article class="portal-panel">
                 <h2>Learning Progress</h2>

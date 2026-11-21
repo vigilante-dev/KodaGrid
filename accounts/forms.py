@@ -1,8 +1,24 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordResetForm, UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Student
+
+
+class AccountPasswordResetForm(PasswordResetForm):
+    """Let legacy passwordless accounts set their first Django password."""
+
+    def get_users(self, email):
+        User = get_user_model()
+        email_field = User.get_email_field_name()
+        active_users = User._default_manager.filter(
+            **{f'{email_field}__iexact': email, 'is_active': True}
+        )
+        return (
+            user for user in active_users
+            if getattr(user, email_field).casefold() == email.casefold()
+        )
 
 
 class StudentRegistrationForm(UserCreationForm):
@@ -15,7 +31,7 @@ class StudentRegistrationForm(UserCreationForm):
         fields = ('username', 'name', 'email', 'career_interest', 'password1', 'password2')
 
     def clean_email(self):
-        email = self.cleaned_data['email'].lower()
+        email = self.cleaned_data['email'].strip().lower()
         if User.objects.filter(email__iexact=email).exists() or Student.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('An account with this email already exists.')
         return email

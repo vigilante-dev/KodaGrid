@@ -1,7 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
+from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import ensure_csrf_cookie
+import json
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -201,12 +206,12 @@ class ClassroomHubView(LoginRequiredMixin, TemplateView):
     def get_user_chat_rooms(self):
         classroom_ids = self.get_user_classrooms().values_list('id', flat=True)
         rooms = ChatRoom.objects.filter(
-            Q(classroom_id__in=classroom_ids) | Q(classroom__isnull=True),
-            is_active=True,
+            Q(classroom_id__in=classroom_ids) | Q(classroom__isnull=True, name='Tutor Announcements'),
+            is_active=True, room_type__in=['group', 'voice'],
         ).select_related('classroom')
         if self.request.user.is_staff or self.request.user.is_superuser:
             return rooms.distinct()
-        return rooms.filter(Q(room_type__in=['group', 'voice']) | Q(participants=self.request.user)).distinct()
+        return rooms.distinct()
 
     def mark_attendance(self, classrooms):
         if self.request.user.is_staff or self.request.user.is_superuser:
@@ -295,7 +300,7 @@ class ClassroomHubView(LoginRequiredMixin, TemplateView):
             defaults={'was_present': True},
         )
         if created:
-            messages.success(request, f'You joined {classroom.name}.')
+            messages.success(request, f'You joined {classroom.name}. Attendance marked: 1 session.')
         else:
             messages.info(request, f'You are already enrolled in {classroom.name}.')
         return redirect('academy:classroom')
@@ -373,7 +378,7 @@ def mentor_answer(question):
         return 'Build a focused portfolio: one web app, one data or automation project, and one teamwork story. Add a clear resume, GitHub links, and short case studies that explain the problem, process, and result.'
     if 'project' in question_lower:
         return 'Choose a project that solves a real problem near you. Good beginner ideas include a school club website, event registration system, study planner, expense tracker, or community resource directory.'
-    return 'Break the topic into fundamentals, practice tasks, and a portfolio project. CodeSavannah Mentor AI recommends learning one concept, building one small example, then teaching it back before moving on.'
+    return 'Break the topic into fundamentals, practice tasks, and a portfolio project. CoderGrid Mentor AI recommends learning one concept, building one small example, then teaching it back before moving on.'
 
 
 class MentorAIView(FormView):
@@ -387,7 +392,7 @@ class MentorAIView(FormView):
         interaction.save()
         self.request.session['mentor_answer'] = interaction.answer
         self.request.session['mentor_question'] = interaction.question
-        messages.success(self.request, 'CodeSavannah Mentor AI prepared a learning recommendation.')
+        messages.success(self.request, 'CoderGrid Mentor AI prepared a learning recommendation.')
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -770,17 +775,41 @@ class RoboticsView(TemplateView):
         return context
 
 
-class VideoCallView(TemplateView):
+class VideoCallView(LoginRequiredMixin, TemplateView):
     template_name = 'academy/video_call.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         room_code = kwargs.get('room_code', 'general')
         classroom = Classroom.objects.filter(class_code__iexact=room_code, is_active=True).first()
+        private_room = ChatRoom.objects.filter(call_code=room_code, room_type='private', is_active=True).first()
+        if private_room and not private_room.participants.filter(pk=self.request.user.pk).exists():
+            from django.core.exceptions import PermissionDenied
+            raise PermissionDenied
+        if classroom and not (classroom.memberships.filter(student=self.request.user).exists()
+                              or self.request.user.is_staff or self.request.user.is_superuser
+                              or TrainerProfile.objects.filter(user=self.request.user, is_approved=True).exists()):
+            from django.core.exceptions import PermissionDenied
+            raise PermissionDenied
+        if not classroom and not private_room:
+            from django.http import Http404
+            raise Http404
+        classroom_chat = None
+        if classroom:
+            classroom_chat, _ = ChatRoom.objects.get_or_create(
+                classroom=classroom, name=f'{classroom.name} Stream',
+                defaults={'room_type': 'group', 'is_active': True},
+            )
+            member_ids = list(classroom.memberships.values_list('student_id', flat=True))
+            if classroom.trainer_id and classroom.trainer.user_id:
+                member_ids.append(classroom.trainer.user_id)
+            classroom_chat.participants.add(*member_ids)
         context['room_code'] = room_code
         context['classroom'] = classroom
-        context['jitsi_room'] = f'CodeSavannah-{room_code}'.replace(' ', '-')
-        context['back_url'] = self.request.META.get('HTTP_REFERER', '/classroom/')
+        context['chat_room_id'] = private_room.pk if private_room else (classroom_chat.pk if classroom_chat else '')
+        context['chat_user_role'] = 'trainer' if _chat_can_announce(self.request.user) else 'student'
+        context['jitsi_room'] = f'CoderGrid-{private_room.call_code}' if private_room else f'CoderGrid-{classroom.class_code}'
+        context['back_url'] = self.request.META.get('HTTP_REFERER', '/accounts/profile/')
         return context
 
 
@@ -799,13 +828,106 @@ class GamesView(TemplateView):
         return context
 
 
-class LiveChatView(TemplateView):
+class LiveChatView(LoginRequiredMixin, TemplateView):
     template_name = 'academy/live_chat.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['rooms'] = ChatRoom.objects.filter(is_active=True).select_related('classroom')[:10]
+        context['rooms'] = ChatRoom.objects.filter(room_type='group', name='Tutor Announcements', is_active=True)[:1]
         context['featured_room'] = context['rooms'].first() if context['rooms'] else None
-        context['recent_messages'] = ChatMessage.objects.select_related('room', 'sender').order_by('-created_at')[:30]
-        context['trainers_online'] = TrainerProfile.objects.filter(is_approved=True)[:5]
+        context['trainers_online'] = TrainerProfile.objects.filter(is_approved=True, user__isnull=False).select_related('user')[:30]
+        context['chat_user_role'] = 'trainer' if _chat_can_announce(self.request.user) else 'student'
         return context
+
+
+def _chat_can_announce(user):
+    return user.is_staff or user.is_superuser or TrainerProfile.objects.filter(user=user, is_approved=True).exists()
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(['GET', 'POST'])
+def chat_api(request):
+    """Authenticated polling chat. Private rooms are visible only to their two members."""
+    if request.method == 'GET':
+        room_id = request.GET.get('room')
+        if not room_id:
+            announcements, _ = ChatRoom.objects.get_or_create(
+                room_type='group', name='Tutor Announcements',
+                defaults={'is_active': True},
+            )
+            rooms = ChatRoom.objects.filter(is_active=True, room_type='private', participants=request.user).distinct()
+            conversations = []
+            for room in rooms:
+                peer = room.participants.exclude(pk=request.user.pk).first()
+                if peer:
+                    conversations.append({'id': room.pk, 'name': peer.get_full_name() or peer.username, 'user_id': peer.pk, 'type': 'private'})
+            User = type(request.user)
+            query = request.GET.get('q', '').strip()[:80]
+            users = User.objects.filter(is_active=True).exclude(pk=request.user.pk)
+            if query:
+                users = users.filter(Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query))
+            users = users.order_by('first_name', 'last_name', 'username')[:30]
+            directory = [{'id': u.pk, 'name': u.get_full_name() or u.username,
+                          'role': 'trainer' if _chat_can_announce(u) else 'student'} for u in users]
+            return JsonResponse({'conversations': conversations, 'announcements': announcements.pk,
+                                 'can_announce': _chat_can_announce(request.user), 'users': directory})
+        room = get_object_or_404(ChatRoom, pk=room_id, is_active=True)
+        allowed = room.participants.filter(pk=request.user.pk).exists()
+        if room.room_type == 'group' and room.name == 'Tutor Announcements':
+            allowed = True
+        if not allowed:
+            return JsonResponse({'error': 'Conversation not found.'}, status=404)
+        after = request.GET.get('after', '0')
+        try:
+            after = max(0, int(after))
+        except ValueError:
+            after = 0
+        messages_qs = list(room.messages.filter(pk__gt=after).select_related('sender').order_by('created_at')[:100])
+        trainer_ids = set(TrainerProfile.objects.filter(
+            user_id__in=[m.sender_id for m in messages_qs if m.sender_id], is_approved=True,
+        ).values_list('user_id', flat=True))
+        return JsonResponse({'messages': [{'id': m.pk, 'text': m.body, 'user': m.sender_name,
+            'time': m.created_at.isoformat(), 'mine': m.sender_id == request.user.pk,
+            'role': 'trainer' if m.sender_id in trainer_ids else 'student'} for m in messages_qs]})
+
+    try:
+        payload = json.loads(request.body or '{}')
+    except (ValueError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
+    action = payload.get('action')
+    if action == 'start':
+        try:
+            peer = get_object_or_404(type(request.user), pk=int(payload.get('user_id')))
+        except (TypeError, ValueError):
+            return JsonResponse({'error': 'Choose a valid account.'}, status=400)
+        if peer.pk == request.user.pk or not peer.is_active:
+            return JsonResponse({'error': 'Choose another active account.'}, status=400)
+        candidates = ChatRoom.objects.filter(room_type='private', is_active=True, participants=request.user).filter(participants=peer)
+        room = next((r for r in candidates if r.participants.count() == 2), None)
+        if not room:
+            room = ChatRoom.objects.create(name='Private conversation', room_type='private')
+            room.participants.add(request.user, peer)
+        return JsonResponse({'id': room.pk, 'name': peer.get_full_name() or peer.username})
+    room = get_object_or_404(ChatRoom, pk=payload.get('room'), is_active=True)
+    is_announcement = room.room_type == 'group' and room.name == 'Tutor Announcements'
+    if not (room.participants.filter(pk=request.user.pk).exists() or is_announcement):
+        return JsonResponse({'error': 'Conversation not found.'}, status=404)
+    if action == 'invite':
+        if room.room_type != 'private':
+            return JsonResponse({'error': 'Calls are available in private conversations.'}, status=400)
+        call_url = request.build_absolute_uri(reverse_lazy('academy:video_call', kwargs={'room_code': str(room.call_code)}))
+        ChatMessage.objects.create(room=room, sender=request.user,
+            sender_name=request.user.get_full_name() or request.user.username,
+            body=f'Call invitation: {call_url}')
+        return JsonResponse({'url': call_url}, status=201)
+    if is_announcement and not _chat_can_announce(request.user):
+        return JsonResponse({'error': 'Only tutors and mentors can post announcements.'}, status=403)
+    body = str(payload.get('text', '')).strip()
+    if not body or len(body) > 1000:
+        return JsonResponse({'error': 'Messages must contain 1 to 1000 characters.'}, status=400)
+    message = ChatMessage.objects.create(room=room, sender=request.user,
+        sender_name=request.user.get_full_name() or request.user.username, body=body)
+    if room.room_type == 'private':
+        room.participants.add(request.user)
+    return JsonResponse({'id': message.pk}, status=201)

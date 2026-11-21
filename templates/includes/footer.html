@@ -1,9 +1,9 @@
+{% load static %}
 <footer class="site-footer">
     <div class="container footer-grid">
         <section>
-            <a class="brand footer-brand" href="{% url 'core:home' %}">
-                <span class="brand-mark">CS</span>
-                <span>CodeSavannah Academy</span>
+            <a class="brand footer-brand" href="{% url 'core:home' %}" aria-label="CoderGrid home">
+                <img class="brand-logo brand-logo-dark" src="{% static 'img/brand/codergrid-logo-dark.svg' %}" alt="">
             </a>
             <p data-i18n="footer_tagline">Preparing African learners for software careers, digital entrepreneurship, and responsible innovation.</p>
             <div class="social-links" aria-label="Social media">
@@ -35,12 +35,10 @@
         </section>
         <section>
             <h2 data-i18n="footer_contact_heading">Contact</h2>
-            <p>Innovation Drive, Nairobi</p>
-            <p><a href="mailto:hello@codesavannah.local">hello@codesavannah.local</a></p>
-            <p><a href="tel:+254700000000">+254 700 000 000</a></p>
+            <a href="{% url 'contact:contact' %}" data-i18n="footer_contact_link">Contact</a>
         </section>
     </div>
     <div class="footer-bottom">
-        <p>&copy; {% now "Y" %} CodeSavannah Academy. <span data-i18n="footer_built_for">Built for future-ready learners.</span></p>
+        <p>&copy; {% now "Y" %} CoderGrid. <span data-i18n="footer_built_for">Built for future-ready learners.</span></p>
     </div>
 </footer>

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Student Account | CodeSavannah Academy{% endblock %}
+{% block title %}Create Student Account | CoderGrid{% endblock %}
 
 {% block content %}
 <section class="auth-section">
@@ -8,13 +8,13 @@
         <div class="auth-copy">
             <p class="eyebrow" data-i18n="auth_register_eyebrow">Student Portal</p>
             <h1 data-i18n="auth_register_title">Create your learner account.</h1>
-            <p data-i18n="auth_register_body">Join CodeSavannah Academy to track learning progress, submit projects, access certificates, and stay connected with mentors.</p>
+            <p data-i18n="auth_register_body">Join CoderGrid to track learning progress, submit projects, access certificates, and stay connected with mentors.</p>
         </div>
         <div class="auth-card">
             <h2 data-i18n="nav_register">Register</h2>
-            <form method="post" class="stacked-form">
+            <form method="post" action="{% url 'accounts:register' %}" class="stacked-form" data-submit-once>
                 {% include 'includes/form_fields.html' %}
-                <button class="btn btn-primary btn-full" type="submit" data-i18n="btn_create_account">Create Account</button>
+                <button class="btn btn-primary btn-full" type="submit" data-i18n="btn_create_account" data-loading-label="Creating your account…">Create Account</button>
             </form>
             <p class="form-note"><span data-i18n="auth_register_already">Already registered?</span> <a href="{% url 'accounts:login' %}" data-i18n="auth_register_login">Login here</a>.</p>
         </div>

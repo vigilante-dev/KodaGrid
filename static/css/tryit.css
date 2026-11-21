@@ -1,5 +1,5 @@
 /* ============================================================
-   CodeSavannah Academy — Try it Yourself Editor
+   CoderGrid Academy — Try it Yourself Editor
    ============================================================ */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -48,9 +48,8 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
     flex-shrink: 0;
 }
 .tryit-logo-mark {
-    background: linear-gradient(135deg, #1341a8, #00d4f5);
-    color: #fff; padding: 3px 7px; border-radius: 5px;
-    font-size: .82rem;
+    display:block; width:30px; height:30px; object-fit:contain;
+    border-radius:7px;
 }
 .tryit-divider { color: var(--muted); }
 

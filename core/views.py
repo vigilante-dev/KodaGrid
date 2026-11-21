@@ -1,18 +1,16 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
-from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import TemplateView, View
+from django.views.generic import FormView, TemplateView, View
 
-from blog.models import BlogPost
 from courses.models import Course
 from events.models import Event
-from gallery.models import GalleryImage
 
-from .forms import NewsletterSignupForm
-from .models import Testimonial, VideoStory
+from .forms import NewsletterSignupForm, TestimonialSubmissionForm
+from .models import Testimonial
 
 
 class HomeView(TemplateView):
@@ -20,39 +18,11 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['featured_courses'] = Course.objects.filter(is_featured=True)[:6]
+        context['featured_courses'] = Course.objects.filter(is_featured=True)[:3]
         context['testimonials'] = Testimonial.objects.filter(is_featured=True)[:3]
+        context['testimonial_form'] = TestimonialSubmissionForm()
         context['upcoming_events'] = Event.objects.filter(date__gte=timezone.now())[:3]
-        context['featured_posts'] = BlogPost.objects.filter(is_featured=True)[:2]
-        context['featured_video'] = VideoStory.objects.filter(is_featured=True).first()
-        gallery_images = GalleryImage.objects.exclude(image='').exclude(image__isnull=True)
-        context['hero_image'] = (
-            gallery_images.filter(suggested_placement__icontains='Hero').first()
-            or gallery_images.filter(detected_activity__icontains='coding').first()
-            or gallery_images.first()
-        )
-        context['visual_story_images'] = list(
-            gallery_images.filter(
-                Q(suggested_placement__icontains='Hero')
-                | Q(suggested_placement__icontains='Girls')
-                | Q(suggested_placement__icontains='Community')
-                | Q(suggested_placement__icontains='Learning')
-                | Q(educational_relevance__icontains='AI')
-                | Q(detected_activity__icontains='coding')
-            )[:6]
-        )
-        if len(context['visual_story_images']) < 4:
-            context['visual_story_images'] = list(gallery_images[:6])
         context['newsletter_form'] = NewsletterSignupForm()
-        context['stats'] = [
-            {'value': 3500, 'suffix': '+', 'label': 'Total Students'},
-            {'value': 1280, 'suffix': '+', 'label': 'Active Learners'},
-            {'value': 46, 'suffix': '+', 'label': 'Trainers'},
-            {'value': 72, 'suffix': '+', 'label': 'Courses'},
-            {'value': 620, 'suffix': '+', 'label': 'Projects Completed'},
-            {'value': 2100, 'suffix': '+', 'label': 'Certifications Issued'},
-        ]
-        context['partners'] = ['Savannah Cloud', 'STEM Hub Africa', 'Future Labs', 'SecureNet', 'DataBridge']
         return context
 
 
@@ -87,9 +57,30 @@ class NewsletterSignupView(View):
         if form.is_valid():
             try:
                 form.save()
-                messages.success(request, 'You are subscribed to CodeSavannah updates.')
+                messages.success(request, 'You are subscribed to CoderGrid updates.')
             except IntegrityError:
                 messages.info(request, 'That email is already subscribed.')
         else:
             messages.error(request, 'Please enter a valid email address.')
         return redirect(request.POST.get('next') or reverse_lazy('core:home'))
+
+
+class TestimonialSubmissionView(LoginRequiredMixin, FormView):
+    form_class = TestimonialSubmissionForm
+    success_url = reverse_lazy('core:home')
+
+    def get(self, request, *args, **kwargs):
+        return redirect(self.success_url)
+
+    def form_valid(self, form):
+        testimonial = form.save(commit=False)
+        testimonial.student_name = self.request.user.get_full_name() or self.request.user.get_username()
+        testimonial.submitted_by = self.request.user
+        testimonial.is_featured = False
+        testimonial.save()
+        messages.success(self.request, 'Thanks for sharing your experience. Your testimonial is awaiting review.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please check the testimonial form and try again.')
+        return redirect(self.success_url)

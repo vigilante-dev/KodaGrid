@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from django.views.generic import FormView
@@ -13,14 +14,14 @@ class ContactView(FormView):
 
     def form_valid(self, form):
         message = form.save()
-        send_mail(
-            subject=f'New contact message: {message.subject}',
-            message=f'{message.name} <{message.email}> wrote:\n\n{message.message}',
-            from_email=None,
-            recipient_list=['hello@codesavannah.local'],
-            fail_silently=True,
-        )
-        messages.success(self.request, 'Thank you. Our admissions team will respond soon.')
+        if settings.CONTACT_EMAIL:
+            send_mail(
+                subject=f'New contact message: {message.subject}',
+                message=f'{message.name} <{message.email}> wrote:\n\n{message.message}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.CONTACT_EMAIL],
+            )
+        messages.success(self.request, 'Your message has been received.')
         return super().form_valid(form)
 
 # Create your views here.

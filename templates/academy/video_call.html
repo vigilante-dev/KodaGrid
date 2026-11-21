@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ classroom.name|default:"Live Session" }} | CodeSavannah Academy{% endblock %}
-{% block meta_description %}Join the live video classroom session at CodeSavannah Academy.{% endblock %}
+{% block title %}{{ classroom.name|default:"Live Session" }} | CoderGrid{% endblock %}
+{% block meta_description %}Join the live video classroom session at CoderGrid.{% endblock %}
 
 {% block content %}
 <div class="videocall-page">
@@ -10,9 +10,9 @@
     {# ── TOP BAR ── #}
     <header class="vc-topbar">
         <div class="vc-topbar-left">
-            <a class="brand" href="{% url 'core:home' %}" aria-label="CodeSavannah home">
-                <span class="brand-mark">CS</span>
-                <span class="vc-brand-name">CodeSavannah Academy</span>
+            <a class="brand" href="{% url 'core:home' %}" aria-label="CoderGrid home">
+                <img class="brand-mark brand-mark-symbol" src="{% static 'img/brand/codergrid-favicon.svg' %}" alt="">
+                <span class="vc-brand-name">CoderGrid</span>
             </a>
         </div>
         <div class="vc-topbar-center">
@@ -172,7 +172,7 @@
             <h3 style="margin:0 0 16px;">{{ classroom.name|default:"Live Session" }}</h3>
             <dl class="detail-list inline-list">
                 <dt>Room Code</dt><dd>{{ room_code }}</dd>
-                <dt>Host</dt><dd>{{ classroom.trainer.name|default:"CodeSavannah Trainer" }}</dd>
+                <dt>Host</dt><dd>{{ classroom.trainer.name|default:"CoderGrid Trainer" }}</dd>
                 <dt>Subject</dt><dd>{{ classroom.learning_path.title|default:"Live Learning Session" }}</dd>
             </dl>
             <div style="margin-top:18px;">
@@ -188,8 +188,8 @@
 <script>
 (function () {
     const JITSI_ROOM   = "{{ jitsi_room }}";
-    const USER_NAME    = "{{ request.user.get_full_name|default:request.user.username|default:'Guest' }}";
-    const USER_EMAIL   = "{{ request.user.email|default:'' }}";
+    const USER_NAME    = "{{ request.user.get_full_name|default:request.user.username|default:'Guest'|escapejs }}";
+    const USER_EMAIL   = "{{ request.user.email|default:''|escapejs }}";
     const BACK_URL     = "{{ back_url|escapejs }}";
     const ROOM_CODE    = "{{ room_code }}";
 
@@ -293,7 +293,7 @@
                 defaultRemoteDisplayName: "Student",
                 hideConferenceSubject: false,
                 hideConferenceTimer: true,
-                subject: "CodeSavannah · " + ROOM_CODE,
+                subject: "CoderGrid · " + ROOM_CODE,
             },
             interfaceConfigOverwrite: {
                 SHOW_JITSI_WATERMARK: false,
@@ -444,8 +444,9 @@
         if (!chatC.dataset.init && typeof initChat === "function") {
             initChat("#vc-chat-container", {
                 currentUser: USER_NAME,
-                userRole: "{% if request.user.is_staff or request.user.is_superuser %}trainer{% else %}student{% endif %}",
-                roomId: ROOM_CODE,
+                userRole: "{{ chat_user_role }}",
+                roomId: "{{ chat_room_id|escapejs }}",
+                apiUrl: "{% url 'academy:chat_api' %}",
             });
             chatC.dataset.init = "true";
         }

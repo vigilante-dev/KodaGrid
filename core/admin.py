@@ -5,7 +5,7 @@ from .models import NewsletterSubscriber, Testimonial, VideoStory
 
 @admin.register(Testimonial)
 class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ('student_name', 'course_completed', 'rating', 'is_featured', 'created_at')
+    list_display = ('student_name', 'course_completed', 'submitted_by', 'rating', 'is_featured', 'created_at')
     list_filter = ('is_featured', 'rating', 'created_at')
     search_fields = ('student_name', 'course_completed', 'feedback')
 

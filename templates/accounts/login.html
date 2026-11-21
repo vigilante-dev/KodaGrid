@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Login | CodeSavannah Academy{% endblock %}
+{% block title %}Login | CoderGrid{% endblock %}
 
 {% block content %}
 <section class="auth-section">
@@ -8,11 +8,11 @@
         <div class="auth-copy">
             <p class="eyebrow" data-i18n="auth_login_eyebrow">Welcome Back</p>
             <h1 data-i18n="auth_login_title">Access your student portal.</h1>
-            <p data-i18n="auth_login_body">Continue your courses, review assignments, track certificates, and stay connected with the CodeSavannah community.</p>
+            <p data-i18n="auth_login_body">Continue your courses, review assignments, track certificates, and stay connected with the CoderGrid community.</p>
         </div>
         <div class="auth-card">
             <h2 data-i18n="nav_login">Login</h2>
-            <form method="post" class="stacked-form">
+            <form method="post" action="{% url 'accounts:login' %}" class="stacked-form">
                 {% include 'includes/form_fields.html' %}
                 <button class="btn btn-primary btn-full" type="submit" data-i18n="btn_login">Login</button>
             </form>

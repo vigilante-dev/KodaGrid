@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -19,9 +20,10 @@ class RegisterView(FormView):
     success_url = reverse_lazy('accounts:profile')
 
     def form_valid(self, form):
-        user = form.save()
+        with transaction.atomic():
+            user = form.save()
         login(self.request, user)
-        messages.success(self.request, 'Welcome to CodeSavannah Academy. Your student account is ready.')
+        messages.success(self.request, 'Welcome to CoderGrid. Your student account is ready.')
         return super().form_valid(form)
 
 

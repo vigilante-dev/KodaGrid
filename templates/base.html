@@ -1,31 +1,41 @@
 {% load static %}
 <!doctype html>
-<html lang="en" data-theme="dark" id="html-root">
+<html lang="en" data-theme="light" id="html-root">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{% block meta_description %}CodeSavannah Academy prepares African learners for software, AI, cybersecurity, cloud, data, and digital entrepreneurship careers through practical projects and mentorship.{% endblock %}">
-    <title>{% block title %}CodeSavannah Academy{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}CoderGrid helps African learners build practical digital skills through guided learning, projects, and mentorship.{% endblock %}">
+    <title>{% block title %}CoderGrid{% endblock %}</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9071879764381392"
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" id="site-favicon" type="image/svg+xml" href="{% static 'img/brand/codergrid-favicon.svg' %}" data-light-href="{% static 'img/brand/codergrid-favicon.svg' %}" data-dark-href="{% static 'img/brand/codergrid-favicon.svg' %}">
     <noscript><style>.page-loader{display:none}</style></noscript>
     <script src="{% static 'js/i18n.js' %}" defer></script>
+    <script src="{% static 'js/lucide-icons.js' %}" defer></script>
     <script src="{% static 'js/app.js' %}" defer></script>
     <script>
         /* Apply saved theme before render to avoid flash */
         (function(){
-            var t = localStorage.getItem('cs_theme') || 'dark';
-            document.getElementById('html-root').dataset.theme = t;
-            var l = localStorage.getItem('cs_lang') || 'en';
-            document.getElementById('html-root').dataset.lang = l;
+            try {
+                var root = document.getElementById('html-root');
+                var theme = localStorage.getItem('cs_theme');
+                var lang = localStorage.getItem('cs_lang');
+                root.dataset.theme = theme === 'dark' ? 'dark' : 'light';
+                root.dataset.lang = ['en', 'sw', 'fr', 'pt'].indexOf(lang) !== -1 ? lang : 'en';
+            } catch (error) {
+                var root = document.getElementById('html-root');
+                root.dataset.theme = 'light';
+                root.dataset.lang = 'en';
+            }
         })();
     </script>
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "EducationalOrganization",
-            "name": "CodeSavannah Academy",
-            "description": "A coding academy platform for programming, software development, AI, cybersecurity, robotics, cloud, and career readiness.",
+            "name": "CoderGrid",
+            "description": "A learning platform helping African youth build practical digital skills.",
             "url": "{{ request.scheme }}://{{ request.get_host }}/"
         }
     </script>

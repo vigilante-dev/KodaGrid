@@ -1,4 +1,4 @@
-/* CodeSavannah Academy — Main JS
+/* CoderGrid — Main JS
    Handles: page loader · counter animations · scroll reveal
             nav scroll effect · image lazy‑load enhancement
             progress bars · live chat · coding games
@@ -16,7 +16,26 @@ document.addEventListener("DOMContentLoaded", () => {
     initLangPicker();
     applyTranslations();
     initClickableCards();
+    initSingleSubmitForms();
 });
+
+function initSingleSubmitForms() {
+    document.querySelectorAll("form[data-submit-once]").forEach(form => {
+        form.addEventListener("submit", event => {
+            if (form.dataset.submitting === "true") {
+                event.preventDefault();
+                return;
+            }
+            form.dataset.submitting = "true";
+            form.setAttribute("aria-busy", "true");
+            const button = form.querySelector('button[type="submit"]');
+            if (button) {
+                button.disabled = true;
+                button.textContent = button.dataset.loadingLabel || "Please wait…";
+            }
+        });
+    });
+}
 
 /* ── Clickable cards (data-href) ─────────────────────────────────── */
 function initClickableCards() {
@@ -70,48 +89,59 @@ function initThemeToggle() {
     const html    = document.getElementById("html-root");
     const btn     = document.getElementById("theme-toggle-btn");
     const iconEl  = document.getElementById("theme-icon");
-    const labelEl = document.getElementById("theme-label");
-    if (!btn) return;
+    const favicon = document.getElementById("site-favicon");
+    if (!html || !btn || !iconEl) return;
 
     const syncUI = (theme) => {
-        iconEl.textContent  = theme === "dark" ? "🌙" : "☀️";
-        labelEl.textContent = theme === "dark" ? "Dark" : "Light";
-        btn.title = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
+        const nextTheme = theme === "dark" ? "light" : "dark";
+        iconEl.innerHTML = theme === "dark"
+            ? '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>'
+            : '<path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"></path>';
+        const label = `Switch to ${nextTheme} mode`;
+        btn.setAttribute("aria-label", label);
+        btn.title = label;
+        if (favicon) {
+            favicon.href = favicon.dataset[`${theme}Href`];
+        }
     };
 
-    const current = localStorage.getItem("cs_theme") || "dark";
+    const current = html.dataset.theme === "dark" ? "dark" : "light";
     html.dataset.theme = current;
     syncUI(current);
 
     btn.addEventListener("click", () => {
         const next = html.dataset.theme === "dark" ? "light" : "dark";
         html.dataset.theme = next;
-        localStorage.setItem("cs_theme", next);
+        try {
+            localStorage.setItem("cs_theme", next);
+        } catch (error) {
+            // Keep the current theme usable when browser storage is unavailable.
+        }
         syncUI(next);
     });
 }
 
 /* ── i18n ─────────────────────────────────────────────────────────── */
 function applyTranslations() {
-    const lang = localStorage.getItem("cs_lang") || "en";
+    const lang = document.documentElement.dataset.lang || "en";
     const i18n = window.CS_I18N || {};
     const dict = i18n[lang] || i18n.en || {};
 
     /* text content */
     document.querySelectorAll("[data-i18n]").forEach(el => {
-        const val = dict[el.dataset.i18n];
+        const val = dict[el.dataset.i18n] ?? i18n.en?.[el.dataset.i18n];
         if (val !== undefined) el.textContent = val;
     });
 
     /* input / textarea placeholders */
     document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-        const val = dict[el.dataset.i18nPlaceholder];
+        const val = dict[el.dataset.i18nPlaceholder] ?? i18n.en?.[el.dataset.i18nPlaceholder];
         if (val !== undefined) el.placeholder = val;
     });
 
     /* aria-labels that need translation */
     document.querySelectorAll("[data-i18n-label]").forEach(el => {
-        const val = dict[el.dataset.i18nLabel];
+        const val = dict[el.dataset.i18nLabel] ?? i18n.en?.[el.dataset.i18nLabel];
         if (val !== undefined) el.setAttribute("aria-label", val);
     });
 
@@ -122,18 +152,34 @@ function applyTranslations() {
 function initLangPicker() {
     const picker  = document.getElementById("lang-picker");
     const btn     = document.getElementById("lang-picker-btn");
-    const flagEl  = document.getElementById("lang-flag");
     const nameEl  = document.getElementById("lang-name");
-    if (!btn) return;
+    if (!picker || !btn || !nameEl) return;
 
-    const saved = localStorage.getItem("cs_lang") || "en";
-    const savedBtn = picker.querySelector(`[data-lang="${saved}"]`);
-    if (savedBtn) {
-        flagEl.textContent = savedBtn.dataset.flag;
-        nameEl.textContent = savedBtn.dataset.label;
-        picker.querySelectorAll(".lang-option").forEach(b => b.classList.remove("active"));
-        savedBtn.classList.add("active");
-    }
+    const options = [...picker.querySelectorAll(".lang-option")];
+    const saved = options.some(option => option.dataset.lang === document.documentElement.dataset.lang)
+        ? document.documentElement.dataset.lang
+        : "en";
+    const savedBtn = options.find(option => option.dataset.lang === saved);
+    document.documentElement.dataset.lang = saved;
+
+    const selectLanguage = (option) => {
+        const lang = option.dataset.lang;
+        document.documentElement.dataset.lang = lang;
+        nameEl.textContent = option.dataset.label;
+        options.forEach(item => {
+            const selected = item === option;
+            item.classList.toggle("active", selected);
+            item.setAttribute("aria-selected", String(selected));
+        });
+        try {
+            localStorage.setItem("cs_lang", lang);
+        } catch (error) {
+            // Translation remains available for this page when browser storage is unavailable.
+        }
+        applyTranslations();
+    };
+
+    if (savedBtn) selectLanguage(savedBtn);
 
     btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -142,16 +188,10 @@ function initLangPicker() {
     });
     document.addEventListener("click", () => { picker.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); });
 
-    picker.querySelectorAll(".lang-option").forEach(opt => {
+    options.forEach(opt => {
         opt.addEventListener("click", () => {
-            const lang = opt.dataset.lang;
-            localStorage.setItem("cs_lang", lang);
-            flagEl.textContent = opt.dataset.flag;
-            nameEl.textContent = opt.dataset.label;
-            picker.querySelectorAll(".lang-option").forEach(b => b.classList.remove("active"));
-            opt.classList.add("active");
+            selectLanguage(opt);
             picker.classList.remove("open");
-            applyTranslations();
         });
     });
 }
@@ -393,7 +433,7 @@ function initGames(containerSelector) {
 
     /* ── TYPER GAME ── */
     const typerSnippets = [
-        { code: "print('Hello, CodeSavannah!')", lang: "Python" },
+        { code: "print('Hello, CoderGrid!')", lang: "Python" },
         { code: "const greet = (name) => `Hello, ${name}!`;", lang: "JavaScript" },
         { code: "for i in range(10):\n    print(i)", lang: "Python" },
         { code: "SELECT * FROM students WHERE active = 1;", lang: "SQL" },
@@ -716,7 +756,49 @@ function initGames(containerSelector) {
 }
 
 /* expose globally */
-window.initChat  = initChat;
+function initChatConnected(containerSelector, options = {}) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    const { currentUser = 'Student', userRole = 'student', roomId, apiUrl = '/chat/api/' } = options;
+    let lastId = 0;
+    const csrf = () => document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+    const request = async (url, payload) => {
+        const response = await fetch(url, { credentials: 'same-origin', method: payload ? 'POST' : 'GET',
+            headers: payload ? { 'Content-Type': 'application/json', 'X-CSRFToken': decodeURIComponent(csrf()) } : {},
+            body: payload ? JSON.stringify(payload) : undefined });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Chat is unavailable.');
+        return data;
+    };
+    container.innerHTML = `<div class="chat-header"><div class="chat-header-info"><span class="chat-status-dot"></span><strong>Classroom Chat</strong><span class="chat-role-badge ${userRole}">${userRole === 'trainer' ? 'Tutor' : 'Student'}</span></div></div><div class="chat-messages" aria-live="polite"></div><form class="chat-input-row" autocomplete="off"><input type="text" placeholder="Type a message…" maxlength="1000" aria-label="Chat message"><button type="submit" class="btn btn-accent btn-small chat-send-btn" aria-label="Send">Send</button></form>`;
+    const messages = container.querySelector('.chat-messages');
+    const input = container.querySelector('input');
+    const append = item => {
+        const bubble = document.createElement('div'); bubble.className = `chat-bubble ${item.mine ? 'chat-bubble-self' : 'chat-bubble-other'}`;
+        if (!item.mine) { const sender = document.createElement('span'); sender.className = 'chat-sender'; sender.textContent = item.user; bubble.appendChild(sender); }
+        const body = document.createElement('p'); body.textContent = item.text;
+        const time = document.createElement('span'); time.className = 'chat-time'; time.textContent = new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        bubble.append(body, time); messages.appendChild(bubble); messages.scrollTop = messages.scrollHeight;
+    };
+    const refresh = async () => {
+        if (!roomId) return;
+        try {
+            const data = await request(`${apiUrl}?room=${encodeURIComponent(roomId)}&after=${lastId}`);
+            data.messages.forEach(item => { append(item); lastId = Math.max(lastId, item.id); });
+        } catch (error) { container.title = error.message; }
+    };
+    refresh();
+    const timer = setInterval(refresh, 2500);
+    container.querySelector('form').addEventListener('submit', event => {
+        event.preventDefault();
+        const text = input.value.trim();
+        if (!text || !roomId) return;
+        request(apiUrl, { room: roomId, text }).then(() => { input.value = ''; refresh(); })
+            .catch(error => { container.title = error.message; });
+    });
+    window.addEventListener('pagehide', () => clearInterval(timer), { once: true });
+}
+window.initChat  = initChatConnected;
 window.initGames = initGames;
 
 /* ============================================================

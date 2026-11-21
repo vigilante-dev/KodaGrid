@@ -23,6 +23,7 @@ from .views import (
     TrainerDirectoryView,
     TryItView,
     VideoCallView,
+    chat_api,
 )
 
 app_name = 'academy'
@@ -44,6 +45,7 @@ urlpatterns = [
     path('certificates/<uuid:code>/', CertificateVerifyView.as_view(), name='certificate_verify'),
     path('games/',        GamesView.as_view(),            name='games'),
     path('chat/',         LiveChatView.as_view(),         name='live_chat'),
+    path('chat/api/', chat_api, name='chat_api'),
     path('call/<str:room_code>/', VideoCallView.as_view(), name='video_call'),
     path('techgirl/',     TechGirlView.as_view(),         name='techgirl'),
     path('techboy/',      TechBoyView.as_view(),          name='techboy'),
