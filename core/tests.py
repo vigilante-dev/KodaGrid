@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from accounts.models import Student
+
 from .models import Testimonial
 
 
@@ -22,7 +24,15 @@ class TestimonialSubmissionTests(TestCase):
         self.assertEqual(Testimonial.objects.count(), self.initial_testimonial_count)
 
     def test_registered_user_submission_waits_for_review(self):
-        user = User.objects.create_user(username='learner', password='safe-test-password')
+        user = User.objects.create_user(
+            username='learner', email='learner@example.test', password='safe-test-password',
+        )
+        Student.objects.create(
+            user=user,
+            name='Learner Student',
+            email=user.email,
+            approval_status=Student.ApprovalStatus.APPROVED,
+        )
         self.client.force_login(user)
 
         response = self.client.post(self.url, self.payload)
@@ -35,7 +45,15 @@ class TestimonialSubmissionTests(TestCase):
         self.assertEqual(Testimonial.objects.count(), self.initial_testimonial_count + 1)
 
     def test_invalid_submission_is_not_saved(self):
-        user = User.objects.create_user(username='learner', password='safe-test-password')
+        user = User.objects.create_user(
+            username='learner', email='learner@example.test', password='safe-test-password',
+        )
+        Student.objects.create(
+            user=user,
+            name='Learner Student',
+            email=user.email,
+            approval_status=Student.ApprovalStatus.APPROVED,
+        )
         self.client.force_login(user)
 
         response = self.client.post(self.url, {**self.payload, 'feedback': ''})

@@ -1,4 +1,4 @@
-/* CoderGrid — Site-wide translations
+/* KodaGrid — Site-wide translations
    Languages: en, sw (Swahili), fr (French), pt (Portuguese)
    Usage: add data-i18n="key" to any element. JS replaces textContent.
           add data-i18n-placeholder="key" for input placeholders.
@@ -43,7 +43,7 @@ window.CS_I18N = {
         nav_trainers: "Trainers",
         nav_trainers_desc: "Meet our instructors",
         nav_ai_mentor: "AI Mentor",
-        nav_ai_mentor_desc: "24/7 coding help",
+        nav_ai_mentor_desc: "Guided learning tips",
         nav_resources: "Resources",
         nav_resources_desc: "Guides & references",
         nav_fees: "Fees & Plans",
@@ -70,6 +70,9 @@ window.CS_I18N = {
         footer_fees: "Fees",
         footer_ai_mentor: "Mentor AI",
         footer_contact_link: "Contact",
+        footer_events: "Events",
+        footer_blog: "Blog",
+        footer_gallery: "Gallery",
         footer_built_for: "Built for future-ready learners.",
 
         /* ── COMMON / SHARED BUTTONS ────────────── */
@@ -98,7 +101,7 @@ window.CS_I18N = {
         home_eyebrow: "Practical digital skills for Africa's next generation",
         home_hero_title: "Learn skills. Build what matters.",
         home_hero_sub: "Explore technology, learn at your own pace, and turn new skills into projects with guidance from a supportive community.",
-        home_why_eyebrow: "Why Choose CoderGrid",
+        home_why_eyebrow: "Why Choose KodaGrid",
         home_why_title: "Industry-ready skills, hands-on projects, mentorship, and career support.",
         home_why_body: "Structured lessons with live code editors, exercises, quizzes, and projects — combined with classroom sessions, trainer mentorship, community challenges, and career guidance. Learners build real things from day one and graduate with a portfolio that proves it.",
         home_platform_eyebrow: "A clear path to your next skill",
@@ -114,10 +117,10 @@ window.CS_I18N = {
         home_tile_community_body: "Connect with mentors and learners who help you keep moving forward.",
         home_vibes_eyebrow: "Coding Vibes",
         home_vibes_title: "Late-night focus, bright ideas, and a community that keeps you building.",
-        home_vibes_body: "From data dashboards to cybersecurity labs, women in tech mentorship sessions to weekend hackathon sprints — CoderGrid is where the work gets done and the ideas come alive.",
+        home_vibes_body: "From data dashboards to cybersecurity labs, women in tech mentorship sessions to weekend hackathon sprints — KodaGrid is where the work gets done and the ideas come alive.",
         home_video_fallback_eyebrow: "Inside the Academy",
         home_video_fallback_title: "See how students move from first lesson to finished project.",
-        home_video_fallback_body: "Coding labs, robotics builds, hackathon teamwork, portfolio reviews, and mentorship moments across the CoderGrid learning journey.",
+        home_video_fallback_body: "Coding labs, robotics builds, hackathon teamwork, portfolio reviews, and mentorship moments across the KodaGrid learning journey.",
         home_featured_eyebrow: "Featured Courses",
         home_featured_title: "Find a course that fits your goals.",
         home_stories_eyebrow: "Learner stories",
@@ -127,7 +130,7 @@ window.CS_I18N = {
         testimonial_write_title: "Share your experience",
         testimonial_review_note: "Your testimonial will be reviewed before it appears publicly.",
         testimonial_submit: "Submit testimonial",
-        testimonial_join_title: "Are you a CoderGrid learner?",
+        testimonial_join_title: "Are you a KodaGrid learner?",
         testimonial_join_body: "Sign in to share your experience. Only registered learners can submit testimonials.",
         home_games_eyebrow: "Learn While You Play",
         home_games_title: "Coding games and interactive challenges",
@@ -136,7 +139,7 @@ window.CS_I18N = {
         home_cta_body: "Join thousands of learners across Africa gaining real digital skills, building portfolios, and finding opportunities.",
 
         /* ── ABOUT ──────────────────────────────── */
-        about_eyebrow: "About CoderGrid",
+        about_eyebrow: "About KodaGrid",
         about_hero_title: "We turn curiosity into capability.",
         about_hero_body: "Our academy exists to help young people gain the digital skills, confidence, and mentorship needed to shape their own futures.",
         about_story_eyebrow: "Our Story",
@@ -167,7 +170,7 @@ window.CS_I18N = {
         contact_eyebrow: "Contact Us",
         contact_hero_title: "Let us help you choose the right path.",
         contact_hero_body: "Talk to our admissions team about courses, school partnerships, events, sponsorships, or mentorship opportunities.",
-        contact_reach_title: "Reach CoderGrid",
+        contact_reach_title: "Reach KodaGrid",
         contact_email_label: "Email",
         contact_phone_label: "Phone",
         contact_location_label: "Location",
@@ -177,25 +180,25 @@ window.CS_I18N = {
         contact_faq1_a: "No. Beginner courses start with fundamentals and progress through guided projects.",
         contact_faq2_q: "Do students receive certificates?",
         contact_faq2_a: "Yes. Students receive certificates after completing lessons, assignments, and portfolio projects.",
-        contact_faq3_q: "Can schools partner with CoderGrid?",
+        contact_faq3_q: "Can schools partner with KodaGrid?",
         contact_faq3_a: "Yes. We support school clubs, workshops, bootcamps, and teacher technology programs.",
         contact_send_title: "Send a message",
 
         /* ── AUTH ───────────────────────────────── */
         auth_login_eyebrow: "Welcome Back",
         auth_login_title: "Access your student portal.",
-        auth_login_body: "Continue your courses, review assignments, track certificates, and stay connected with the CoderGrid community.",
+        auth_login_body: "Continue your courses, review assignments, track certificates, and stay connected with the KodaGrid community.",
         auth_login_forgot: "Forgot password?",
         auth_login_newhere: "New here?",
         auth_login_create: "Create an account",
         auth_register_eyebrow: "Student Portal",
         auth_register_title: "Create your learner account.",
-        auth_register_body: "Join CoderGrid to track learning progress, submit projects, access certificates, and stay connected with mentors.",
+        auth_register_body: "Join KodaGrid to track learning progress, submit projects, access certificates, and stay connected with mentors.",
         auth_register_already: "Already registered?",
         auth_register_login: "Login here",
 
         /* ── TECHGIRL ───────────────────────────── */
-        tg_eyebrow: "Tech Girl · CoderGrid",
+        tg_eyebrow: "Tech Girl · KodaGrid",
         tg_title1: "She Learns.",
         tg_title2: "She Builds.",
         tg_title3: "She Leads.",
@@ -216,7 +219,7 @@ window.CS_I18N = {
         tg_cta_body: "Join thousands of girls in Africa building their future through code, robotics, AI, and creativity.",
 
         /* ── TECHBOY ────────────────────────────── */
-        tb_eyebrow: "Tech Boy · CoderGrid",
+        tb_eyebrow: "Tech Boy · KodaGrid",
         tb_title1: "Code It.",
         tb_title2: "Build It.",
         tb_title3: "Ship It.",
@@ -231,7 +234,7 @@ window.CS_I18N = {
         tb_rm_title: "They started where you are right now.",
         tb_cta_eyebrow: "Your Mission Starts Now",
         tb_cta_title: "Ready to become a Code Warrior?",
-        tb_cta_body: "Join thousands of boys across Africa building software, robots, games, and careers through CoderGrid.",
+        tb_cta_body: "Join thousands of boys across Africa building software, robots, games, and careers through KodaGrid.",
         tb_cta_btn: "Enrol Now — Free Starter Track",
 
         /* ── HIGH SCHOOL ────────────────────────── */
@@ -291,7 +294,7 @@ window.CS_I18N = {
         nav_trainers: "Wakufunzi",
         nav_trainers_desc: "Kutana na wakufunzi wetu",
         nav_ai_mentor: "Mshauri wa AI",
-        nav_ai_mentor_desc: "Msaada wa msimbo 24/7",
+        nav_ai_mentor_desc: "Vidokezo vya kujifunza",
         nav_resources: "Rasilimali",
         nav_resources_desc: "Miongozo na marejeo",
         nav_fees: "Ada na Mipango",
@@ -318,6 +321,9 @@ window.CS_I18N = {
         footer_fees: "Ada",
         footer_ai_mentor: "Mshauri wa AI",
         footer_contact_link: "Mawasiliano",
+        footer_events: "Matukio",
+        footer_blog: "Blogu",
+        footer_gallery: "Picha",
         footer_built_for: "Imejengwa kwa wanafunzi wa kesho.",
 
         /* ── COMMON BUTTONS ── */
@@ -346,7 +352,7 @@ window.CS_I18N = {
         home_eyebrow: "Ujuzi wa kidijitali kwa kizazi kijacho cha Afrika",
         home_hero_title: "Jifunze ujuzi. Jenga mambo yenye maana.",
         home_hero_sub: "Gundua teknolojia, jifunze kwa kasi yako, na tumia ujuzi mpya kujenga miradi kwa msaada wa jamii inayokujali.",
-        home_why_eyebrow: "Kwa Nini Chagua CoderGrid",
+        home_why_eyebrow: "Kwa Nini Chagua KodaGrid",
         home_why_title: "Ujuzi unaohitajika na sekta, miradi halisi, ushauri, na msaada wa kazi.",
         home_why_body: "Masomo yenye muundo na wahariri wa msimbo wa moja kwa moja, mazoezi, maswali na miradi — pamoja na vikao vya darasani, ushauri wa mkufunzi, changamoto za jamii, na mwongozo wa kazi. Wanafunzi hujenga vitu halisi tangu siku ya kwanza.",
         home_platform_eyebrow: "Njia wazi ya kupata ujuzi mpya",
@@ -375,7 +381,7 @@ window.CS_I18N = {
         testimonial_write_title: "Shiriki uzoefu wako",
         testimonial_review_note: "Ushuhuda wako utakaguliwa kabla ya kuchapishwa.",
         testimonial_submit: "Tuma ushuhuda",
-        testimonial_join_title: "Je, wewe ni mwanafunzi wa CoderGrid?",
+        testimonial_join_title: "Je, wewe ni mwanafunzi wa KodaGrid?",
         testimonial_join_body: "Ingia ili kushiriki uzoefu wako. Wanafunzi waliosajiliwa pekee ndio wanaoweza kutuma ushuhuda.",
         home_games_eyebrow: "Jifunze Ukicheza",
         home_games_title: "Michezo ya msimbo na changamoto za mwingiliano",
@@ -384,7 +390,7 @@ window.CS_I18N = {
         home_cta_body: "Jiunge na maelfu ya wanafunzi kote Afrika wakipata ujuzi wa kweli wa kidijitali, kujenga portfolio, na kupata fursa.",
 
         /* ── ABOUT ── */
-        about_eyebrow: "Kuhusu Chuo cha CoderGrid",
+        about_eyebrow: "Kuhusu Chuo cha KodaGrid",
         about_hero_title: "Tunabadilisha udadisi kuwa uwezo.",
         about_hero_body: "Chuo chetu kinawezesha vijana kupata ujuzi wa kidijitali, ujasiri, na ushauri unaohitajika kuunda mustakabali wao.",
         about_story_eyebrow: "Hadithi Yetu",
@@ -415,7 +421,7 @@ window.CS_I18N = {
         contact_eyebrow: "Wasiliana Nasi",
         contact_hero_title: "Turuhusu tukusaidie kuchagua njia sahihi.",
         contact_hero_body: "Zungumza na timu yetu ya udahili kuhusu kozi, ushirikiano na shule, matukio, ufadhili, au fursa za ushauri.",
-        contact_reach_title: "Wasiliana na CoderGrid",
+        contact_reach_title: "Wasiliana na KodaGrid",
         contact_email_label: "Barua pepe",
         contact_phone_label: "Simu",
         contact_location_label: "Mahali",
@@ -425,25 +431,25 @@ window.CS_I18N = {
         contact_faq1_a: "Hapana. Kozi za mwanzo zinaanza na misingi na kuendelea kupitia miradi iliyoongozwa.",
         contact_faq2_q: "Je, wanafunzi wanapata vyeti?",
         contact_faq2_a: "Ndiyo. Wanafunzi wanapata vyeti baada ya kukamilisha masomo, kazi, na miradi ya portfolio.",
-        contact_faq3_q: "Je, shule zinaweza kushirikiana na CoderGrid?",
+        contact_faq3_q: "Je, shule zinaweza kushirikiana na KodaGrid?",
         contact_faq3_a: "Ndiyo. Tunasaidia vilabu vya shule, warsha, kambi za mafunzo, na programu za teknolojia kwa walimu.",
         contact_send_title: "Tuma ujumbe",
 
         /* ── AUTH ── */
         auth_login_eyebrow: "Karibu Tena",
         auth_login_title: "Ingia kwenye portal yako ya mwanafunzi.",
-        auth_login_body: "Endelea na kozi zako, kagua kazi, fuatilia vyeti, na ukae umeunganishwa na jamii ya CoderGrid.",
+        auth_login_body: "Endelea na kozi zako, kagua kazi, fuatilia vyeti, na ukae umeunganishwa na jamii ya KodaGrid.",
         auth_login_forgot: "Umesahau nywila?",
         auth_login_newhere: "Mpya hapa?",
         auth_login_create: "Fungua akaunti",
         auth_register_eyebrow: "Portal ya Mwanafunzi",
         auth_register_title: "Fungua akaunti yako ya mwanafunzi.",
-        auth_register_body: "Jiunge na CoderGrid kufuatilia maendeleo ya kujifunza, kuwasilisha miradi, kupata vyeti, na kukaa umeunganishwa na washauri.",
+        auth_register_body: "Jiunge na KodaGrid kufuatilia maendeleo ya kujifunza, kuwasilisha miradi, kupata vyeti, na kukaa umeunganishwa na washauri.",
         auth_register_already: "Tayari umesajiliwa?",
         auth_register_login: "Ingia hapa",
 
         /* ── TECHGIRL ── */
-        tg_eyebrow: "Tech Girl · CoderGrid",
+        tg_eyebrow: "Tech Girl · KodaGrid",
         tg_title1: "Anajifunza.",
         tg_title2: "Anajenga.",
         tg_title3: "Anaongoza.",
@@ -464,7 +470,7 @@ window.CS_I18N = {
         tg_cta_body: "Jiunge na maelfu ya wasichana barani Afrika wanaojenga mustakabali wao kupitia msimbo, roboti, AI, na ubunifu.",
 
         /* ── TECHBOY ── */
-        tb_eyebrow: "Tech Boy · CoderGrid",
+        tb_eyebrow: "Tech Boy · KodaGrid",
         tb_title1: "Andika Msimbo.",
         tb_title2: "Kijenga.",
         tb_title3: "Tuma.",
@@ -479,7 +485,7 @@ window.CS_I18N = {
         tb_rm_title: "Walianza mahali ulipo sasa hivi.",
         tb_cta_eyebrow: "Dhamira Yako Inaanza Sasa",
         tb_cta_title: "Je, uko tayari kuwa Code Warrior?",
-        tb_cta_body: "Jiunge na maelfu ya wavulana barani Afrika wanaojenga programu, roboti, michezo, na kazi kupitia CoderGrid.",
+        tb_cta_body: "Jiunge na maelfu ya wavulana barani Afrika wanaojenga programu, roboti, michezo, na kazi kupitia KodaGrid.",
         tb_cta_btn: "Jiandikishe Sasa — Mwanzo Bure",
 
         /* ── HIGH SCHOOL ── */
@@ -539,7 +545,7 @@ window.CS_I18N = {
         nav_trainers: "Formateurs",
         nav_trainers_desc: "Rencontrez nos formateurs",
         nav_ai_mentor: "Mentor IA",
-        nav_ai_mentor_desc: "Aide à la programmation 24h/24",
+        nav_ai_mentor_desc: "Conseils d'apprentissage",
         nav_resources: "Ressources",
         nav_resources_desc: "Guides et références",
         nav_fees: "Frais et Plans",
@@ -566,6 +572,9 @@ window.CS_I18N = {
         footer_fees: "Frais",
         footer_ai_mentor: "Mentor IA",
         footer_contact_link: "Contact",
+        footer_events: "Événements",
+        footer_blog: "Blog",
+        footer_gallery: "Galerie",
         footer_built_for: "Construit pour les apprenants prêts pour l'avenir.",
 
         /* ── COMMON BUTTONS ── */
@@ -594,7 +603,7 @@ window.CS_I18N = {
         home_eyebrow: "L'académie de code axée sur les étudiants africains",
         home_hero_title: "Transformez Votre Avenir Grâce au Code",
         home_hero_sub: "Apprenez la programmation, l'IA, la cybersécurité et le développement logiciel avec des leçons structurées, des projets réels, du mentorat et une communauté qui vous garde dans l'action.",
-        home_why_eyebrow: "Pourquoi Choisir CoderGrid",
+        home_why_eyebrow: "Pourquoi Choisir KodaGrid",
         home_why_title: "Compétences prêtes pour l'industrie, projets pratiques, mentorat et soutien professionnel.",
         home_why_body: "Leçons structurées avec éditeurs de code en direct, exercices, quiz et projets — combinés avec des sessions en classe, du mentorat par des formateurs, des défis communautaires et une orientation professionnelle.",
         home_platform_eyebrow: "Expérience de la Plateforme",
@@ -627,7 +636,7 @@ window.CS_I18N = {
         home_cta_body: "Rejoignez des milliers d'apprenants en Afrique acquérant de vraies compétences numériques, construisant des portfolios et trouvant des opportunités.",
 
         /* ── ABOUT ── */
-        about_eyebrow: "À Propos de CoderGrid",
+        about_eyebrow: "À Propos de KodaGrid",
         about_hero_title: "Nous transformons la curiosité en capacité.",
         about_hero_body: "Notre académie existe pour aider les jeunes à acquérir les compétences numériques, la confiance et le mentorat nécessaires pour façonner leur propre avenir.",
         about_story_eyebrow: "Notre Histoire",
@@ -658,7 +667,7 @@ window.CS_I18N = {
         contact_eyebrow: "Contactez-nous",
         contact_hero_title: "Laissez-nous vous aider à choisir la bonne voie.",
         contact_hero_body: "Parlez à notre équipe d'admission des cours, des partenariats scolaires, des événements, des parrainages ou des opportunités de mentorat.",
-        contact_reach_title: "Contacter CoderGrid",
+        contact_reach_title: "Contacter KodaGrid",
         contact_email_label: "E-mail",
         contact_phone_label: "Téléphone",
         contact_location_label: "Emplacement",
@@ -668,25 +677,25 @@ window.CS_I18N = {
         contact_faq1_a: "Non. Les cours débutants commencent par les fondamentaux et progressent à travers des projets guidés.",
         contact_faq2_q: "Les étudiants reçoivent-ils des certificats?",
         contact_faq2_a: "Oui. Les étudiants reçoivent des certificats après avoir terminé les leçons, les devoirs et les projets de portfolio.",
-        contact_faq3_q: "Les écoles peuvent-elles s'associer à CoderGrid?",
+        contact_faq3_q: "Les écoles peuvent-elles s'associer à KodaGrid?",
         contact_faq3_a: "Oui. Nous soutenons les clubs scolaires, ateliers, bootcamps et programmes technologiques pour enseignants.",
         contact_send_title: "Envoyer un message",
 
         /* ── AUTH ── */
         auth_login_eyebrow: "Bienvenue",
         auth_login_title: "Accédez à votre portail étudiant.",
-        auth_login_body: "Continuez vos cours, révisez les devoirs, suivez les certificats et restez connecté avec la communauté CoderGrid.",
+        auth_login_body: "Continuez vos cours, révisez les devoirs, suivez les certificats et restez connecté avec la communauté KodaGrid.",
         auth_login_forgot: "Mot de passe oublié?",
         auth_login_newhere: "Nouveau ici?",
         auth_login_create: "Créer un compte",
         auth_register_eyebrow: "Portail Étudiant",
         auth_register_title: "Créez votre compte apprenant.",
-        auth_register_body: "Rejoignez CoderGrid pour suivre votre progression, soumettre des projets, accéder aux certificats et rester connecté avec des mentors.",
+        auth_register_body: "Rejoignez KodaGrid pour suivre votre progression, soumettre des projets, accéder aux certificats et rester connecté avec des mentors.",
         auth_register_already: "Déjà inscrit?",
         auth_register_login: "Connectez-vous ici",
 
         /* ── TECHGIRL ── */
-        tg_eyebrow: "Tech Girl · CoderGrid",
+        tg_eyebrow: "Tech Girl · KodaGrid",
         tg_title1: "Elle Apprend.",
         tg_title2: "Elle Construit.",
         tg_title3: "Elle Dirige.",
@@ -707,7 +716,7 @@ window.CS_I18N = {
         tg_cta_body: "Rejoignez des milliers de filles en Afrique qui construisent leur avenir grâce au code, à la robotique, à l'IA et à la créativité.",
 
         /* ── TECHBOY ── */
-        tb_eyebrow: "Tech Boy · CoderGrid",
+        tb_eyebrow: "Tech Boy · KodaGrid",
         tb_title1: "Codez-le.",
         tb_title2: "Construisez-le.",
         tb_title3: "Déployez-le.",
@@ -722,7 +731,7 @@ window.CS_I18N = {
         tb_rm_title: "Ils ont commencé là où vous êtes maintenant.",
         tb_cta_eyebrow: "Votre Mission Commence Maintenant",
         tb_cta_title: "Prêt à devenir un Code Warrior?",
-        tb_cta_body: "Rejoignez des milliers de garçons en Afrique qui construisent des logiciels, des robots, des jeux et des carrières via CoderGrid.",
+        tb_cta_body: "Rejoignez des milliers de garçons en Afrique qui construisent des logiciels, des robots, des jeux et des carrières via KodaGrid.",
         tb_cta_btn: "S'inscrire Maintenant — Démarrage Gratuit",
 
         /* ── HIGH SCHOOL ── */
@@ -782,7 +791,7 @@ window.CS_I18N = {
         nav_trainers: "Treinadores",
         nav_trainers_desc: "Conheça nossos instrutores",
         nav_ai_mentor: "Mentor de IA",
-        nav_ai_mentor_desc: "Ajuda de programação 24/7",
+        nav_ai_mentor_desc: "Dicas de aprendizagem",
         nav_resources: "Recursos",
         nav_resources_desc: "Guias e referências",
         nav_fees: "Taxas e Planos",
@@ -809,6 +818,9 @@ window.CS_I18N = {
         footer_fees: "Taxas",
         footer_ai_mentor: "Mentor IA",
         footer_contact_link: "Contato",
+        footer_events: "Eventos",
+        footer_blog: "Blog",
+        footer_gallery: "Galeria",
         footer_built_for: "Construído para aprendizes prontos para o futuro.",
 
         /* ── COMMON BUTTONS ── */
@@ -837,7 +849,7 @@ window.CS_I18N = {
         home_eyebrow: "A academia de código focada em estudantes africanos",
         home_hero_title: "Transforme Seu Futuro Através do Código",
         home_hero_sub: "Aprenda programação, IA, cibersegurança e desenvolvimento de software com aulas estruturadas, projetos reais, mentoria e uma comunidade que mantém você construindo.",
-        home_why_eyebrow: "Por Que Escolher CoderGrid",
+        home_why_eyebrow: "Por Que Escolher KodaGrid",
         home_why_title: "Habilidades prontas para a indústria, projetos práticos, mentoria e suporte profissional.",
         home_why_body: "Aulas estruturadas com editores de código ao vivo, exercícios, questionários e projetos — combinados com sessões em sala de aula, mentoria de treinadores, desafios comunitários e orientação profissional.",
         home_platform_eyebrow: "Experiência da Plataforma",
@@ -870,7 +882,7 @@ window.CS_I18N = {
         home_cta_body: "Junte-se a milhares de aprendizes na África adquirindo habilidades digitais reais, construindo portfólios e encontrando oportunidades.",
 
         /* ── ABOUT ── */
-        about_eyebrow: "Sobre a CoderGrid",
+        about_eyebrow: "Sobre a KodaGrid",
         about_hero_title: "Transformamos a curiosidade em capacidade.",
         about_hero_body: "Nossa academia existe para ajudar jovens a adquirir as habilidades digitais, confiança e mentoria necessárias para moldar seus próprios futuros.",
         about_story_eyebrow: "Nossa História",
@@ -901,7 +913,7 @@ window.CS_I18N = {
         contact_eyebrow: "Fale Conosco",
         contact_hero_title: "Deixe-nos ajudá-lo a escolher o caminho certo.",
         contact_hero_body: "Fale com nossa equipe de admissões sobre cursos, parcerias escolares, eventos, patrocínios ou oportunidades de mentoria.",
-        contact_reach_title: "Contatar CoderGrid",
+        contact_reach_title: "Contatar KodaGrid",
         contact_email_label: "E-mail",
         contact_phone_label: "Telefone",
         contact_location_label: "Localização",
@@ -911,25 +923,25 @@ window.CS_I18N = {
         contact_faq1_a: "Não. Os cursos para iniciantes começam com fundamentos e progridem através de projetos guiados.",
         contact_faq2_q: "Os alunos recebem certificados?",
         contact_faq2_a: "Sim. Os alunos recebem certificados após concluir as aulas, tarefas e projetos de portfólio.",
-        contact_faq3_q: "As escolas podem fazer parcerias com CoderGrid?",
+        contact_faq3_q: "As escolas podem fazer parcerias com KodaGrid?",
         contact_faq3_a: "Sim. Apoiamos clubes escolares, workshops, bootcamps e programas de tecnologia para professores.",
         contact_send_title: "Enviar uma mensagem",
 
         /* ── AUTH ── */
         auth_login_eyebrow: "Bem-vindo de Volta",
         auth_login_title: "Acesse seu portal de aluno.",
-        auth_login_body: "Continue seus cursos, revise tarefas, acompanhe certificados e fique conectado com a comunidade CoderGrid.",
+        auth_login_body: "Continue seus cursos, revise tarefas, acompanhe certificados e fique conectado com a comunidade KodaGrid.",
         auth_login_forgot: "Esqueceu a senha?",
         auth_login_newhere: "Novo aqui?",
         auth_login_create: "Criar uma conta",
         auth_register_eyebrow: "Portal do Aluno",
         auth_register_title: "Crie sua conta de aluno.",
-        auth_register_body: "Junte-se à CoderGrid para acompanhar seu progresso, enviar projetos, acessar certificados e manter contato com mentores.",
+        auth_register_body: "Junte-se à KodaGrid para acompanhar seu progresso, enviar projetos, acessar certificados e manter contato com mentores.",
         auth_register_already: "Já registrado?",
         auth_register_login: "Faça login aqui",
 
         /* ── TECHGIRL ── */
-        tg_eyebrow: "Tech Girl · CoderGrid",
+        tg_eyebrow: "Tech Girl · KodaGrid",
         tg_title1: "Ela Aprende.",
         tg_title2: "Ela Constrói.",
         tg_title3: "Ela Lidera.",
@@ -950,7 +962,7 @@ window.CS_I18N = {
         tg_cta_body: "Junte-se a milhares de meninas na África construindo seu futuro através do código, robótica, IA e criatividade.",
 
         /* ── TECHBOY ── */
-        tb_eyebrow: "Tech Boy · CoderGrid",
+        tb_eyebrow: "Tech Boy · KodaGrid",
         tb_title1: "Codifique.",
         tb_title2: "Construa.",
         tb_title3: "Lance.",
@@ -965,7 +977,7 @@ window.CS_I18N = {
         tb_rm_title: "Eles começaram onde você está agora.",
         tb_cta_eyebrow: "Sua Missão Começa Agora",
         tb_cta_title: "Pronto para se tornar um Code Warrior?",
-        tb_cta_body: "Junte-se a milhares de meninos na África construindo software, robôs, jogos e carreiras através da CoderGrid.",
+        tb_cta_body: "Junte-se a milhares de meninos na África construindo software, robôs, jogos e carreiras através da KodaGrid.",
         tb_cta_btn: "Matricular Agora — Trilha Inicial Grátis",
 
         /* ── HIGH SCHOOL ── */

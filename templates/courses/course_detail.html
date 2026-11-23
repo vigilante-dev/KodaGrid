@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ course.title }} | CoderGrid{% endblock %}
+{% block title %}{{ course.title }} | KodaGrid{% endblock %}
 {% block meta_description %}{{ course.description|truncatewords:24 }}{% endblock %}
 
 {% block content %}
@@ -37,6 +37,29 @@
 
             <h2>Requirements</h2>
             {{ course.requirements|default:"No previous experience is required. Curiosity and commitment are enough to begin."|linebreaks }}
+
+            <section id="course-notes" class="cd-lessons-section">
+                <h2 style="display:flex;align-items:center;gap:10px;margin-top:40px;">
+                    <i class="bi bi-journal-text" style="color:var(--accent);"></i>
+                    Course Notes
+                </h2>
+                {% if course.notes %}
+                    <div class="rich-text">{{ course.notes|linebreaks }}</div>
+                {% else %}
+                    <p class="empty-state">Course notes will appear here when they are added.</p>
+                {% endif %}
+                {% if can_edit_course_notes %}
+                    <details style="margin-top:20px;" {% if not course.notes %}open{% endif %}>
+                        <summary class="text-link" style="cursor:pointer;">Paste or edit course notes</summary>
+                        <form method="post" action="{{ course.get_absolute_url }}#course-notes" style="margin-top:16px;">
+                            {% csrf_token %}
+                            <label for="course-notes-input">Paste the notes for this course</label>
+                            <textarea id="course-notes-input" name="notes" rows="18" style="width:100%;margin:12px 0;padding:14px;" placeholder="Paste course notes here">{{ course.notes }}</textarea>
+                            <button class="btn btn-primary" type="submit">Save Course Notes</button>
+                        </form>
+                    </details>
+                {% endif %}
+            </section>
 
             <h2>Certification</h2>
             {{ course.certification_details|default:"Students receive a certificate of completion and portfolio guidance after meeting project requirements."|linebreaks }}

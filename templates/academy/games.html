@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Coding Games | CoderGrid{% endblock %}
-{% block meta_description %}Sharpen your programming skills through fun coding games — typing races, bug fixing, code fill-ins, and tech quizzes at CoderGrid.{% endblock %}
+{% block title %}Coding Games | KodaGrid{% endblock %}
+{% block meta_description %}Sharpen your programming skills through fun coding games — typing races, bug fixing, code fill-ins, and tech quizzes at KodaGrid.{% endblock %}
 
 {% block content %}
 
@@ -68,7 +68,7 @@
                 <h2>Select a challenge to begin</h2>
             </div>
         </div>
-        <div id="games-container" class="games-container reveal"></div>
+        <div id="games-container" class="games-container reveal" data-score-url="{% url 'academy:game_score' %}" data-signed-in="{{ user.is_authenticated|yesno:'true,false' }}" data-login-url="{% url 'accounts:login' %}?next={{ request.path|urlencode }}"></div>
     </div>
 </section>
 
@@ -78,7 +78,7 @@
         <div class="section-heading reveal">
             <div>
                 <p class="eyebrow">Top Players</p>
-                <h2>This Week's Leaderboard</h2>
+                <h2>Leaderboard: last 7 days</h2>
             </div>
         </div>
         <div class="leaderboard-list reveal">
@@ -88,9 +88,14 @@
                 <span class="lb-name">{{ entry.name }}</span>
                 <span class="lb-score">{{ entry.score }} pts</span>
             </div>
+            {% empty %}
+            <p style="color:var(--muted);text-align:center;">No scores yet this week. Play a game to claim the top spot!</p>
             {% endfor %}
         </div>
-        <p style="color:var(--muted);margin-top:22px;text-align:center;">Play any game to add your score. Leaderboard resets weekly.</p>
+        <p style="color:var(--muted);margin-top:22px;text-align:center;">
+            Your total is the sum of your best score in each game over the last 7 days.
+            {% if not user.is_authenticated %}<a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in</a> to save your scores.{% endif %}
+        </p>
     </div>
 </section>
 

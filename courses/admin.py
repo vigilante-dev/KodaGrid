@@ -7,7 +7,8 @@ from .models import Course
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'level', 'duration', 'instructor', 'is_featured')
     list_filter = ('category', 'level', 'is_featured')
-    search_fields = ('title', 'description', 'instructor')
+    search_fields = ('title', 'description', 'notes', 'instructor')
+    fields = ('title', 'slug', 'description', 'notes', 'learning_outcomes', 'duration', 'category', 'level', 'requirements', 'certification_details', 'instructor', 'image', 'is_featured')
     prepopulated_fields = {'slug': ('title',)}
 
 # Register your models here.

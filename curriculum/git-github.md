@@ -19,7 +19,7 @@ references:
   - https://git-scm.com/docs
   - https://docs.github.com/en/get-started
   - https://docs.github.com/en/pull-requests
-originality: Original CoderGrid instructional content; references identify official documentation.
+originality: Original KodaGrid instructional content; references identify official documentation.
 ---
 
 # Git & GitHub · Collaborate with Confidence

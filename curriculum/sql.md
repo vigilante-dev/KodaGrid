@@ -18,7 +18,7 @@ stages:
 references:
   - https://www.postgresql.org/docs/current/tutorial.html
   - https://www.postgresql.org/docs/current/ddl.html
-originality: Original CoderGrid instructional content; references identify official documentation. Examples use broadly supported SQL with PostgreSQL named as the reference dialect.
+originality: Original KodaGrid instructional content; references identify official documentation. Examples use broadly supported SQL with PostgreSQL named as the reference dialect.
 ---
 
 # SQL · Ask Questions of Data

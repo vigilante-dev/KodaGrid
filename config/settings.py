@@ -118,12 +118,17 @@ elif os.environ.get('DJANGO_DB_ENGINE') == 'postgresql':
         }
     }
 else:
+    sqlite_path = os.environ.get('DJANGO_SQLITE_PATH', '').strip()
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': Path(sqlite_path).expanduser() if sqlite_path else BASE_DIR / 'db.sqlite3',
         }
     }
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.StudentApprovalBackend',
+]
 
 
 # Password validation
@@ -165,10 +170,25 @@ LOCALE_PATHS = [BASE_DIR / 'locale']
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE was removed in Django 5.1; STORAGES is the only supported form.
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage'
+            if DEBUG
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
+    },
+}
+# Fall back to unhashed URLs instead of raising if collectstatic was skipped on a deploy.
+WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+media_path = os.environ.get('DJANGO_MEDIA_ROOT', '').strip()
+MEDIA_ROOT = Path(media_path).expanduser() if media_path else BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -182,11 +202,26 @@ EMAIL_BACKEND = os.environ.get(
 )
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL',
-    'CoderGrid <webmaster@localhost>',
+    'KodaGrid <webmaster@localhost>',
 )
 CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', '').strip()
 
 ANALYTICS_ID = os.environ.get('DJANGO_ANALYTICS_ID', '')
+
+# Public contact details and social profiles shown in the footer; anything unset is hidden.
+PUBLIC_CONTACT_EMAIL = os.environ.get('PUBLIC_CONTACT_EMAIL', '').strip()
+PUBLIC_CONTACT_PHONE = os.environ.get('PUBLIC_CONTACT_PHONE', '').strip()
+SOCIAL_LINKS = [
+    (label, short, url)
+    for label, short, url in (
+        ('LinkedIn', 'in', os.environ.get('SOCIAL_LINKEDIN_URL', '').strip()),
+        ('X', 'x', os.environ.get('SOCIAL_X_URL', '').strip()),
+        ('Instagram', 'ig', os.environ.get('SOCIAL_INSTAGRAM_URL', '').strip()),
+        ('YouTube', 'yt', os.environ.get('SOCIAL_YOUTUBE_URL', '').strip()),
+        ('Facebook', 'fb', os.environ.get('SOCIAL_FACEBOOK_URL', '').strip()),
+    )
+    if url.startswith('https://')
+]
 
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = not DEBUG
@@ -208,3 +243,32 @@ CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(csrf_origins))
 SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0' if DEBUG else '31536000'))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# Behind Render's proxy REMOTE_ADDR is the proxy, so read the client IP from X-Forwarded-For.
+RATE_LIMIT_TRUST_FORWARDED_FOR = (
+    os.environ.get('DJANGO_TRUST_X_FORWARDED_FOR', 'True' if render_hostname else 'False')
+    .strip().lower() in {'true', '1', 'yes'}
+)
+
+MAX_IMAGE_UPLOAD_MB = int(os.environ.get('DJANGO_MAX_IMAGE_UPLOAD_MB', '5'))
+
+# Django only logs to the console when DEBUG is on by default; Render needs errors on stderr.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}

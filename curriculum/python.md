@@ -18,7 +18,7 @@ stages:
 references:
   - https://docs.python.org/3/tutorial/
   - https://docs.python.org/3/library/
-originality: Original CoderGrid instructional content; references identify authoritative documentation.
+originality: Original KodaGrid instructional content; references identify authoritative documentation.
 ---
 
 # Python · Practical Programming

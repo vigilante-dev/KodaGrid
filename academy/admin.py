@@ -10,6 +10,7 @@ from .models import (
     ClassMembership,
     Classroom,
     CommunityChallenge,
+    GameScore,
     FeePlan,
     ForumReply,
     ForumTopic,
@@ -222,4 +223,10 @@ class MentorAIInteractionAdmin(admin.ModelAdmin):
     search_fields = ('name', 'question', 'answer')
     readonly_fields = ('created_at',)
 
-# Register your models here.
+
+@admin.register(GameScore)
+class GameScoreAdmin(admin.ModelAdmin):
+    list_display = ('user', 'game', 'score', 'created_at')
+    list_filter = ('game', 'created_at')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name')
+    readonly_fields = ('created_at',)

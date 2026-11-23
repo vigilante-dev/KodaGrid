@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Your Results | CoderGrid{% endblock %}
+{% block title %}Your Results | KodaGrid{% endblock %}
 
 {% block content %}
 {% if not assessment %}
@@ -59,7 +59,7 @@
         </div>
         <div class="path-grid">
             {% for path in assessment.recommended_paths %}
-            {% with detail=path_detail|default:{}|default:{} %}
+            {% with detail=path_detail %}
             <article class="path-card reveal reveal-delay-{{ forloop.counter }}">
                 <div style="font-size:2rem;margin-bottom:12px;">
                     {% if path == 'Scratch for Kids' %}🐱
@@ -128,12 +128,6 @@
             </div>
             <ul class="check-list reveal reveal-right">
                 {% with style=assessment.learning_style %}
-                {% for tip in revision_tips|default:{}|default:{} %}
-                {% empty %}
-                <li>Build a mini project every week</li>
-                <li>Explain what you learn to someone else</li>
-                <li>Review your code 24 hours after writing it</li>
-                {% endfor %}
                 {# fallback per style #}
                 {% if assessment.learning_style == 'visual' %}
                 <li>Draw diagrams and flowcharts of every concept</li>

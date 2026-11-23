@@ -42,10 +42,14 @@ class EventDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = kwargs.get('form') or EventRegistrationForm()
+        context['registration_closed'] = self.object.date < timezone.now()
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if self.object.date < timezone.now():
+            messages.info(request, 'Registration for this event has closed.')
+            return redirect(self.object.get_absolute_url())
         form = EventRegistrationForm(request.POST)
         if form.is_valid():
             registration = form.save(commit=False)
@@ -55,15 +59,22 @@ class EventDetailView(DetailView):
             except IntegrityError:
                 messages.info(request, 'This email is already registered for the event.')
                 return redirect(self.object.get_absolute_url())
-            send_mail(
+            sent = send_mail(
                 subject=f'Event registration: {self.object.title}',
-                message=f'{registration.name} registered for {self.object.title}.',
+                message=(
+                    f'Hi {registration.name},\n\n'
+                    f'You are registered for {self.object.title} on '
+                    f'{timezone.localtime(self.object.date):%A %d %B %Y, %H:%M} at {self.object.location}.\n\n'
+                    'See you there!'
+                ),
                 from_email=None,
                 recipient_list=[registration.email],
                 fail_silently=True,
             )
-            messages.success(request, 'Registration received. We have sent a confirmation email.')
+            if sent:
+                messages.success(request, 'Registration received. We have sent a confirmation email.')
+            else:
+                messages.success(request, 'Registration received. We look forward to seeing you.')
             return redirect(self.object.get_absolute_url())
         return self.render_to_response(self.get_context_data(form=form))
 
-# Create your views here.

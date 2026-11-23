@@ -17,7 +17,7 @@ stages:
   - {order: 6, stage: Final Assessment, slug: react-assessment, estimated_minutes: 50}
 references:
   - https://react.dev/learn
-originality: Original CoderGrid instructional content; references identify official documentation.
+originality: Original KodaGrid instructional content; references identify official documentation.
 ---
 
 # React · Build Interfaces from Components

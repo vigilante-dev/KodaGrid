@@ -1,0 +1,22 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Something went wrong | KodaGrid</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    {# Standalone on purpose: rendered without request context, so it must not depend on the database or context processors. #}
+    <main id="main-content">
+        <section class="page-hero">
+            <div class="container">
+                <p class="eyebrow">Error 500</p>
+                <h1>Something went wrong on our side.</h1>
+                <p>The problem has been logged. Please try again in a few minutes.</p>
+                <p style="margin-top:20px;"><a class="btn btn-primary" href="/">Go to the homepage</a></p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

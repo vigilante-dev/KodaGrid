@@ -4,8 +4,10 @@ from django.db import IntegrityError
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, TemplateView, View
 
+from academy.models import TrainerProfile
 from courses.models import Course
 from events.models import Event
 
@@ -37,11 +39,8 @@ class AboutView(TemplateView):
             ('Future Readiness', 'Every program connects technical skills with careers, entrepreneurship, and responsible innovation.'),
             ('Mentorship', 'Learners receive guidance from instructors, alumni, and technology partners.'),
         ]
-        context['team'] = [
-            {'name': 'Amina Wanjiku', 'role': 'Executive Director', 'focus': 'Youth innovation and partnerships'},
-            {'name': 'Brian Otieno', 'role': 'Lead Instructor', 'focus': 'Software engineering and AI'},
-            {'name': 'Grace Njeri', 'role': 'Career Programs Lead', 'focus': 'Internships, mentorship, and employability'},
-        ]
+        # Managed in the admin (Academy > Trainer profiles) instead of hard-coded names.
+        context['team'] = TrainerProfile.objects.filter(is_approved=True)[:6]
         context['achievements'] = [
             'Launched coding clubs with partner schools.',
             'Supported student portfolios across web, mobile, robotics, and data projects.',
@@ -57,12 +56,19 @@ class NewsletterSignupView(View):
         if form.is_valid():
             try:
                 form.save()
-                messages.success(request, 'You are subscribed to CoderGrid updates.')
+                messages.success(request, 'You are subscribed to KodaGrid updates.')
             except IntegrityError:
                 messages.info(request, 'That email is already subscribed.')
         else:
             messages.error(request, 'Please enter a valid email address.')
-        return redirect(request.POST.get('next') or reverse_lazy('core:home'))
+        next_url = request.POST.get('next', '')
+        if not url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = reverse_lazy('core:home')
+        return redirect(next_url)
 
 
 class TestimonialSubmissionView(LoginRequiredMixin, FormView):

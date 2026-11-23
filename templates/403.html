@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Access denied | KodaGrid{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Error 403</p>
+        <h1>You don't have access to this page.</h1>
+        <p>This area is limited to members of a class, approved trainers, or staff. If you think you should have access, please get in touch.</p>
+        <p style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+            {% if user.is_authenticated %}
+                <a class="btn btn-primary" href="{% url 'accounts:profile' %}">Back to my portal</a>
+            {% else %}
+                <a class="btn btn-primary" href="{% url 'accounts:login' %}">Log in</a>
+            {% endif %}
+            <a class="btn btn-ghost" href="{% url 'contact:contact' %}">Contact us</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

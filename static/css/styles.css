@@ -1,5 +1,5 @@
 /* ============================================================
-   CoderGrid — Design System
+   KodaGrid — Design System
    Palette: Soft plum · Violet · Warm neutrals
    ============================================================ */
 
@@ -3393,3 +3393,4 @@ summary { cursor:pointer; font-weight:800; }
     .ws-tryit-panes { grid-template-columns: 1fr; grid-template-rows: 1fr 4px 1fr; }
     .ws-tryit-divider { cursor: row-resize; }
 }
+.result-note { color:var(--muted); font-size:.92rem; margin:8px 0 14px; }

@@ -553,3 +553,25 @@ class RoboticsKit(models.Model):
 
     def __str__(self):
         return f'{self.brand} {self.name}'
+
+
+class GameScore(models.Model):
+    GAMES = [
+        ('typer', 'Code Typer'),
+        ('bugfixer', 'Bug Fixer'),
+        ('filler', 'Code Fill-In'),
+        ('quiz', 'Tech Quiz'),
+    ]
+    # Scores are reported by the browser, so cap them at what a perfect game can reach.
+    MAX_SCORES = {'typer': 5000, 'bugfixer': 200, 'filler': 200, 'quiz': 200}
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='game_scores')
+    game = models.CharField(max_length=20, choices=GAMES)
+    score = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user} — {self.get_game_display()}: {self.score}'

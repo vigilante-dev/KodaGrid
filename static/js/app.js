@@ -1,4 +1,4 @@
-/* CoderGrid — Main JS
+/* KodaGrid — Main JS
    Handles: page loader · counter animations · scroll reveal
             nav scroll effect · image lazy‑load enhancement
             progress bars · live chat · coding games
@@ -251,127 +251,7 @@ function initImageEnhancements() {
 }
 
 
-/* ================================================================
-   LIVE CLASSROOM CHAT
-   Call initChat(containerSelector, options) on the chat page.
-   ================================================================ */
-function initChat(containerSelector, options = {}) {
-    const container = document.querySelector(containerSelector);
-    if (!container) return;
-
-    const { currentUser = "Student", userRole = "student", roomId = "general" } = options;
-    const storageKey = `cs_chat_${roomId}`;
-
-    /* mock messages persisted in sessionStorage so page refresh keeps them */
-    const loadMessages = () => {
-        try { return JSON.parse(sessionStorage.getItem(storageKey) || "[]"); }
-        catch { return []; }
-    };
-    const saveMessages = (msgs) => sessionStorage.setItem(storageKey, JSON.stringify(msgs));
-
-    let messages = loadMessages();
-
-    /* seed with sample content the first time */
-    if (!messages.length) {
-        messages = [
-            { user: "Trainer Amina", role: "trainer", text: "Welcome to today's session! We will be building a REST API with Django. 🐍", time: "9:00 AM" },
-            { user: "Brian M.", role: "student", text: "So excited for this! I've been practising serialisers all week.", time: "9:01 AM" },
-            { user: "Grace N.", role: "student", text: "Do we need to have completed the OOP lesson first?", time: "9:02 AM" },
-            { user: "Trainer Amina", role: "trainer", text: "Great question Grace — yes, OOP basics are needed. Check the Resources tab if you need a refresher.", time: "9:03 AM" },
-        ];
-        saveMessages(messages);
-    }
-
-    const colorMap = { trainer: "var(--accent)", student: "var(--emerald)" };
-
-    const renderMessage = (msg, isSelf) => {
-        const div = document.createElement("div");
-        div.className = `chat-bubble ${isSelf ? "chat-bubble-self" : "chat-bubble-other"}`;
-        div.innerHTML = `
-            ${!isSelf ? `<span class="chat-sender" style="color:${colorMap[msg.role] || "var(--muted)"};">${msg.user}${msg.role === "trainer" ? " 🎓" : ""}</span>` : ""}
-            <p>${escapeHtml(msg.text)}</p>
-            <span class="chat-time">${msg.time}</span>
-        `;
-        return div;
-    };
-
-    const escapeHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-    const now = () => {
-        const d = new Date();
-        const h = d.getHours(), m = d.getMinutes();
-        return `${h > 12 ? h - 12 : h || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}`;
-    };
-
-    container.innerHTML = `
-        <div class="chat-header">
-            <div class="chat-header-info">
-                <span class="chat-status-dot"></span>
-                <strong id="chat-room-name">Classroom Chat</strong>
-                <span class="chat-role-badge ${userRole}">${userRole === "trainer" ? "🎓 Trainer" : "👨‍💻 Student"}</span>
-            </div>
-            <span class="chat-member-count" id="chat-member-count">1 online</span>
-        </div>
-        <div class="chat-messages" id="chat-messages" aria-live="polite" aria-label="Chat messages"></div>
-        <form class="chat-input-row" id="chat-form" autocomplete="off">
-            <input id="chat-input" type="text" placeholder="Type a message…" maxlength="500" aria-label="Chat message">
-            <button type="submit" class="btn btn-accent btn-small chat-send-btn" aria-label="Send">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
-        </form>
-    `;
-
-    const msgBox = container.querySelector("#chat-messages");
-    const form   = container.querySelector("#chat-form");
-    const input  = container.querySelector("#chat-input");
-
-    const scrollBottom = () => msgBox.scrollTo({ top: msgBox.scrollHeight, behavior: "smooth" });
-
-    const renderAll = () => {
-        msgBox.innerHTML = "";
-        messages.forEach((m) => msgBox.appendChild(renderMessage(m, m.user === currentUser)));
-        scrollBottom();
-    };
-
-    renderAll();
-
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const text = input.value.trim();
-        if (!text) return;
-        const msg = { user: currentUser, role: userRole, text, time: now() };
-        messages.push(msg);
-        if (messages.length > 120) messages.shift();
-        saveMessages(messages);
-        msgBox.appendChild(renderMessage(msg, true));
-        scrollBottom();
-        input.value = "";
-        input.focus();
-    });
-
-    /* simulate a trainer reply after a few seconds (demo only) */
-    const trainerReplies = [
-        "Great progress! Keep it up. 💪",
-        "Anyone else have questions? Don't be shy!",
-        "Remember: every bug you fix makes you a better developer.",
-        "Good thinking! That's exactly how it works.",
-        "Check the exercises tab for practice problems on this topic.",
-    ];
-    let replyIdx = 0;
-    const scheduleReply = () => {
-        const delay = 12000 + Math.random() * 15000;
-        setTimeout(() => {
-            const msg = { user: "Trainer Amina", role: "trainer", text: trainerReplies[replyIdx % trainerReplies.length], time: now() };
-            replyIdx++;
-            messages.push(msg);
-            saveMessages(messages);
-            msgBox.appendChild(renderMessage(msg, false));
-            scrollBottom();
-            scheduleReply();
-        }, delay);
-    };
-    scheduleReply();
-}
+/* LIVE CLASSROOM CHAT: see initChatConnected below (server-backed, exported as window.initChat). */
 
 
 /* ================================================================
@@ -390,6 +270,35 @@ function initGames(containerSelector) {
     ];
 
     let activeGame = null;
+
+    /* Save a finished game's score to the server leaderboard (signed-in players only). */
+    const submitScore = (game, score) => {
+        const url = root.dataset.scoreUrl;
+        const signedIn = root.dataset.signedIn === "true";
+        const result = root.querySelector(".game-result");
+        const note = document.createElement("p");
+        note.className = "result-note";
+        if (!url || !signedIn) {
+            if (result && root.dataset.loginUrl) {
+                note.innerHTML = `<a href="${root.dataset.loginUrl}">Log in</a> to save your score to the leaderboard.`;
+                result.querySelector(".btn")?.before(note);
+            }
+            return;
+        }
+        if (!score) return;
+        const csrf = document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1] || "";
+        fetch(url, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": decodeURIComponent(csrf) },
+            body: JSON.stringify({ game, score }),
+        }).then(response => {
+            if (response.ok && result) {
+                note.textContent = "Score saved to the leaderboard.";
+                result.querySelector(".btn")?.before(note);
+            }
+        }).catch(() => {});
+    };
 
     const renderMenu = () => {
         root.innerHTML = `
@@ -433,7 +342,7 @@ function initGames(containerSelector) {
 
     /* ── TYPER GAME ── */
     const typerSnippets = [
-        { code: "print('Hello, CoderGrid!')", lang: "Python" },
+        { code: "print('Hello, KodaGrid!')", lang: "Python" },
         { code: "const greet = (name) => `Hello, ${name}!`;", lang: "JavaScript" },
         { code: "for i in range(10):\n    print(i)", lang: "Python" },
         { code: "SELECT * FROM students WHERE active = 1;", lang: "SQL" },
@@ -518,6 +427,7 @@ function initGames(containerSelector) {
                         <button class="btn btn-accent" id="play-again">Play Again</button>
                     </div>
                 `;
+                submitScore("typer", score);
                 root.querySelector("#play-again")?.addEventListener("click", runTyperGame);
             };
         };
@@ -556,6 +466,7 @@ function initGames(containerSelector) {
         const render = () => {
             if (idx >= bugChallenges.length) {
                 root.innerHTML = `<div class="game-area">${backBtn()}<div class="game-result"><h3>All bugs squashed! 🐛✅</h3><p class="result-score">Final score: <strong>${score}</strong></p><button class="btn btn-accent" id="play-again">Play Again</button></div></div>`;
+                submitScore("bugfixer", score);
                 injectBack();
                 root.querySelector("#play-again")?.addEventListener("click", runBugFixerGame);
                 return;
@@ -601,6 +512,7 @@ function initGames(containerSelector) {
                     if (lives <= 0) {
                         setTimeout(() => {
                             root.innerHTML = `<div class="game-area">${backBtn()}<div class="game-result"><h3>Game Over 💔</h3><p class="result-score">Score: <strong>${score}</strong></p><button class="btn btn-accent" id="play-again">Try Again</button></div></div>`;
+                            submitScore("bugfixer", score);
                             injectBack();
                             root.querySelector("#play-again")?.addEventListener("click", runBugFixerGame);
                         }, 1400);
@@ -631,6 +543,7 @@ function initGames(containerSelector) {
         const render = () => {
             if (idx >= fillChallenges.length) {
                 root.innerHTML = `<div class="game-area">${backBtn()}<div class="game-result"><h3>All filled in! 🧩</h3><p class="result-score">Score: <strong>${score}/${fillChallenges.length * 10}</strong></p><button class="btn btn-accent" id="play-again">Play Again</button></div></div>`;
+                submitScore("filler", score);
                 injectBack();
                 root.querySelector("#play-again")?.addEventListener("click", runFillerGame);
                 return;
@@ -704,6 +617,7 @@ function initGames(containerSelector) {
             if (idx >= shuffled.length) {
                 const pct = Math.round((score / (shuffled.length * 10)) * 100);
                 root.innerHTML = `<div class="game-area">${backBtn()}<div class="game-result"><h3>Quiz Complete! 🧠</h3><p class="result-score">Score: <strong>${score}/${shuffled.length * 10}</strong> (${pct}%)</p><p>${pct >= 70 ? "🏆 Excellent work!" : pct >= 50 ? "👍 Good effort — keep studying!" : "📚 Review the lessons and try again."}</p><button class="btn btn-accent" id="play-again">Play Again</button></div></div>`;
+                submitScore("quiz", score);
                 injectBack();
                 root.querySelector("#play-again")?.addEventListener("click", runQuizGame);
                 return;

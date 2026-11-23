@@ -18,7 +18,7 @@ stages:
 references:
   - https://www.typescriptlang.org/docs/handbook/intro.html
   - https://tc39.es/ecma262/
-originality: Original CoderGrid instructional content; references identify authoritative standards.
+originality: Original KodaGrid instructional content; references identify authoritative standards.
 ---
 
 # TypeScript · Safer JavaScript at Scale

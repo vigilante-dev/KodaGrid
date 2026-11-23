@@ -18,7 +18,7 @@ stages:
 references:
   - https://nodejs.org/docs/latest/api/
   - https://nodejs.org/en/learn
-originality: Original CoderGrid instructional content; references identify official documentation.
+originality: Original KodaGrid instructional content; references identify official documentation.
 ---
 
 # Node.js · JavaScript Beyond the Browser
@@ -51,7 +51,7 @@ Run with `node greet.mjs Amina`. `process.argv` contains command-line arguments;
 import { createServer } from "node:http";
 const server = createServer((request, response) => {
   response.writeHead(200, { "content-type": "text/plain; charset=utf-8" });
-  response.end("CoderGrid practice server is ready.\n");
+  response.end("KodaGrid practice server is ready.\n");
 });
 server.listen(3000, "127.0.0.1");
 ```

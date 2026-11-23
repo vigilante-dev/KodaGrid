@@ -11,3 +11,7 @@ firebase-service-account*.json
 venv/
 env/
 .DS_Store
+node_modules/
+tmp*/
+tmp_*.jpg
+*.log

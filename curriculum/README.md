@@ -1,4 +1,4 @@
-# CoderGrid original technology curriculum
+# KodaGrid original technology curriculum
 
 This curriculum is original instructional material. It uses public language concepts and links to primary specifications or official documentation for reference; those references are not copied lesson text.
 

@@ -212,7 +212,7 @@
         node.querySelectorAll?.('i[class*="bi-"], span[class*="bi-"]').forEach(renderIcon);
     }
 
-    window.CoderGridIcons = {
+    window.KodaGridIcons = {
         render: scan,
         svg: (name, className) => svgMarkup(name, className),
     };

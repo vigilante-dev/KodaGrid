@@ -1,7 +1,0 @@
-{
-  "name": "codergrid",
-  "dependencies": {
-    "firebase": "^13.4.0",
-    "marked": "^18.0.5"
-  }
-}

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ classroom.name|default:"Live Session" }} | CoderGrid{% endblock %}
-{% block meta_description %}Join the live video classroom session at CoderGrid.{% endblock %}
+{% block title %}{{ classroom.name|default:"Live Session" }} | KodaGrid{% endblock %}
+{% block meta_description %}Join the live video classroom session at KodaGrid.{% endblock %}
 
 {% block content %}
 <div class="videocall-page">
@@ -10,9 +10,9 @@
     {# ── TOP BAR ── #}
     <header class="vc-topbar">
         <div class="vc-topbar-left">
-            <a class="brand" href="{% url 'core:home' %}" aria-label="CoderGrid home">
+            <a class="brand" href="{% url 'core:home' %}" aria-label="KodaGrid home">
                 <span class="brand-mark">CS</span>
-                <span class="vc-brand-name">CoderGrid</span>
+                <span class="vc-brand-name">KodaGrid</span>
             </a>
         </div>
         <div class="vc-topbar-center">
@@ -172,7 +172,7 @@
             <h3 style="margin:0 0 16px;">{{ classroom.name|default:"Live Session" }}</h3>
             <dl class="detail-list inline-list">
                 <dt>Room Code</dt><dd>{{ room_code }}</dd>
-                <dt>Host</dt><dd>{{ classroom.trainer.name|default:"CoderGrid Trainer" }}</dd>
+                <dt>Host</dt><dd>{{ classroom.trainer.name|default:"KodaGrid Trainer" }}</dd>
                 <dt>Subject</dt><dd>{{ classroom.learning_path.title|default:"Live Learning Session" }}</dd>
             </dl>
             <div style="margin-top:18px;">
@@ -293,7 +293,7 @@
                 defaultRemoteDisplayName: "Student",
                 hideConferenceSubject: false,
                 hideConferenceTimer: true,
-                subject: "CoderGrid · " + ROOM_CODE,
+                subject: "KodaGrid · " + ROOM_CODE,
             },
             interfaceConfigOverwrite: {
                 SHOW_JITSI_WATERMARK: false,

@@ -1,15 +1,21 @@
-from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
-from django.http import JsonResponse
-from django.shortcuts import redirect
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import ensure_csrf_cookie
 import json
+import uuid
+from datetime import timedelta
+
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Max, Q
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from .forms import AssignmentSubmissionForm, ChatMessageForm, CreateClassroomForm, JoinClassForm, MentorAIForm, MentorshipBookingForm, TrainerApplicationForm
@@ -26,6 +32,7 @@ from .models import (
     Classroom,
     CommunityChallenge,
     FeePlan,
+    GameScore,
     ForumTopic,
     JobOpportunity,
     LearningMaterial,
@@ -190,8 +197,7 @@ class ClassroomHubView(LoginRequiredMixin, TemplateView):
     template_name = 'academy/classroom.html'
 
     def user_can_manage(self):
-        user = self.request.user
-        return user.is_staff or user.is_superuser or hasattr(user, 'trainer_profile')
+        return _chat_can_announce(self.request.user)
 
     def get_user_classrooms(self):
         queryset = Classroom.objects.filter(is_active=True).select_related('trainer', 'learning_path')
@@ -205,13 +211,14 @@ class ClassroomHubView(LoginRequiredMixin, TemplateView):
 
     def get_user_chat_rooms(self):
         classroom_ids = self.get_user_classrooms().values_list('id', flat=True)
-        rooms = ChatRoom.objects.filter(
-            Q(classroom_id__in=classroom_ids) | Q(classroom__isnull=True, name='Tutor Announcements'),
-            is_active=True, room_type__in=['group', 'voice'],
-        ).select_related('classroom')
-        if self.request.user.is_staff or self.request.user.is_superuser:
-            return rooms.distinct()
-        return rooms.distinct()
+        room_filter = Q(classroom_id__in=classroom_ids)
+        # The announcements room is read-only for students (see chat_api), so only offer it
+        # as a posting target to trainers and staff.
+        if _chat_can_announce(self.request.user):
+            room_filter |= Q(classroom__isnull=True, name='Tutor Announcements')
+        return ChatRoom.objects.filter(
+            room_filter, is_active=True, room_type__in=['group', 'voice'],
+        ).select_related('classroom').distinct()
 
     def mark_attendance(self, classrooms):
         if self.request.user.is_staff or self.request.user.is_superuser:
@@ -359,6 +366,10 @@ class ClassroomHubView(LoginRequiredMixin, TemplateView):
         form = ChatMessageForm(request.POST, rooms=rooms)
         if not form.is_valid():
             return self.render_to_response(self.get_context_data(chat_form=form))
+        room = form.cleaned_data['room']
+        if room.classroom_id is None and room.name == 'Tutor Announcements' and not _chat_can_announce(request.user):
+            messages.error(request, 'Only tutors and mentors can post announcements.')
+            return redirect('academy:classroom')
         message = form.save(commit=False)
         message.sender = request.user
         message.sender_name = request.user.get_full_name() or request.user.username
@@ -378,7 +389,7 @@ def mentor_answer(question):
         return 'Build a focused portfolio: one web app, one data or automation project, and one teamwork story. Add a clear resume, GitHub links, and short case studies that explain the problem, process, and result.'
     if 'project' in question_lower:
         return 'Choose a project that solves a real problem near you. Good beginner ideas include a school club website, event registration system, study planner, expense tracker, or community resource directory.'
-    return 'Break the topic into fundamentals, practice tasks, and a portfolio project. CoderGrid Mentor AI recommends learning one concept, building one small example, then teaching it back before moving on.'
+    return 'Break the topic into fundamentals, practice tasks, and a portfolio project. KodaGrid Mentor AI recommends learning one concept, building one small example, then teaching it back before moving on.'
 
 
 class MentorAIView(FormView):
@@ -392,14 +403,13 @@ class MentorAIView(FormView):
         interaction.save()
         self.request.session['mentor_answer'] = interaction.answer
         self.request.session['mentor_question'] = interaction.question
-        messages.success(self.request, 'CoderGrid Mentor AI prepared a learning recommendation.')
+        messages.success(self.request, 'KodaGrid Mentor AI prepared a learning recommendation.')
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['mentor_answer'] = self.request.session.pop('mentor_answer', '')
         context['mentor_question'] = self.request.session.pop('mentor_question', '')
-        context['recent_interactions'] = MentorAIInteraction.objects.all()[:4]
         return context
 
 
@@ -506,7 +516,6 @@ class TechBoyView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         from gallery.models import GalleryImage
-        from django.db.models import Q
         boy_images = GalleryImage.objects.exclude(image='').exclude(image__isnull=True).exclude(
             Q(detected_subject__icontains='girl') |
             Q(detected_subject__icontains='woman') |
@@ -516,12 +525,12 @@ class TechBoyView(TemplateView):
             boy_images = GalleryImage.objects.exclude(image='').exclude(image__isnull=True)[:12]
         context['boy_images'] = boy_images
         context['role_models'] = [
-            {'name': 'Linus Torvalds',   'role': 'Creator of Linux & Git',      'fact': 'Started Linux at age 21 in a college dorm room. Now powers 97% of the internet.'},
+            {'name': 'Linus Torvalds',   'role': 'Creator of Linux & Git',      'fact': 'Started Linux at age 21 as a university student. Linux now runs most of the world\'s servers.'},
             {'name': 'Elon Musk',        'role': 'Tesla, SpaceX, xAI Founder',  'fact': 'Taught himself programming at 9. Sold his first game at 12 for $500.'},
             {'name': 'Mark Zuckerberg',  'role': 'Meta Founder',                'fact': 'Built Facebook at 19 while studying at Harvard.'},
-            {'name': 'Karim Aboutaleb',  'role': 'African Tech Entrepreneur',   'fact': 'Built one of Africa\'s fastest-growing fintech platforms from Nairobi.'},
+            {'name': 'Iyinoluwa Aboyeji', 'role': 'African Tech Entrepreneur',  'fact': 'Co-founded Andela and Flutterwave, two of Africa\'s best-known tech companies.'},
             {'name': 'Andile Ngcaba',    'role': 'Africa Tech Pioneer',         'fact': 'Helped bring the internet to millions of Africans through infrastructure investment.'},
-            {'name': 'Turing (Alan)',    'role': 'Father of Computer Science',  'fact': 'Cracked Nazi codes in WWII and laid the foundations for all modern AI.'},
+            {'name': 'Alan Turing',      'role': 'Father of Computer Science',  'fact': 'Helped break Enigma codes in WWII and laid foundations for computing and AI.'},
         ]
         context['programs'] = [
             {'icon': 'file-earmark-code', 'title': 'Code Warriors',   'desc': 'Python, C++, and algorithms. Build games, automations, and command-line tools.',    'course_slug': 'python-programming'},
@@ -590,7 +599,6 @@ class AssessmentView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        from django.utils import timezone
         answers = {}
         score = 0
         strengths = []
@@ -782,17 +790,21 @@ class VideoCallView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         room_code = kwargs.get('room_code', 'general')
         classroom = Classroom.objects.filter(class_code__iexact=room_code, is_active=True).first()
-        private_room = ChatRoom.objects.filter(call_code=room_code, room_type='private', is_active=True).first()
+        # Class codes are short strings and call codes are UUIDs; filtering a UUIDField with a
+        # class code raises ValidationError, so only query private rooms for valid UUIDs.
+        private_room = None
+        try:
+            call_code = uuid.UUID(room_code)
+        except ValueError:
+            call_code = None
+        if call_code:
+            private_room = ChatRoom.objects.filter(call_code=call_code, room_type='private', is_active=True).first()
         if private_room and not private_room.participants.filter(pk=self.request.user.pk).exists():
-            from django.core.exceptions import PermissionDenied
             raise PermissionDenied
         if classroom and not (classroom.memberships.filter(student=self.request.user).exists()
-                              or self.request.user.is_staff or self.request.user.is_superuser
-                              or TrainerProfile.objects.filter(user=self.request.user, is_approved=True).exists()):
-            from django.core.exceptions import PermissionDenied
+                              or _chat_can_announce(self.request.user)):
             raise PermissionDenied
         if not classroom and not private_room:
-            from django.http import Http404
             raise Http404
         classroom_chat = None
         if classroom:
@@ -808,24 +820,67 @@ class VideoCallView(LoginRequiredMixin, TemplateView):
         context['classroom'] = classroom
         context['chat_room_id'] = private_room.pk if private_room else (classroom_chat.pk if classroom_chat else '')
         context['chat_user_role'] = 'trainer' if _chat_can_announce(self.request.user) else 'student'
-        context['jitsi_room'] = f'CoderGrid-{private_room.call_code}' if private_room else f'CoderGrid-{classroom.class_code}'
-        context['back_url'] = self.request.META.get('HTTP_REFERER', '/accounts/profile/')
+        context['jitsi_room'] = f'KodaGrid-{private_room.call_code}' if private_room else f'KodaGrid-{classroom.class_code}'
+        back_url = self.request.META.get('HTTP_REFERER', '')
+        if not url_has_allowed_host_and_scheme(back_url, allowed_hosts={self.request.get_host()}):
+            back_url = reverse_lazy('accounts:profile')
+        context['back_url'] = back_url
         return context
 
 
+def weekly_leaderboard(limit=10):
+    """Rank players by the sum of their best score in each game over the last 7 days."""
+    since = timezone.now() - timedelta(days=7)
+    bests = (
+        GameScore.objects.filter(created_at__gte=since)
+        .values('user_id', 'game')
+        .annotate(best=Max('score'))
+    )
+    totals = {}
+    for row in bests:
+        totals[row['user_id']] = totals.get(row['user_id'], 0) + row['best']
+    ranked = sorted(totals.items(), key=lambda item: item[1], reverse=True)[:limit]
+    users = get_user_model().objects.in_bulk([user_id for user_id, _total in ranked])
+    badges = {1: '🥇', 2: '🥈', 3: '🥉'}
+    leaderboard = []
+    for rank, (user_id, total) in enumerate(ranked, start=1):
+        user = users.get(user_id)
+        if not user:
+            continue
+        # Show first name and last initial only; this page is public.
+        if user.first_name:
+            name = f'{user.first_name} {user.last_name[:1]}.' if user.last_name else user.first_name
+        else:
+            name = user.username
+        leaderboard.append({'rank': rank, 'name': name, 'score': total, 'badge': badges.get(rank, '⭐')})
+    return leaderboard
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class GamesView(TemplateView):
     template_name = 'academy/games.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['leaderboard'] = [
-            {'rank': 1, 'name': 'Amara O.',   'score': 2840, 'badge': '🥇'},
-            {'rank': 2, 'name': 'Brian M.',   'score': 2410, 'badge': '🥈'},
-            {'rank': 3, 'name': 'Grace N.',   'score': 1980, 'badge': '🥉'},
-            {'rank': 4, 'name': 'Kofi A.',    'score': 1750, 'badge': '⭐'},
-            {'rank': 5, 'name': 'Zara K.',    'score': 1620, 'badge': '⭐'},
-        ]
+        context['leaderboard'] = weekly_leaderboard()
         return context
+
+
+@login_required
+@require_http_methods(['POST'])
+def game_score_api(request):
+    try:
+        payload = json.loads(request.body or '{}')
+        game = str(payload.get('game', ''))
+        score = int(payload.get('score'))
+    except (TypeError, ValueError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Invalid score.'}, status=400)
+    max_score = GameScore.MAX_SCORES.get(game)
+    if max_score is None or not 0 <= score <= max_score:
+        return JsonResponse({'error': 'Invalid score.'}, status=400)
+    if score:
+        GameScore.objects.create(user=request.user, game=game, score=score)
+    return JsonResponse({'saved': bool(score)}, status=201)
 
 
 class LiveChatView(LoginRequiredMixin, TemplateView):
@@ -862,7 +917,7 @@ def chat_api(request):
                 peer = room.participants.exclude(pk=request.user.pk).first()
                 if peer:
                     conversations.append({'id': room.pk, 'name': peer.get_full_name() or peer.username, 'user_id': peer.pk, 'type': 'private'})
-            User = type(request.user)
+            User = get_user_model()
             query = request.GET.get('q', '').strip()[:80]
             users = User.objects.filter(is_active=True).exclude(pk=request.user.pk)
             if query:
@@ -898,7 +953,7 @@ def chat_api(request):
     action = payload.get('action')
     if action == 'start':
         try:
-            peer = get_object_or_404(type(request.user), pk=int(payload.get('user_id')))
+            peer = get_object_or_404(get_user_model(), pk=int(payload.get('user_id')))
         except (TypeError, ValueError):
             return JsonResponse({'error': 'Choose a valid account.'}, status=400)
         if peer.pk == request.user.pk or not peer.is_active:

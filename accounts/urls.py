@@ -1,17 +1,24 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
-from .forms import AccountPasswordResetForm
-from .views import ProfileView, RegisterView, firebase_session
+from .forms import AccountPasswordResetForm, StudentAuthenticationForm
+from .views import ProfileView, RegisterView
 
 app_name = 'accounts'
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
+    path(
+        'login/',
+        auth_views.LoginView.as_view(
+            authentication_form=StudentAuthenticationForm,
+            template_name='accounts/login.html',
+            redirect_authenticated_user=True,
+        ),
+        name='login',
+    ),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
-    path('firebase/session/', firebase_session, name='firebase_session'),
     path(
         'password-reset/',
         auth_views.PasswordResetView.as_view(

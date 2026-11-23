@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ event.title }} | CoderGrid{% endblock %}
+{% block title %}{{ event.title }} | KodaGrid{% endblock %}
+
+{% block meta_description %}{{ event.description|truncatechars:155 }}{% endblock %}
 
 {% block content %}
 <section class="page-hero detail-hero">
@@ -27,11 +29,16 @@
         </article>
 
         <aside class="side-panel">
-            <h2>Register for this event</h2>
-            <form method="post" class="stacked-form">
-                {% include 'includes/form_fields.html' %}
-                <button class="btn btn-primary btn-full" type="submit">Submit Registration</button>
-            </form>
+            {% if registration_closed %}
+                <h2>Registration closed</h2>
+                <p>This event has already taken place. Browse our <a href="{% url 'events:list' %}">upcoming events</a> to find the next one.</p>
+            {% else %}
+                <h2>Register for this event</h2>
+                <form method="post" class="stacked-form">
+                    {% include 'includes/form_fields.html' %}
+                    <button class="btn btn-primary btn-full" type="submit">Submit Registration</button>
+                </form>
+            {% endif %}
         </aside>
     </div>
 </section>

@@ -5,12 +5,20 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from accounts.models import Student
+
 from .models import Assignment, AttendanceRecord, ClassMembership, Classroom, LearningPath, Submission, TrainerProfile
 
 
 class ClassroomWorkflowTests(TestCase):
     def setUp(self):
         self.student = User.objects.create_user(username='denzel', password='pass12345')
+        Student.objects.create(
+            user=self.student,
+            name='Denzel Student',
+            email='denzel@example.test',
+            approval_status=Student.ApprovalStatus.APPROVED,
+        )
         self.staff = User.objects.create_user(username='admin', password='pass12345', is_staff=True)
         self.path = LearningPath.objects.create(
             title='Python Workflow Test',

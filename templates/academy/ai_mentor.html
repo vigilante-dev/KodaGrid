@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}CoderGrid Mentor AI | CoderGrid{% endblock %}
+{% block title %}KodaGrid Mentor AI | KodaGrid{% endblock %}
 
 {% block content %}
 <section class="page-hero">
     <div class="container">
-        <p class="eyebrow">CoderGrid Mentor AI</p>
+        <p class="eyebrow">KodaGrid Mentor AI</p>
         <h1>Ask for coding help, project ideas, and learning direction.</h1>
         <p>This built-in mentor gives structured guidance for beginners, students, and career switchers.</p>
     </div>
@@ -30,6 +30,7 @@
                 <h2>What should I build after learning Python?</h2>
                 <p>Mentor AI responds with practical next steps, portfolio ideas, and learning paths.</p>
             {% endif %}
+            <p style="margin-top:16px;">Need one-on-one help? <a href="{% url 'academy:trainers' %}">Book a session with a trainer</a>.</p>
         </aside>
     </div>
 </section>

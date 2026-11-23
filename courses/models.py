@@ -37,6 +37,7 @@ class Course(models.Model):
     title = models.CharField(max_length=180)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     description = models.TextField()
+    notes = models.TextField(blank=True, help_text='Course notes shown on the public course page.')
     learning_outcomes = models.TextField(blank=True)
     duration = models.CharField(max_length=80)
     category = models.CharField(max_length=60, choices=CATEGORY_CHOICES)

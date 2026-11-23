@@ -1,4 +1,7 @@
 from django.db.models import Count, Q
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 from django.views.generic import DetailView, ListView
 
 from academy.models import LearningPath
@@ -45,6 +48,15 @@ class CourseDetailView(DetailView):
     template_name = 'courses/course_detail.html'
     context_object_name = 'course'
 
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_staff:
+            raise PermissionDenied
+        self.object = self.get_object()
+        self.object.notes = request.POST.get('notes', '')
+        self.object.save(update_fields=['notes', 'updated_at'])
+        messages.success(request, 'Course notes saved.')
+        return redirect(self.object.get_absolute_url() + '#course-notes')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         from academy.models import LearningPath
@@ -60,6 +72,7 @@ class CourseDetailView(DetailView):
                 if path:
                     break
         context['learning_path'] = path
+        context['can_edit_course_notes'] = self.request.user.is_authenticated and self.request.user.is_staff
         return context
 
 # Create your views here.

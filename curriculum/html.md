@@ -18,7 +18,7 @@ stages:
 references:
   - https://html.spec.whatwg.org/multipage/
   - https://www.w3.org/WAI/fundamentals/accessibility-intro/
-originality: Original CoderGrid instructional content; references identify authoritative standards.
+originality: Original KodaGrid instructional content; references identify authoritative standards.
 ---
 
 # HTML · Structure for the Web

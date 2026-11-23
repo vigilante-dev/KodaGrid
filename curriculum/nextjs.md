@@ -18,7 +18,7 @@ stages:
 references:
   - https://nextjs.org/docs
   - https://react.dev/learn
-originality: Original CoderGrid instructional content; references identify official documentation.
+originality: Original KodaGrid instructional content; references identify official documentation.
 ---
 
 # Next.js · Full-Stack React Applications

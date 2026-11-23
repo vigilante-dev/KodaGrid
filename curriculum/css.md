@@ -18,7 +18,7 @@ stages:
 references:
   - https://www.w3.org/TR/css/
   - https://www.w3.org/WAI/WCAG22/Understanding/
-originality: Original CoderGrid instructional content; references identify authoritative standards.
+originality: Original KodaGrid instructional content; references identify authoritative standards.
 ---
 
 # CSS · Layout and Visual Design

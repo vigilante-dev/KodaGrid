@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Page not found | KodaGrid{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">Error 404</p>
+        <h1>We couldn't find that page.</h1>
+        <p>The link may be out of date, or the page may have moved. Try one of these instead.</p>
+        <p style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+            <a class="btn btn-primary" href="{% url 'core:home' %}">Go to the homepage</a>
+            <a class="btn btn-ghost" href="{% url 'academy:learning_paths' %}">Browse learning paths</a>
+            <a class="btn btn-ghost" href="{% url 'contact:contact' %}">Contact us</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

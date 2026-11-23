@@ -18,7 +18,7 @@ stages:
 references:
   - https://tc39.es/ecma262/
   - https://developer.mozilla.org/en-US/docs/Web/JavaScript
-originality: Original CoderGrid instructional content; references identify authoritative standards.
+originality: Original KodaGrid instructional content; references identify authoritative standards.
 ---
 
 # JavaScript · Logic and Interaction

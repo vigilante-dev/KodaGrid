@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Try it Yourself — CoderGrid</title>
+    <title>Try it Yourself — KodaGrid</title>
     {% load static %}
-    <link rel="icon" type="image/svg+xml" href="{% static 'img/brand/codergrid-favicon.svg' %}">
+    <link rel="icon" type="image/png" href="{% static 'img/brand/kodagrid-favicon-light.png' %}">
     <link rel="stylesheet" href="{% static 'css/tryit.css' %}">
 </head>
 <body class="tryit-page">
@@ -13,7 +13,7 @@
 <header class="tryit-header">
     <div class="tryit-logo">
         <span class="tryit-logo-mark">CS</span>
-        <span>CoderGrid</span>
+        <span>KodaGrid</span>
         <span class="tryit-divider">|</span>
         <span id="tryit-lang-label">HTML Editor</span>
     </div>
@@ -103,7 +103,7 @@
 </head>
 <body>
     <div class="card">
-        <h1>Hello, CoderGrid! 🚀</h1>
+        <h1>Hello, KodaGrid! 🚀</h1>
         <p>Edit this code and click <strong>Run</strong> to see the result.</p>
         <button class="btn" onclick="this.textContent='You clicked it!'">
             Click Me
@@ -112,11 +112,11 @@
 </body>
 </html>`,
 
-        python: `# CoderGrid Python Editor
+        python: `# KodaGrid Python Editor
 # Click Run to execute your Python code
 
 def greet(name):
-    return f"Hello, {name}! Welcome to CoderGrid."
+    return f"Hello, {name}! Welcome to KodaGrid."
 
 students = ["Amara", "Brian", "Grace", "Kofi"]
 
@@ -131,7 +131,7 @@ print(f"\\nSum of 1 to 10 = {total}")
 squares = [x**2 for x in range(1, 6)]
 print(f"Squares: {squares}")`,
 
-        javascript: `// CoderGrid JavaScript Editor
+        javascript: `// KodaGrid JavaScript Editor
 // Click Run to execute
 
 const students = [
@@ -154,7 +154,7 @@ console.log(\`\\nTop student: \${top.name} (\${top.score}%)\`);
 const aStudents = students.filter(s => s.score >= 90);
 console.log(\`A students: \${aStudents.map(s => s.name).join(", ")}\`);`,
 
-        css: `/* CoderGrid CSS Editor */
+        css: `/* KodaGrid CSS Editor */
 /* Edit the CSS and click Run to see the styled preview */
 
 body {
@@ -198,7 +198,7 @@ body {
     margin-top: 16px;
 }`,
 
-        sql: `-- CoderGrid SQL Editor
+        sql: `-- KodaGrid SQL Editor
 -- This shows SQL syntax. Connect to a real DB to run it.
 
 -- Create a students table
