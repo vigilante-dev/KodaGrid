@@ -38,6 +38,63 @@
             <h2>Requirements</h2>
             {{ course.requirements|default:"No previous experience is required. Curiosity and commitment are enough to begin."|linebreaks }}
 
+            {# ── CLASSROOM SYLLABUS (sections & topics managed in the admin) ── #}
+            {% if sections or is_teacher %}
+            <section id="syllabus" class="cd-lessons-section">
+                <div class="syl-head">
+                    <h2 style="margin:0;">Course Syllabus</h2>
+                    {% if sections %}
+                    <span class="syl-meta">{{ sections|length }} section{{ sections|length|pluralize }} · {{ topic_total }} topic{{ topic_total|pluralize }}{% if hours_total %} · about {{ hours_total }} hour{{ hours_total|pluralize }} of class time{% endif %}</span>
+                    {% endif %}
+                </div>
+                {% if is_teacher %}
+                <p class="syl-teacher-bar">
+                    You're seeing drafts and trainer notes because you teach this course.
+                    {% if user.is_staff %}<a href="{% url 'admin:courses_course_change' course.pk %}">Edit sections &amp; topics in the admin</a>{% endif %}
+                </p>
+                {% endif %}
+                {% for section in sections %}
+                <details class="syl-section" {% if forloop.first %}open{% endif %}>
+                    <summary>
+                        <span class="syl-section-label">{% if section.week_label %}{{ section.week_label }}{% else %}Section {{ forloop.counter }}{% endif %}</span>
+                        <strong>{{ section.title }}</strong>
+                        {% if not section.is_published %}<span class="syl-draft">Draft</span>{% endif %}
+                        <span class="syl-count">{{ section.topics.all|length }} topic{{ section.topics.all|length|pluralize }}</span>
+                    </summary>
+                    <div class="syl-section-body">
+                        {% if section.overview %}<p>{{ section.overview }}</p>{% endif %}
+                        {% if section.objective_list %}
+                        <p class="syl-subhead">By the end of this section you will:</p>
+                        <ul class="check-list">{% for objective in section.objective_list %}<li>{{ objective }}</li>{% endfor %}</ul>
+                        {% endif %}
+                        <div class="cd-lesson-list">
+                            {% for topic in section.topics.all %}
+                            <a class="cd-lesson-row" href="{{ topic.get_absolute_url }}">
+                                <span class="cd-lesson-num">{{ forloop.counter }}</span>
+                                <div class="cd-lesson-info">
+                                    <strong>{{ topic.title }}{% if not topic.is_published %} <span class="syl-draft">Draft</span>{% endif %}</strong>
+                                    {% if topic.summary %}<span class="cd-lesson-meta">{{ topic.summary }}</span>{% endif %}
+                                    <span class="cd-lesson-meta">
+                                        {{ topic.get_session_format_display }} · {{ topic.duration_minutes }} min
+                                        {% if topic.notes %} · Notes{% endif %}
+                                        {% if topic.in_class_activity %} · Activity{% endif %}
+                                        {% if topic.homework %} · Homework{% endif %}
+                                    </span>
+                                </div>
+                                <span class="cd-lesson-arrow" aria-hidden="true">›</span>
+                            </a>
+                            {% empty %}
+                            <p class="empty-state">Topics for this section are coming soon.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </details>
+                {% empty %}
+                <p class="empty-state">No sections yet. Add sections and topics to this course in the admin to build the classroom syllabus.</p>
+                {% endfor %}
+            </section>
+            {% endif %}
+
             <section id="course-notes" class="cd-lessons-section">
                 <h2 style="display:flex;align-items:center;gap:10px;margin-top:40px;">
                     <i class="bi bi-journal-text" style="color:var(--accent);"></i>
@@ -166,5 +223,18 @@
 .cd-lesson-meta i { font-size: .82rem; }
 .cd-lesson-arrow { color: var(--muted); font-size: .85rem; flex-shrink: 0; transition: color 150ms; }
 .cd-lesson-row:hover .cd-lesson-arrow { color: var(--accent); }
+.syl-head { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 16px; margin:24px 0 12px; }
+.syl-meta { color: var(--muted); font-size: .9rem; }
+.syl-teacher-bar { font-size: .88rem; padding: 10px 14px; border-radius: var(--radius-lg); border: 1px dashed var(--accent); color: var(--muted); }
+.syl-section { border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 12px; background: var(--surface); }
+.syl-section > summary { cursor: pointer; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; list-style: none; }
+.syl-section > summary::-webkit-details-marker { display: none; }
+.syl-section > summary::before { content: "▸"; color: var(--accent); transition: transform 150ms; }
+.syl-section[open] > summary::before { transform: rotate(90deg); }
+.syl-section-label { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+.syl-count { margin-left: auto; font-size: .8rem; color: var(--muted); }
+.syl-section-body { padding: 0 16px 16px; }
+.syl-subhead { font-weight: 700; margin: 12px 0 6px; }
+.syl-draft { font-size: .7rem; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--surface-soft); color: var(--muted); border: 1px solid var(--border); }
 </style>
 {% endblock %}

@@ -200,7 +200,7 @@ class ClassroomHubView(LoginRequiredMixin, TemplateView):
         return _chat_can_announce(self.request.user)
 
     def get_user_classrooms(self):
-        queryset = Classroom.objects.filter(is_active=True).select_related('trainer', 'learning_path')
+        queryset = Classroom.objects.filter(is_active=True).select_related('trainer', 'learning_path', 'course')
         if self.request.user.is_staff or self.request.user.is_superuser:
             return queryset
         return queryset.filter(memberships__student=self.request.user).distinct()

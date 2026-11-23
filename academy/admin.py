@@ -99,8 +99,9 @@ class ChatRoomInline(admin.TabularInline):
 
 @admin.register(Classroom)
 class ClassroomAdmin(admin.ModelAdmin):
-    list_display = ('name', 'class_code', 'trainer', 'learning_path', 'start_date', 'is_active')
-    list_filter = ('is_active', 'start_date')
+    list_display = ('name', 'class_code', 'trainer', 'course', 'learning_path', 'start_date', 'is_active')
+    list_filter = ('is_active', 'start_date', 'course')
+    autocomplete_fields = ('course',)
     search_fields = ('name', 'class_code', 'description')
     inlines = [AssignmentInline, MaterialInline, AnnouncementInline, LiveSessionInline, ChatRoomInline]
 

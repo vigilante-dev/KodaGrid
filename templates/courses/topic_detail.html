@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ topic.title }} · {{ course.title }} | KodaGrid{% endblock %}
+{% block meta_description %}{{ topic.summary|default:topic.notes|truncatechars:155 }}{% endblock %}
+
+{% block content %}
+<section class="page-hero detail-hero">
+    <div class="container">
+        <p class="eyebrow">
+            <a href="{{ course.get_absolute_url }}#syllabus" style="color:inherit;">{{ course.title }}</a>
+            · {% if topic.section.week_label %}{{ topic.section.week_label }}: {% endif %}{{ topic.section.title }}
+        </p>
+        <h1>{{ topic.title }}</h1>
+        {% if topic.summary %}<p>{{ topic.summary }}</p>{% endif %}
+        <p class="topic-badges">
+            <span class="tag">{{ topic.get_session_format_display }}</span>
+            <span class="tag">{{ topic.duration_minutes }} min</span>
+            <span class="tag">Topic {{ topic_number }} of {{ topic_total }}</span>
+            {% if not topic.is_published or not topic.section.is_published %}<span class="tag">Draft</span>{% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        <article class="rich-text topic-body">
+            {% if is_teacher and topic.trainer_notes %}
+            <aside class="topic-trainer" aria-label="Trainer notes">
+                <p class="topic-block-label">Trainer notes · only visible to trainers and staff</p>
+                {{ topic.trainer_notes|urlize|linebreaks }}
+            </aside>
+            {% endif %}
+
+            <h2>Notes</h2>
+            {% if topic.notes %}
+                {{ topic.notes|urlize|linebreaks }}
+            {% else %}
+                <p class="empty-state">Notes for this topic will appear here once your trainer adds them.</p>
+            {% endif %}
+
+            {% if topic.in_class_activity %}
+            <div class="topic-block">
+                <p class="topic-block-label">In class</p>
+                <h2>Class activity</h2>
+                {{ topic.in_class_activity|urlize|linebreaks }}
+            </div>
+            {% endif %}
+
+            {% if topic.question_list %}
+            <div class="topic-block">
+                <p class="topic-block-label">Talk it through</p>
+                <h2>Discussion questions</h2>
+                <ol>{% for question in topic.question_list %}<li>{{ question }}</li>{% endfor %}</ol>
+            </div>
+            {% endif %}
+
+            {% if topic.homework %}
+            <div class="topic-block">
+                <p class="topic-block-label">After class</p>
+                <h2>Homework</h2>
+                {{ topic.homework|urlize|linebreaks }}
+            </div>
+            {% endif %}
+
+            {% if topic.resource_list or topic.attachment %}
+            <div class="topic-block">
+                <h2>Resources</h2>
+                <ul>
+                    {% for link in topic.resource_list %}
+                    <li><a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.title }}</a></li>
+                    {% endfor %}
+                    {% if topic.attachment %}
+                    <li>
+                        {% if user.is_authenticated %}
+                            <a href="{{ topic.attachment.url }}">Download handout</a>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in</a> to download the handout.
+                        {% endif %}
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <nav class="topic-nav" aria-label="Topic navigation">
+                {% if prev_topic %}<a class="btn btn-ghost" href="{{ prev_topic.get_absolute_url }}">‹ {{ prev_topic.title }}</a>{% else %}<span></span>{% endif %}
+                {% if next_topic %}<a class="btn btn-primary" href="{{ next_topic.get_absolute_url }}">{{ next_topic.title }} ›</a>{% endif %}
+            </nav>
+        </article>
+
+        <aside class="side-panel topic-outline" aria-label="Course syllabus">
+            <h2>Syllabus</h2>
+            {% for section in sections %}
+                <p class="topic-outline-section">{% if section.week_label %}{{ section.week_label }}: {% endif %}{{ section.title }}</p>
+                <ol class="topic-outline-list">
+                    {% for item in section.topics.all %}
+                    <li{% if item.pk == topic.pk %} class="is-current" aria-current="page"{% endif %}>
+                        <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            {% endfor %}
+            <button class="btn btn-ghost btn-full" type="button" onclick="window.print()" style="margin-top:14px;">Print notes</button>
+            {% if user.is_staff %}
+            <a class="btn btn-ghost btn-full" style="margin-top:8px;" href="{% url 'admin:courses_coursetopic_change' topic.pk %}">Edit this topic</a>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
+<style>
+.topic-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.topic-block { border-top: 1px solid var(--border); margin-top: 28px; padding-top: 8px; }
+.topic-block-label { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin: 12px 0 0; }
+.topic-trainer { border: 1px dashed var(--accent); border-radius: var(--radius-lg); padding: 4px 18px 10px; margin-bottom: 24px; background: var(--surface-soft); }
+.topic-nav { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin-top: 36px; border-top: 1px solid var(--border); padding-top: 20px; }
+.topic-outline-section { font-weight: 800; font-size: .85rem; margin: 14px 0 6px; }
+.topic-outline-list { margin: 0; padding-left: 20px; font-size: .9rem; }
+.topic-outline-list li { margin: 4px 0; }
+.topic-outline-list li.is-current a { font-weight: 800; color: var(--accent); }
+@media print {
+    .site-header, .site-footer, .topic-outline, .topic-nav, .messages, .skip-link, .page-loader { display: none !important; }
+    .detail-layout { display: block; }
+    .page-hero { padding: 0; background: none; color: #000; }
+    .page-hero * { color: #000 !important; }
+}
+</style>
+{% endblock %}

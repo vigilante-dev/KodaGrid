@@ -67,4 +67,92 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
-# Create your models here.
+
+def _lines(text):
+    return [line.strip() for line in (text or '').splitlines() if line.strip()]
+
+
+class CourseSection(models.Model):
+    """A unit of a course, e.g. "Week 1: Python Basics", made up of classroom topics."""
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sections')
+    title = models.CharField(max_length=180)
+    week_label = models.CharField(
+        max_length=60, blank=True,
+        help_text='Optional label shown before the title, e.g. "Week 1" or "Module 2".',
+    )
+    order = models.PositiveIntegerField(default=1)
+    overview = models.TextField(blank=True, help_text='What this section covers and why it matters.')
+    learning_objectives = models.TextField(blank=True, help_text='One objective per line.')
+    is_published = models.BooleanField(default=True, help_text='Untick to keep this section as a draft.')
+
+    class Meta:
+        ordering = ['course', 'order', 'id']
+
+    def __str__(self):
+        label = f'{self.week_label}: ' if self.week_label else ''
+        return f'{self.course.title} — {label}{self.title}'
+
+    def objective_list(self):
+        return _lines(self.learning_objectives)
+
+
+class CourseTopic(models.Model):
+    """One classroom session within a section: notes, activity, discussion, and homework."""
+
+    FORMAT_CHOICES = [
+        ('lecture', 'Lecture'),
+        ('workshop', 'Hands-on workshop'),
+        ('lab', 'Coding lab'),
+        ('discussion', 'Group discussion'),
+        ('project', 'Project work'),
+        ('assessment', 'Assessment'),
+        ('self-study', 'Self-study'),
+    ]
+
+    section = models.ForeignKey(CourseSection, on_delete=models.CASCADE, related_name='topics')
+    title = models.CharField(max_length=180)
+    order = models.PositiveIntegerField(default=1)
+    session_format = models.CharField(max_length=20, choices=FORMAT_CHOICES, default='lecture')
+    duration_minutes = models.PositiveIntegerField(default=60)
+    summary = models.CharField(max_length=300, blank=True, help_text='One-line summary shown in the syllabus.')
+    notes = models.TextField(blank=True, help_text='Topic notes for students. Links are made clickable.')
+    in_class_activity = models.TextField(blank=True, help_text='What students do together during the session.')
+    discussion_questions = models.TextField(blank=True, help_text='One question per line.')
+    homework = models.TextField(blank=True)
+    resources = models.TextField(
+        blank=True,
+        help_text='One link per line. Use "Title | https://example.com" or just the URL.',
+    )
+    attachment = models.FileField(
+        upload_to='materials/course-topics/', blank=True, null=True,
+        help_text='Slides or handouts. Downloadable by signed-in users.',
+    )
+    trainer_notes = models.TextField(
+        blank=True,
+        help_text='Private teaching notes: timing, common mistakes, answers. Only staff and approved trainers see these.',
+    )
+    is_published = models.BooleanField(default=True, help_text='Untick to keep this topic as a draft.')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['section', 'order', 'id']
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('courses:topic', kwargs={'slug': self.section.course.slug, 'pk': self.pk})
+
+    def question_list(self):
+        return _lines(self.discussion_questions)
+
+    def resource_list(self):
+        links = []
+        for line in _lines(self.resources):
+            title, _sep, url = line.rpartition('|')
+            url = url.strip()
+            if url.startswith(('https://', 'http://')):
+                links.append({'title': title.strip() or url, 'url': url})
+        return links
+

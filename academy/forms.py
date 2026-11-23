@@ -26,7 +26,7 @@ class JoinClassForm(forms.Form):
 class CreateClassroomForm(forms.ModelForm):
     class Meta:
         model = Classroom
-        fields = ('name', 'learning_path', 'description', 'meeting_link', 'start_date')
+        fields = ('name', 'course', 'learning_path', 'description', 'meeting_link', 'start_date')
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'description': forms.Textarea(attrs={'rows': 4}),

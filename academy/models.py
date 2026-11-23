@@ -164,6 +164,10 @@ class Classroom(models.Model):
     class_code = models.CharField(max_length=12, unique=True, default=generate_class_code)
     trainer = models.ForeignKey(TrainerProfile, on_delete=models.SET_NULL, blank=True, null=True, related_name='classrooms')
     learning_path = models.ForeignKey(LearningPath, on_delete=models.SET_NULL, blank=True, null=True, related_name='classrooms')
+    course = models.ForeignKey(
+        'courses.Course', on_delete=models.SET_NULL, blank=True, null=True, related_name='classrooms',
+        help_text='Course whose syllabus (sections and topics) this class follows.',
+    )
     description = models.TextField()
     meeting_link = models.URLField(blank=True)
     start_date = models.DateField(default=timezone.now)

@@ -86,7 +86,9 @@
                                 </div>
                                 <span class="classroom-code-badge">{{ classroom.class_code }}</span>
                             </div>
-                            {% if classroom.learning_path %}
+                            {% if classroom.course %}
+                            <p style="font-size:.9rem;margin:10px 0 0;"><a href="{{ classroom.course.get_absolute_url }}#syllabus">{{ classroom.course.title }} · class syllabus</a></p>
+                            {% elif classroom.learning_path %}
                             <p style="color:var(--muted);font-size:.9rem;margin:10px 0 0;">{{ classroom.learning_path.title }}</p>
                             {% endif %}
                             <div class="classroom-card-actions">
